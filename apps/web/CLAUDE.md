@@ -4,6 +4,22 @@ React Router v7 in **framework mode** (SSR) with **Mantine** UI. In production t
 app is not served by Vite: `apps/api` serves the build output and the SSR request
 handler from one Node process.
 
+**What to build lives in [`docs/DEVELOPMENT_PLAN.md`](../../docs/DEVELOPMENT_PLAN.md)**
+(the single source of truth; see the root `CLAUDE.md`). For frontend work, the
+relevant sections are:
+- §3, the UI/UX design:
+  - principles and navigation;
+  - the page inventory with routes and access levels (§3.3);
+  - user journeys J1–J9 (§3.4);
+  - feedback and system states (§3.5);
+  - the mastery model (§3.6).
+- §1.3, the lesson Markdown blocks the reader renders.
+- §2.5, the practice screen behaviour: step feedback, the tolerance shown to the
+  student, hints, `<NumericKeypad>`, session length.
+
+New routes and pages must match §3.3. If a page needs to differ from the plan,
+update the plan in the same PR.
+
 ## Layout
 
 ```

@@ -4,6 +4,23 @@ Node.js + **Fastify**, **better-auth** for sessions, **Drizzle** for PostgreSQL.
 In production this process also serves the frontend: the API is mounted under
 `/api/*` and the React Router SSR handler answers everything else.
 
+**What to build lives in [`docs/DEVELOPMENT_PLAN.md`](../../docs/DEVELOPMENT_PLAN.md)**
+(the single source of truth; see the root `CLAUDE.md`). For backend work, the
+relevant sections are:
+- §2.6, data model changes: practice sessions and attempts, lesson reads, topic
+  progress, reference tables, problem reports.
+- §2.3, the reference-data process: versioned tables with a source and an
+  `unverified` → `verified` status. Only teachers verify, and students only get
+  verified data.
+- §2.5, practice checking: the server regenerates the task from
+  `templateId + templateVersion + seed` and re-checks every step. The client's
+  verdict is never trusted.
+- §2.7, the task-text tables that are prepared for review.
+- §3.3, access levels per page. Each must be enforced by the matching API route.
+
+Schema changes should follow §2.6. If they need to differ, update the plan in the
+same PR.
+
 ## Layout
 
 ```

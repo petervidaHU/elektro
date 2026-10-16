@@ -1,5 +1,11 @@
 # Development plan: syllabus, calculations, UX
 
+> **This document is the single source of truth for scope, design and business
+> decisions.** The `CLAUDE.md` files hold the durable engineering rules and link
+> here. When a decision changes, update the *Decisions* table below (and §5) in the
+> same PR, and update `CLAUDE.md` if a rule is affected. Never leave the two
+> contradicting each other.
+
 Status: **draft v2** (2026-10-16). This plan builds on the foundation that already
 exists: auth and roles, i18n, lesson approval, the voltage-drop engine and
 calculator, and the `topic_progress` / `practice_attempts` tables. It covers three
@@ -667,7 +673,9 @@ All under `/:locale`. 🔓 = public, 👤 = student+, 🎓 = teacher+, 🛠 = ad
 ## 4. Delivery order
 
 Each line is one or a few small PRs. The **milestone-1 path** comes first, and the
-broadening follows.
+broadening follows. Status and the acceptance test of each milestone are tracked in
+[`ROADMAP.md`](ROADMAP.md). The definition of done is in `CLAUDE.md`. M1a also
+adds Playwright for the acceptance tests.
 
 | Phase | Contents | Done when |
 | --- | --- | --- |
