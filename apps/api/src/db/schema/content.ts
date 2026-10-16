@@ -23,10 +23,12 @@ export const lessons = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     topicId: text("topic_id", { enum: TOPIC_IDS }).notNull(),
     slug: text("slug").notNull().unique(),
+    /** Order of the lesson within its topic (ascending); topics follow the syllabus. */
+    position: integer("position").notNull().default(0),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [index("lessons_topic_id_idx").on(table.topicId)],
+  (table) => [index("lessons_topic_id_position_idx").on(table.topicId, table.position)],
 );
 
 /**

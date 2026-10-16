@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { CONTENT_ACTIONS } from "../content/status.js";
 import { LOCALES } from "../locales.js";
-import { TOPIC_IDS } from "../topics.js";
+import { TOPIC_IDS } from "../syllabus/topics.js";
 
 export const localeSchema = z.enum(LOCALES);
 export const topicIdSchema = z.enum(TOPIC_IDS);
@@ -17,6 +17,8 @@ export const slugSchema = z
 export const createLessonSchema = z.object({
   topicId: topicIdSchema,
   slug: slugSchema,
+  /** Order of the lesson within its topic (ascending). */
+  position: z.number().int().min(0).max(10_000).default(0),
 });
 
 /**

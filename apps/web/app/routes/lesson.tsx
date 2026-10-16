@@ -2,6 +2,7 @@ import { Badge, Group, Stack, Text, Title, Typography } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { useLoaderData } from "react-router";
 import type { ContentStatus, TopicId } from "@elektro/shared";
+import type { BreadcrumbHandle } from "../components/app-shell/breadcrumbs";
 import { apiFetch } from "../lib/api";
 import type { Route } from "./+types/lesson";
 
@@ -27,6 +28,13 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
   return { lesson: data.lesson };
 }
+
+export const handle: BreadcrumbHandle = {
+  breadcrumbs: (data) => [
+    { labelKey: "nav.lessons", path: "lessons" },
+    { label: (data as Awaited<ReturnType<typeof loader>> | undefined)?.lesson.title ?? "" },
+  ],
+};
 
 export default function LessonDetail() {
   const { lesson } = useLoaderData<typeof loader>();

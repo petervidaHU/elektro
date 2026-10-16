@@ -1,3 +1,5 @@
+import type { CalcResult } from "./types.js";
+
 /**
  * Voltage drop (feszültségesés) on a cable run.
  *
@@ -74,7 +76,15 @@ function requirePositive(value: number, field: string): number {
   return value;
 }
 
-export function calculateVoltageDrop(input: VoltageDropInput): VoltageDropResult {
+/**
+ * Returns the drop plus the steps a student works through:
+ *
+ *     b  -> R = rho * L / S  -> dU = b * R * I * cos(phi)  -> dU% = dU / Un * 100
+ *
+ * which is the Annex G formula above, split at the conductor resistance R of
+ * one conductor.
+ */
+export function calculateVoltageDrop(input: VoltageDropInput): CalcResult<VoltageDropResult> {
   const current = requirePositive(input.current_A, "current_A");
   const length = requirePositive(input.length_m, "length_m");
   const crossSection = requirePositive(input.crossSection_mm2, "crossSection_mm2");
@@ -94,13 +104,34 @@ export function calculateVoltageDrop(input: VoltageDropInput): VoltageDropResult
     throw new CalculationInputError("system");
   }
 
-  const voltageDrop_V =
-    phaseFactor * resistivity * (length / crossSection) * current * powerFactor;
+  const conductorResistance_ohm = (resistivity * length) / crossSection;
+  const voltageDrop_V = phaseFactor * conductorResistance_ohm * current * powerFactor;
+  const voltageDropPercent = (voltageDrop_V / nominalVoltage) * 100;
 
   return {
-    voltageDrop_V,
-    voltageDropPercent: (voltageDrop_V / nominalVoltage) * 100,
-    phaseFactor,
+    result: { voltageDrop_V, voltageDropPercent, phaseFactor },
+    steps: [
+      {
+        id: "phase-factor",
+        value: phaseFactor,
+        unit: "dimensionless",
+        formulaId:
+          input.system === "three-phase" ? "phase-factor-three-phase" : "phase-factor-single-phase",
+      },
+      {
+        id: "conductor-resistance",
+        value: conductorResistance_ohm,
+        unit: "ohm",
+        formulaId: "conductor-resistance",
+      },
+      { id: "voltage-drop", value: voltageDrop_V, unit: "volt", formulaId: "voltage-drop" },
+      {
+        id: "voltage-drop-percent",
+        value: voltageDropPercent,
+        unit: "percent",
+        formulaId: "voltage-drop-percent",
+      },
+    ],
   };
 }
 
@@ -128,7 +159,7 @@ export function requiredCrossSectionForLimit(
   limitPercent: number,
 ): number {
   const limit = requirePositive(limitPercent, "limitPercent");
-  const unit = calculateVoltageDrop({ ...input, crossSection_mm2: 1 });
+  const { result: unit } = calculateVoltageDrop({ ...input, crossSection_mm2: 1 });
 
   // dU% is inversely proportional to S, so S_min = dU%(S = 1 mm2) / limit%.
   return unit.voltageDropPercent / limit;

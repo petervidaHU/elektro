@@ -3,6 +3,7 @@ import { and, desc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import {
   applyContentAction,
+  compareTopics,
   contentActionSchema,
   createLessonSchema,
   ERROR_CODES,
@@ -47,6 +48,7 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
       .select({
         slug: lessons.slug,
         topicId: lessons.topicId,
+        position: lessons.position,
         version: lessonVersions.version,
         title: lessonTranslations.title,
         summary: lessonTranslations.summary,
@@ -72,6 +74,14 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
       seen.add(row.slug);
       return true;
     });
+
+    // Syllabus order: topics as in the shared syllabus, lessons by position.
+    visible.sort(
+      (a, b) =>
+        compareTopics(a.topicId, b.topicId) ||
+        a.position - b.position ||
+        a.slug.localeCompare(b.slug),
+    );
 
     return { lessons: visible };
   });
@@ -116,9 +126,14 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
 
     const [created] = await db()
       .insert(lessons)
-      .values({ topicId: input.topicId, slug: input.slug })
+      .values({ topicId: input.topicId, slug: input.slug, position: input.position })
       .onConflictDoNothing({ target: lessons.slug })
-      .returning({ id: lessons.id, slug: lessons.slug, topicId: lessons.topicId });
+      .returning({
+        id: lessons.id,
+        slug: lessons.slug,
+        topicId: lessons.topicId,
+        position: lessons.position,
+      });
 
     if (!created) {
       throw new HttpError(409, ERROR_CODES.VALIDATION_FAILED, { slug: ["duplicate"] });

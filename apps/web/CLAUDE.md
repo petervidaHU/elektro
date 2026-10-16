@@ -55,6 +55,13 @@ app/theme.ts          touch-first Mantine theme (MIN_TOUCH_TARGET)
   (`2,5 mm²`). Never format numbers by hand.
 - **Calculations never live here.** Import the engine from `@elektro/shared`, so
   the browser, SSR and the API all compute the same result.
+- **Server-side API calls go through `app/lib/api.ts`** (`apiFetch`, `apiUrl`,
+  `forwardedHeaders`): loopback to the API plus the browser's session, CSRF and
+  client-IP headers. Never fetch the public URL from a loader or action - behind
+  the reverse proxy it may not resolve.
+- **The signed-in user** is loaded once by `routes/locale-layout`; read it with
+  `useLayoutData()`. Login-only pages call `requireUser(request, locale)` in their
+  loader, which sends guests to `/login?returnTo=...` (validated by `safeReturnTo`).
 - **The UI is not a security boundary.** Hiding a control is a convenience; the
   API re-checks the role on every request.
 

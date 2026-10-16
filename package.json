@@ -11,6 +11,7 @@
     "build": "npm run build --workspaces --if-present",
     "start": "npm run start -w @elektro/api",
     "test": "npm run build -w @elektro/shared && npm run test --workspaces --if-present",
+    "test:e2e": "npm run test:e2e -w @elektro/e2e",
     "lint": "eslint .",
     "typecheck": "npm run build -w @elektro/shared && npm run typecheck --workspaces --if-present",
     "db:generate": "npm run db:generate -w @elektro/api",
@@ -29,6 +30,7 @@
   },
   "workspaces": [
     "packages/shared",
-    "apps/*"
+    "apps/*",
+    "e2e"
   ]
 }

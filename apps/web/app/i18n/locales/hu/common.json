@@ -5,17 +5,21 @@
   },
   "nav": {
     "home": "Kezdőlap",
-    "lessons": "Elmélet",
-    "calculators": "Számítások",
-    "simulator": "Mérés szimulátor",
-    "login": "Bejelentkezés",
+    "lessons": "Tananyag",
+    "calculators": "Számolás",
+    "simulator": "Szimulátor",
+    "account": "Profil",
+    "login": "Belépés",
     "logout": "Kijelentkezés",
-    "menu": "Menü"
+    "menu": "Menü",
+    "bottomBar": "Alsó menü",
+    "headerNav": "Felső menü",
+    "breadcrumbs": "Útvonal"
   },
   "home": {
     "title": "Mit szeretnél gyakorolni?",
     "lessons": {
-      "title": "Elmélet",
+      "title": "Tananyag",
       "description": "Tananyag témakörök szerint, lépésenként."
     },
     "calculators": {
@@ -25,10 +29,12 @@
     "simulator": {
       "title": "Mérés szimulátor",
       "description": "Villamos mérések gyakorlása, jegyzőkönyv kitöltése."
-    }
+    },
+    "locked": "Jelentkezz be",
+    "lockedHint": "A gyakorláshoz be kell jelentkezned."
   },
   "lessons": {
-    "title": "Elmélet",
+    "title": "Tananyag",
     "empty": "Ehhez a témakörhöz még nincs jóváhagyott tananyag.",
     "allTopics": "Összes témakör",
     "status": {
@@ -56,9 +62,9 @@
       "powerFactor": "Teljesítményfaktor (cos φ)",
       "result": "Feszültségesés",
       "resultPercent": "Feszültségesés a névleges feszültség százalékában",
-      "formula": "Alkalmazott összefüggés",
       "limitNote": "A megengedett feszültségesés értékét a tananyag adja meg; az alkalmazás nem feltételez határértéket.",
-      "invalidInput": "Minden érték legyen nullánál nagyobb szám."
+      "invalidInput": "Minden érték legyen nullánál nagyobb szám.",
+      "steps": "A számítás lépései"
     }
   },
   "simulator": {
@@ -71,39 +77,109 @@
       "email": "E-mail cím",
       "password": "Jelszó",
       "submit": "Bejelentkezés",
-      "noAccountNote": "Fiókot az oktató vagy az adminisztrátor hoz létre."
-    }
+      "noAccount": "Még nincs fiókod?",
+      "registerLink": "Regisztrálj"
+    },
+    "register": {
+      "title": "Regisztráció",
+      "name": "Név",
+      "email": "E-mail cím",
+      "password": "Jelszó",
+      "passwordHint": "Legalább 10 karakter.",
+      "submit": "Fiók létrehozása",
+      "haveAccount": "Van már fiókod?",
+      "loginLink": "Jelentkezz be"
+    },
+    "showPassword": "Jelszó megjelenítése"
   },
   "topic": {
+    "electrical-safety-basics": "Villamos biztonság alapjai",
+    "isolation-procedure": "Feszültségmentesítés",
+    "occupational-safety": "Munkavédelem és tűzvédelem",
     "dc-circuits": "Egyenáramú körök",
     "ohms-law": "Ohm törvénye",
+    "conductor-resistance": "Vezetők ellenállása",
     "series-parallel-circuits": "Soros és párhuzamos kapcsolás",
+    "voltage-sources": "Feszültségforrások",
     "power-and-energy": "Teljesítmény és energia",
+    "electric-field-and-capacitors": "Villamos erőtér, kondenzátor",
+    "magnetism-and-induction": "Mágneses tér és indukció",
     "ac-fundamentals": "Váltakozó áram alapjai",
     "three-phase-systems": "Háromfázisú rendszerek",
-    "conductors-and-cross-section": "Vezetők és keresztmetszet",
+    "measuring-instruments": "Mérőműszerek és alapmérések",
+    "power-electronics-basics": "Ipari elektronika alapjai",
+    "logic-basics": "Digitális technika alapjai",
+    "wiring-diagrams": "Villamos rajzok és rajzjelek",
+    "installation-planning": "A szerelési munka előkészítése",
+    "conductors-and-cross-section": "Vezetékek és keresztmetszet",
+    "cables-and-cable-laying": "Kábelek és kábelfektetés",
+    "installation-methods": "Szerelési módok",
+    "lighting-circuits": "Világítási áramkörök",
+    "building-controls": "Épületvillamossági vezérlések",
+    "building-automation": "Intelligens épületautomatika",
+    "distribution-boards": "Elosztóberendezések",
+    "service-connection-and-metering": "Csatlakozóberendezés és mérőhely",
+    "motor-control": "Motorvezérlések, mágneskapcsolók",
+    "photovoltaic-systems": "Napelemes (fotovoltaikus) rendszerek",
+    "temporary-site-supply": "Ideiglenes építési energiaellátás",
+    "power-system": "Villamosenergia-rendszer",
+    "supply-systems": "Hálózati rendszerek (TN, TT, IT)",
     "voltage-drop": "Feszültségesés",
+    "current-carrying-capacity": "Vezetékek terhelhetősége",
     "overcurrent-protection": "Túláramvédelem, kismegszakító",
-    "rcd-protection": "Áram-védőkapcsoló (ÁVK)",
-    "shock-protection": "Érintésvédelem",
+    "shock-protection": "Áramütés elleni védelem (érintésvédelem)",
     "earthing-and-bonding": "Földelés és egyenpotenciálra hozás",
+    "rcd-protection": "Áram-védőkapcsoló (ÁVK)",
+    "lightning-protection": "Villámvédelem",
+    "surge-protection": "Túlfeszültség-védelem",
+    "transformers": "Transzformátorok",
+    "electric-motors": "Villamos motorok",
+    "initial-verification": "Szerelői ellenőrzés",
     "continuity-of-pe": "Védővezető (PE) folytonossága",
     "insulation-resistance": "Szigetelési ellenállás",
     "loop-impedance": "Hurokimpedancia",
     "rcd-testing": "Áram-védőkapcsoló vizsgálata",
     "earth-resistance": "Földelési ellenállás",
-    "measurement-report": "Mérési jegyzőkönyv"
+    "measurement-report": "Mérési jegyzőkönyv",
+    "overhead-lines": "Szabadvezetékek",
+    "network-switchgear": "Hálózati kapcsolókészülékek",
+    "substations": "Transzformátor- és kapcsolóállomások",
+    "network-earthing": "Hálózati földelések",
+    "public-lighting": "Közvilágítás",
+    "network-operation": "Villamos hálózatok üzeme",
+    "industrial-distribution": "Ipari elosztóhálózatok",
+    "power-factor-correction": "Fázisjavítás",
+    "industrial-controls": "Ipari vezérlőberendezések",
+    "machine-maintenance": "Villamos gépek üzemeltetése",
+    "equipment-testing": "Villamos berendezések vizsgálata"
   },
-  "topicGroup": {
-    "basics": "Alapok",
+  "module": {
+    "safety": "Biztonság",
+    "fundamentals": "Villamos alapok",
+    "documentation": "Dokumentáció",
     "installation": "Szerelés",
-    "measurement": "Mérés"
+    "sizing-and-protection": "Méretezés és védelem",
+    "machines": "Villamos gépek",
+    "verification": "Ellenőrzés és mérés",
+    "other-specialisations": "További szakmairányok"
+  },
+  "examPart": {
+    "base": "Ágazati alapvizsga",
+    "I": "I. Alkatrész- és anyagismeret",
+    "II": "II. Technológiai ismeret",
+    "III": "III. Számítási feladatok",
+    "IV": "IV. Villamos biztonsági ismeret",
+    "project": "Projektfeladat"
   },
   "unit": {
+    "dimensionless": "mértékegység nélkül",
     "ampere": "A",
+    "volt": "V",
+    "ohm": "Ω",
+    "watt": "W",
     "metre": "m",
     "squareMillimetre": "mm²",
-    "volt": "V"
+    "percent": "%"
   },
   "error": {
     "UNAUTHENTICATED": "Jelentkezz be a folytatáshoz.",
@@ -119,5 +195,44 @@
     "INTERNAL_ERROR": "Váratlan hiba történt.",
     "pageNotFound": "Ez az oldal nem található.",
     "backHome": "Vissza a kezdőlapra"
+  },
+  "landing": {
+    "title": "Gyakorold a villanyszerelő szakmát lépésről lépésre",
+    "intro": "Elmélet, számítási feladatok és mérésgyakorlás a villanyszerelő képzéshez – telefonon is.",
+    "register": "Regisztráció",
+    "login": "Bejelentkezés",
+    "browse": "Nézd meg a tananyagot"
+  },
+  "dashboard": {
+    "greeting": "Szia, {{name}}!",
+    "subtitle": "Mit szeretnél ma gyakorolni?"
+  },
+  "privacy": {
+    "notice": "Az oktatók látják a tanulási előrehaladásodat és a gyakorlásaid előzményeit. Az adataidat a fiókod törléséig őrizzük meg."
+  },
+  "account": {
+    "title": "Profil",
+    "name": "Név",
+    "email": "E-mail cím",
+    "role": "Szerepkör",
+    "logout": "Kijelentkezés"
+  },
+  "role": {
+    "student": "Tanuló",
+    "teacher": "Oktató",
+    "admin": "Adminisztrátor"
+  },
+  "keypad": {
+    "label": "Számbillentyűzet",
+    "backspace": "Utolsó karakter törlése",
+    "clear": "Mező ürítése",
+    "sign": "Előjelváltás",
+    "decimal": "Tizedesvessző"
+  },
+  "calcStep": {
+    "phase-factor": "Fázistényező (b)",
+    "conductor-resistance": "Egy vezető ellenállása (R)",
+    "voltage-drop": "Feszültségesés (ΔU)",
+    "voltage-drop-percent": "Százalékos feszültségesés (ΔU%)"
   }
 }

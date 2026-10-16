@@ -16,6 +16,7 @@ import { authRoutes } from "./routes/auth.js";
 import { calcRoutes } from "./routes/calc.js";
 import { contentRoutes } from "./routes/content.js";
 import { healthRoutes } from "./routes/health.js";
+import { meRoutes } from "./routes/me.js";
 import { topicRoutes } from "./routes/topics.js";
 
 /** JSON logs in production, pretty logs in development, silence in tests. */
@@ -99,6 +100,7 @@ export async function buildApp(): Promise<FastifyInstance> {
 
       await api.register(authPlugin);
       await api.register(healthRoutes);
+      await api.register(meRoutes);
       await api.register(topicRoutes);
       await api.register(calcRoutes);
       await api.register(contentRoutes);

@@ -21,12 +21,27 @@ async function loadServerBuild(): Promise<ServerBuild> {
   return build.default ?? build;
 }
 
+/**
+ * The origin the browser sees. Behind the TLS-terminating reverse proxy the
+ * socket is plain HTTP, so without this `request.url` would be `http://...`
+ * while the browser sends `Origin: https://...` - and React Router rejects
+ * every form action whose origin does not match `request.url` (CSRF check).
+ */
+export function publicRequestOrigin(publicBaseUrl: string): { protocol: string; host: string } {
+  const url = new URL(publicBaseUrl);
+  return { protocol: url.protocol, host: url.host };
+}
+
 export async function registerWebHandler(app: FastifyInstance): Promise<void> {
+  const config = env();
   const build = await loadServerBuild();
-  const handler = createRequestHandler(build, env().NODE_ENV);
+  const handler = createRequestHandler(build, config.NODE_ENV);
   // The second argument node-fetch-server passes is the client address, not
   // a React Router load context, so it is dropped here.
-  const listener = createRequestListener((request: Request) => handler(request));
+  const listener = createRequestListener(
+    (request: Request) => handler(request),
+    publicRequestOrigin(config.BETTER_AUTH_URL),
+  );
 
   // Anything that is not an API route and not a static asset is an app route.
   app.setNotFoundHandler((request, reply) => {

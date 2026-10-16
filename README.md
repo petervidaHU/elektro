@@ -49,6 +49,7 @@ http://localhost:5173.
 | `npm run build` | build shared, API and web |
 | `npm start` | run the production server (one process, `PORT`) |
 | `npm run test` | all workspaces |
+| `npm run test:e2e` | Playwright milestone acceptance tests on a phone viewport, against the running app (default: the dev container; override with `E2E_BASE_URL`). First time: `npx -w @elektro/e2e playwright install chromium` |
 | `npm run lint` / `npm run typecheck` | ESLint / TypeScript |
 | `npm run db:generate` | generate a Drizzle migration from schema changes |
 | `npm run db:migrate` / `npm run db:seed` | apply migrations / create the first admin |

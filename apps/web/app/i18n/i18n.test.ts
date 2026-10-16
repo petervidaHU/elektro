@@ -2,9 +2,14 @@ import { describe, expect, it } from "vitest";
 import {
   CONTENT_STATUSES,
   ERROR_CODES,
+  EXAM_PARTS,
+  FORMULAS,
   LOCALES,
-  TOPIC_GROUPS,
+  MODULES,
+  ROLES,
   TOPIC_IDS,
+  UNITS,
+  calculateVoltageDrop,
 } from "@elektro/shared";
 import hu from "./locales/hu/common.json";
 import { localeFromPathname, localePath } from "./locale";
@@ -21,9 +26,42 @@ describe("hu translations", () => {
     }
   });
 
-  it("covers every topic group", () => {
-    for (const group of TOPIC_GROUPS) {
-      expect(hu.topicGroup, `missing topicGroup.${group}`).toHaveProperty(group);
+  it("covers every syllabus module", () => {
+    for (const module of MODULES) {
+      expect(hu.module, `missing module.${module}`).toHaveProperty(module);
+    }
+  });
+
+  it("covers every exam part", () => {
+    for (const part of EXAM_PARTS) {
+      expect(hu.examPart, `missing examPart.${part}`).toHaveProperty(part);
+    }
+  });
+
+  it("covers every role", () => {
+    for (const role of ROLES) {
+      expect(hu.role, `missing role.${role}`).toHaveProperty(role);
+    }
+  });
+
+  it("covers every unit", () => {
+    for (const unit of UNITS) {
+      expect(hu.unit, `missing unit.${unit}`).toHaveProperty(unit);
+    }
+  });
+
+  it("names every step of the voltage-drop calculation", () => {
+    const { steps } = calculateVoltageDrop({
+      current_A: 1,
+      length_m: 1,
+      crossSection_mm2: 1,
+      resistivity_ohm_mm2_per_m: 1,
+      nominalVoltage_V: 1,
+      system: "single-phase",
+    });
+    for (const step of steps) {
+      expect(hu.calcStep, `missing calcStep.${step.id}`).toHaveProperty(step.id);
+      expect(FORMULAS).toHaveProperty(step.formulaId);
     }
   });
 

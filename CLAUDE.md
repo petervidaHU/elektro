@@ -41,6 +41,7 @@ npm install
 npm run dev            # web + api in watch mode (needs DATABASE_URL)
 npm run build
 npm run test           # all workspaces
+npm run test:e2e       # Playwright milestone acceptance tests (needs the running app; E2E_BASE_URL)
 npm run lint
 npm run typecheck
 npm run db:generate    # drizzle-kit: generate migration from schema changes
@@ -93,7 +94,7 @@ This app teaches safety-critical material. Wrong numbers can teach dangerous hab
   3. New user-facing text has i18n keys.
   4. Learning interactions work with touch only.
   5. The plan is updated if scope or a decision changed.
-- **Milestone:** its acceptance test in `docs/ROADMAP.md` passes, and the milestone is ticked there.
+- **Milestone:** its acceptance test in `docs/ROADMAP.md` passes (`npm run test:e2e`, in `e2e/tests/`), and the milestone is ticked there.
 - Config only from environment variables (`DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`/public base URL, `PORT`). Never commit secrets; keep `.env.example` up to date.
 - Before finishing a task: `npm run lint && npm run typecheck && npm test` pass.
 

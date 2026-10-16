@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import {
   Alert,
   Card,
-  Code,
   Divider,
   Group,
   NumberInput,
@@ -14,6 +13,8 @@ import {
 } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
+import { CalcSteps } from "../components/calc-steps";
+import type { BreadcrumbHandle } from "../components/app-shell/breadcrumbs";
 import {
   calculateVoltageDrop,
   CalculationInputError,
@@ -38,6 +39,13 @@ import {
  * numeric fields have steppers, so the whole calculation can be done with
  * touch alone.
  */
+export const handle: BreadcrumbHandle = {
+  breadcrumbs: () => [
+    { labelKey: "nav.calculators", path: "calculators" },
+    { labelKey: "calculators.voltageDrop.title" },
+  ],
+};
+
 export default function VoltageDrop() {
   const { t } = useTranslation();
   const params = useParams();
@@ -54,7 +62,7 @@ export default function VoltageDrop() {
   const calculation = useMemo(() => {
     try {
       return {
-        result: calculateVoltageDrop({
+        calc: calculateVoltageDrop({
           current_A: Number(current),
           length_m: Number(length),
           crossSection_mm2: Number(crossSection),
@@ -67,7 +75,7 @@ export default function VoltageDrop() {
       };
     } catch (error) {
       if (error instanceof CalculationInputError) {
-        return { result: null, error };
+        return { calc: null, error };
       }
       throw error;
     }
@@ -172,7 +180,7 @@ export default function VoltageDrop() {
         />
       </Stack>
 
-      {calculation.error ? (
+      {calculation.calc === null ? (
         <Alert color="red" variant="light">
           {t("calculators.voltageDrop.invalidInput")}
         </Alert>
@@ -183,7 +191,7 @@ export default function VoltageDrop() {
               {t("calculators.voltageDrop.result")}
             </Text>
             <Title order={3}>
-              {formatQuantity(calculation.result.voltageDrop_V, t("unit.volt"), locale, {
+              {formatQuantity(calculation.calc.result.voltageDrop_V, t("unit.volt"), locale, {
                 maximumFractionDigits: 2,
               })}
             </Title>
@@ -193,20 +201,16 @@ export default function VoltageDrop() {
                 {t("calculators.voltageDrop.resultPercent")}:
               </Text>
               <Text size="sm" fw={600}>
-                {formatPercent(calculation.result.voltageDropPercent, locale)}
+                {formatPercent(calculation.calc.result.voltageDropPercent, locale)}
               </Text>
             </Group>
 
             <Divider my="xs" />
 
             <Text size="sm" c="dimmed">
-              {t("calculators.voltageDrop.formula")}
+              {t("calculators.voltageDrop.steps")}
             </Text>
-            <Code block>
-              {system === "single-phase"
-                ? "ΔU = 2 · ρ · (L / S) · I · cos φ"
-                : "ΔU = √3 · ρ · (L / S) · I · cos φ"}
-            </Code>
+            <CalcSteps steps={calculation.calc.steps} locale={locale} />
           </Stack>
         </Card>
       )}

@@ -5,9 +5,11 @@ import { db, schema } from "../db/index.js";
 import { env, useSecureCookies } from "../env.js";
 
 /**
- * Auth v1: email + password only, **no outgoing email**. Admins create teacher
- * accounts, promote users and reset passwords, so e-mail verification and
- * password-reset mail are deliberately disabled.
+ * Auth v1: email + password only, **no outgoing email**. Anyone can register
+ * (`/api/auth/sign-up/email`) and always gets the `student` role - `role` is
+ * not client-writable. Admins create teacher accounts, promote users and reset
+ * passwords, so e-mail verification and password-reset mail are deliberately
+ * disabled.
  */
 export function createAuth() {
   const config = env();

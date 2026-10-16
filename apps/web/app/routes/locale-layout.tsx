@@ -1,84 +1,100 @@
-import {
-  AppShell,
-  Burger,
-  Group,
-  NavLink as MantineNavLink,
-  Title,
-} from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { AppShell, Badge, Button, Container, Group, Text, Title } from "@mantine/core";
 import { useTranslation } from "react-i18next";
-import { NavLink, Outlet, useParams } from "react-router";
+import { Link, NavLink, Outlet, useLoaderData, useLocation } from "react-router";
 import { isLocale, type Locale } from "@elektro/shared";
+import { BottomNav } from "../components/app-shell/bottom-nav";
+import { Breadcrumbs } from "../components/app-shell/breadcrumbs";
+import { navItems, type NavItem } from "../components/app-shell/nav-items";
 import { localePath } from "../i18n/locale";
+import { getCurrentUser } from "../lib/session";
 import type { Route } from "./+types/locale-layout";
 
 /**
- * Validates the locale segment and renders the app frame.
+ * Validates the locale segment, loads the signed-in user once for every page
+ * below it, and renders the app frame (docs/DEVELOPMENT_PLAN.md §3.2):
  *
- * Navigation is touch-only: a burger opens a full-width menu whose items are
- * all at least one touch target tall.
+ * - phone: a bottom tab bar within thumb reach;
+ * - desktop (`sm` and up): the same items in the header.
+ *
+ * Child routes read the user with `useRouteLoaderData("routes/locale-layout")`.
+ * Hiding items is a convenience only; the API checks the role on every request.
  */
-export function loader({ params }: Route.LoaderArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
   if (!isLocale(params.locale)) {
     // Unknown locale is a missing page, not a fallback to the default.
     throw new Response(null, { status: 404 });
   }
 
-  return { locale: params.locale };
+  return { locale: params.locale, user: await getCurrentUser(request) };
 }
 
-const NAV_ITEMS = [
-  { path: "", labelKey: "nav.home" },
-  { path: "lessons", labelKey: "nav.lessons" },
-  { path: "calculators", labelKey: "nav.calculators" },
-  { path: "simulator", labelKey: "nav.simulator" },
-  { path: "login", labelKey: "nav.login" },
-] as const;
+export type LocaleLayoutData = Awaited<ReturnType<typeof loader>>;
+
+const BOTTOM_BAR_HEIGHT = 64;
+
+/** Same rule as `NavLink`: exact for `end` items, otherwise the whole subtree. */
+function isActive(item: NavItem, locale: Locale, pathname: string): boolean {
+  const target = localePath(locale, item.path);
+  return item.end ? pathname === target : pathname === target || pathname.startsWith(`${target}/`);
+}
 
 export default function LocaleLayout() {
   const { t } = useTranslation();
-  const params = useParams();
-  const locale = (isLocale(params.locale) ? params.locale : "hu") as Locale;
-  const [opened, { toggle, close }] = useDisclosure(false);
+  const { locale, user } = useLoaderData<typeof loader>();
+  const { pathname } = useLocation();
+  const items = navItems(user);
 
   return (
     <AppShell
       header={{ height: 60 }}
-      navbar={{ width: 260, breakpoint: "sm", collapsed: { mobile: !opened } }}
+      footer={{ height: { base: BOTTOM_BAR_HEIGHT, sm: 0 } }}
       padding="md"
     >
       <AppShell.Header>
-        <Group h="100%" px="md" gap="sm">
-          <Burger
-            opened={opened}
-            onClick={toggle}
-            hiddenFrom="sm"
-            size="md"
-            aria-label={t("nav.menu")}
-          />
-          <Title order={1} size="h4">
-            {t("app.name")}
-          </Title>
-        </Group>
+        <Container size="lg" h="100%">
+          <Group h="100%" justify="space-between" wrap="nowrap">
+            <Title order={1} size="h4">
+              <Link to={localePath(locale)} style={{ color: "inherit", textDecoration: "none" }}>
+                {t("app.name")}
+              </Link>
+            </Title>
+
+            <Group gap="xs" visibleFrom="sm" component="nav" aria-label={t("nav.headerNav")}>
+              {items.map((item) => (
+                <Button
+                  key={item.key}
+                  component={NavLink}
+                  to={localePath(locale, item.path)}
+                  end={item.end}
+                  variant={isActive(item, locale, pathname) ? "light" : "subtle"}
+                >
+                  {t(item.labelKey)}
+                </Button>
+              ))}
+            </Group>
+
+            {user && (
+              <Group gap="xs" visibleFrom="sm" wrap="nowrap">
+                <Text size="sm" truncate maw={180}>
+                  {user.name}
+                </Text>
+                <Badge variant="light">{t(`role.${user.role}`)}</Badge>
+              </Group>
+            )}
+          </Group>
+        </Container>
       </AppShell.Header>
 
-      <AppShell.Navbar p="xs">
-        {NAV_ITEMS.map((item) => (
-          <MantineNavLink
-            key={item.path}
-            component={NavLink}
-            to={localePath(locale, item.path)}
-            end={item.path === ""}
-            label={t(item.labelKey)}
-            onClick={close}
-            style={{ minHeight: 44 }}
-          />
-        ))}
-      </AppShell.Navbar>
-
       <AppShell.Main>
-        <Outlet />
+        <Container size="lg" px={0}>
+          <Breadcrumbs locale={locale} />
+          <Outlet />
+        </Container>
       </AppShell.Main>
+
+      <AppShell.Footer hiddenFrom="sm">
+        <BottomNav items={items} locale={locale} />
+      </AppShell.Footer>
     </AppShell>
   );
 }

@@ -9,6 +9,9 @@ COPY package.json package-lock.json .npmrc ./
 COPY packages/shared/package.json packages/shared/
 COPY apps/api/package.json apps/api/
 COPY apps/web/package.json apps/web/
+# The e2e workspace is in the lockfile, so its manifest must be present for
+# `npm ci`; its dev-only dependencies never reach the runtime image.
+COPY e2e/package.json e2e/
 RUN npm ci
 
 # ---- build ------------------------------------------------------------------

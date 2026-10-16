@@ -1,0 +1,31 @@
+/* Phone navigation: a tab bar within thumb reach, every tab a full touch target. */
+.bar {
+  display: flex;
+  height: 100%;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 44px;
+  min-width: 44px;
+  text-decoration: none;
+  font-size: var(--mantine-font-size-xs);
+  color: var(--mantine-color-dimmed);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tab[aria-current="page"] {
+  color: var(--mantine-primary-color-filled);
+  font-weight: 600;
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--mantine-primary-color-filled);
+  outline-offset: -2px;
+}
