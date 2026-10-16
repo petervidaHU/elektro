@@ -53,7 +53,8 @@ http://localhost:5173.
 | `npm run lint` / `npm run typecheck` | ESLint / TypeScript |
 | `npm run db:generate` | generate a Drizzle migration from schema changes |
 | `npm run db:migrate` / `npm run db:seed` | apply migrations / create the first admin |
-| `npm run db:seed:content` | load the bundled lesson drafts (`apps/api/content/`) as `ai_draft` for teacher review; existing lessons are left alone. In the production container (working directory `apps/api`): `node dist/scripts/seed-content.js` |
+| `npm run content:check` | validate the lesson files in `apps/api/content/lessons/` (paths, front matter, lesson format) and list the claims to verify. Authoring brief and file layout: `docs/THEORY_TOC.md` |
+| `npm run db:seed:content` | load the lesson files as `ai_draft` for teacher review; drafts nobody reviewed yet are updated from their files, lessons in review or approved are never touched. In the production container (working directory `apps/api`): `node dist/scripts/seed-content.js` |
 
 ## Production
 

@@ -13,7 +13,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx --env-file-if-exists=../../.env src/scripts/migrate.ts",
     "db:seed": "tsx --env-file-if-exists=../../.env src/scripts/seed.ts",
-    "db:seed:content": "tsx --env-file-if-exists=../../.env src/scripts/seed-content.ts"
+    "db:seed:content": "tsx --env-file-if-exists=../../.env src/scripts/seed-content.ts",
+    "content:check": "tsx src/scripts/content-check.ts"
   },
   "dependencies": {
     "@elektro/shared": "*",

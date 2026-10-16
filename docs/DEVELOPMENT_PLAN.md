@@ -234,6 +234,12 @@ which are rendered by the web app and validated by a shared zod schema on save:
 | `:::term{id=...}` | Inline reference to a glossary term (tap to see the definition) |
 | `:::next` | Rendered automatically: calculator / practice / simulator links for the topic |
 
+**Authoring workflow (v1):** lessons are written with Claude from the brief and
+table of contents in [`THEORY_TOC.md`](THEORY_TOC.md), delivered as files under
+`apps/api/content/lessons/<locale>/<module>/<topic>/<NN>-<slug>.md`, validated with
+`npm run content:check` and loaded with `npm run db:seed:content` as `ai_draft`.
+Approval then happens in the app as usual.
+
 Additional content entities, each with the same versioning and approval as lessons:
 - **Glossary (fogalomtár):** language-neutral `glossary_terms` + per-locale
   translations. Seed it with the domain terms from `CLAUDE.md`.

@@ -17,7 +17,8 @@
     "db:generate": "npm run db:generate -w @elektro/api",
     "db:migrate": "npm run db:migrate -w @elektro/api",
     "db:seed": "npm run db:seed -w @elektro/api",
-    "db:seed:content": "npm run db:seed:content -w @elektro/api"
+    "db:seed:content": "npm run db:seed:content -w @elektro/api",
+    "content:check": "npm run content:check -w @elektro/api"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

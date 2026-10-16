@@ -38,6 +38,7 @@ src/plugins/auth.ts        session resolution + requireUser / requireRole
 src/routes/                health, topics, calc, content, admin, auth
 src/scripts/               migrate.ts, seed.ts
 drizzle/                   generated migrations (never edited by hand)
+content/lessons/           lesson drafts as files (docs/THEORY_TOC.md); content:check, db:seed:content
 ```
 
 ## Rules
