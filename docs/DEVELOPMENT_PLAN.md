@@ -68,6 +68,7 @@ Key facts from the documents that shape this plan:
 | Q15 | Who verifies reference tables | **Teachers** (any user with role `teacher` or higher) |
 | Q16 | Pre-filled candidate reference values | **Yes.** Claude pre-fills candidate values with citations, stored as `unverified`, and a teacher verifies them (§2.3) |
 | Q17 | Exam-style (multiple-choice) answer mode | **Not in v1** |
+| Q18 | Extra calculators from the theory TOC review | **Added to the §2.2 catalogue** (2026-10-16). Highest value: `connection-power`, `phase-balancing` (P1), `material-list`, `short-circuit-current` (P2) |
 
 ---
 
@@ -317,6 +318,24 @@ Each row's data needs fall into one of three kinds:
 | `insulation-evaluation` | insulation-resistance | Pass/fail of a measured value for a circuit's nominal voltage | table: test voltage + minimum value | P3 |
 | `rcd-test-evaluation` | rcd-testing | Pass/fail of trip time / trip current | table: limits per RCD type | P3 |
 | `power-factor-correction` | power-factor-correction | Q_C = P·(tan φ1 − tan φ2); capacitance | physics | P3 (other specialisation) |
+| `connection-power` | service-connection-and-metering | Available power from the meter-point MCB (1- and 3-phase, `P = U·I`, `P = √3·U·I`); compare with the consumer demand from `load-demand` | physics | **P1** |
+| `phase-balancing` | distribution-boards | Assign circuits to L1/L2/L3; current per phase; the most loaded phase; suggest a more even split | physics | **P1** |
+| `material-list` | installation-planning | Material quantities from a plan's data: cable lengths per type, conduit, boxes; cost with prices given in the task | physics (arithmetic) | **P2** |
+| `short-circuit-current` | overcurrent-protection | Prospective fault current `I_k = U₀ / Z_s`; does the MCB's magnetic trip operate | physics; trip multiple per characteristic = table | **P2** |
+| `charge-current` | dc-circuits | `Q = I·t` | physics | P2 |
+| `kirchhoff` | series-parallel-circuits | Node and loop laws on a two-loop circuit, step-checked | physics | P2 |
+| `wheatstone-bridge` | series-parallel-circuits | Balance condition; unknown resistance | physics | P2 |
+| `ac-values` | ac-fundamentals | Peak ↔ RMS (`U = Uₘ / √2`), `f = 1 / T` | physics | P2 |
+| `meter-range-extension` | measuring-instruments | Shunt and series resistor for range extension | physics | P2 |
+| `measurement-error` | measuring-instruments | Digital meter accuracy (± % of reading + digits); range of the true value | physics (meter data given in the task) | P2 |
+| `pe-continuity-check` | continuity-of-pe | Compare a measured PE resistance with `R = ρ·L/S` of the conductor | material: ρ | P2 |
+| `body-current` | electrical-safety-basics | Current through the body `I = Uₑ / Rₜ`; compare with the IEC/TS 60479-1 thresholds | physics; body impedance = table | P3 |
+| `neutral-current` | three-phase-systems | Neutral current of an unbalanced load (phasor sum of the phase currents) | physics | P3 |
+| `pv-string` | photovoltaic-systems | String voltage and current from module data (series/parallel); check against the inverter input range | physics (module and inverter data given in the task) | P3 |
+| `line-losses` | power-system | Line loss `P = I²·R` for the same power at two voltage levels (why transmission uses high voltage) | physics | P3 |
+| `ip-code` | installation-methods | Decode an IP code (helper, no practice) | table: IP digit meanings | P3 |
+| `earth-electrode` | earthing-and-bonding | Approximate resistance of a rod electrode from soil resistivity | table: soil resistivity, approximation formula | P3 |
+| `measurement-report-practice` | measurement-report | Fill the pass/fail column of a report from measured values (uses the evaluation calculators and the simulator) | table (via the evaluators) | P3 |
 
 Every row needs:
 - an engine function + zod schema;
@@ -515,6 +534,7 @@ transaction as each write, and an admin script can rebuild all of it.
 | K10 | P2 calculators (physics first, then table-dependent ones once verified) |
 | K11 | Calculator ↔ lesson links (`:::example` opens the calculator pre-filled; calculator shows "learn the theory" link) |
 | K12 | `practice_templates` / `practice_task_texts` tables + i18n → DB sync script (unused at runtime in v1) |
+| K13 | P1 calculators from the TOC review: `connection-power`, `phase-balancing` + templates |
 
 ---
 
@@ -690,7 +710,7 @@ adds Playwright for the acceptance tests.
 | **M1a** Foundations for learning | S1, S2, K1, K2, U1, U2 | New nav works on phone; topics have modules, metadata and the PTT/KKK refs; open registration works |
 | **M1b** Voltage drop end to end | S3, S4, U3, U4, K3, K4, K5/U6, K6, `lesson_reads`, U8 (basic) | A student reads the voltage-drop lesson → uses the calculator (with ρ warning) → completes a session (with tolerance shown) → sees the summary and progress; a teacher approves the lesson. Deployed. |
 | **M2** Loop closed | U5, U7, U9, U10, U11, U12, K12 | Dashboard, history (with privacy notice), teacher monitoring, review and problem-report stub usable on phone |
-| **M3** Exam-relevant breadth | K7, K8 + U13, K8a, K9, S5 glossary, S6 intros, K11; lessons for modules A, B (phase 1), E | All P1 physics calculators with practice; reference-table workflow live; `cable-selection` live once tables are verified; ~15 approved lessons |
+| **M3** Exam-relevant breadth | K7, K13, K8 + U13, K8a, K9, S5 glossary, S6 intros, K11; lessons for modules A, B (phase 1), E | All P1 physics calculators with practice; reference-table workflow live; `cable-selection` live once tables are verified; ~15 approved lessons |
 | **M4** Further calculators & content | K10, insights (U9), lessons for modules C, D, G (phase 1) | P2 calculators live; verification topics have lessons ready for the simulator |
 | **M5+** | Simulator (phase 4), AI drafting (phase 5: task texts move to DB), pilot (phase 6), content phase 2–3 topics | per roadmap |
 
