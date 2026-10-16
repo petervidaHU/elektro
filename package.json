@@ -1,0 +1,34 @@
+{
+  "name": "elektro",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "concurrently -n shared,api,web -k \"npm run dev -w @elektro/shared\" \"npm run dev -w @elektro/api\" \"npm run dev -w @elektro/web\"",
+    "build": "npm run build --workspaces --if-present",
+    "start": "npm run start -w @elektro/api",
+    "test": "npm run build -w @elektro/shared && npm run test --workspaces --if-present",
+    "lint": "eslint .",
+    "typecheck": "npm run build -w @elektro/shared && npm run typecheck --workspaces --if-present",
+    "db:generate": "npm run db:generate -w @elektro/api",
+    "db:migrate": "npm run db:migrate -w @elektro/api",
+    "db:seed": "npm run db:seed -w @elektro/api"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "26.6.5",
+    "concurrently": "10.0.6",
+    "eslint": "10.12.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "17.13.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.71.2"
+  },
+  "workspaces": [
+    "packages/shared",
+    "apps/*"
+  ]
+}

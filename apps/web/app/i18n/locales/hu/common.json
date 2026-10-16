@@ -1,0 +1,123 @@
+{
+  "app": {
+    "name": "Elektro",
+    "tagline": "Villanyszerelő képzés gyakorlóalkalmazás"
+  },
+  "nav": {
+    "home": "Kezdőlap",
+    "lessons": "Elmélet",
+    "calculators": "Számítások",
+    "simulator": "Mérés szimulátor",
+    "login": "Bejelentkezés",
+    "logout": "Kijelentkezés",
+    "menu": "Menü"
+  },
+  "home": {
+    "title": "Mit szeretnél gyakorolni?",
+    "lessons": {
+      "title": "Elmélet",
+      "description": "Tananyag témakörök szerint, lépésenként."
+    },
+    "calculators": {
+      "title": "Számítások",
+      "description": "Számológépek és lépésenként ellenőrzött gyakorló feladatok."
+    },
+    "simulator": {
+      "title": "Mérés szimulátor",
+      "description": "Villamos mérések gyakorlása, jegyzőkönyv kitöltése."
+    }
+  },
+  "lessons": {
+    "title": "Elmélet",
+    "empty": "Ehhez a témakörhöz még nincs jóváhagyott tananyag.",
+    "allTopics": "Összes témakör",
+    "status": {
+      "ai_draft": "Vázlat",
+      "in_review": "Ellenőrzés alatt",
+      "approved": "Jóváhagyott",
+      "changes_requested": "Javítás szükséges"
+    }
+  },
+  "calculators": {
+    "title": "Számítások",
+    "voltageDrop": {
+      "title": "Feszültségesés",
+      "description": "Vezeték feszültségesésének számítása.",
+      "system": "Hálózat",
+      "singlePhase": "Egyfázisú",
+      "threePhase": "Háromfázisú",
+      "material": "Vezető anyaga",
+      "copper": "Réz",
+      "aluminium": "Alumínium",
+      "current": "Áramerősség",
+      "length": "Vezetékhossz (egy irányban)",
+      "crossSection": "Keresztmetszet",
+      "nominalVoltage": "Névleges feszültség",
+      "powerFactor": "Teljesítményfaktor (cos φ)",
+      "result": "Feszültségesés",
+      "resultPercent": "Feszültségesés a névleges feszültség százalékában",
+      "formula": "Alkalmazott összefüggés",
+      "limitNote": "A megengedett feszültségesés értékét a tananyag adja meg; az alkalmazás nem feltételez határértéket.",
+      "invalidInput": "Minden érték legyen nullánál nagyobb szám."
+    }
+  },
+  "simulator": {
+    "title": "Mérés szimulátor",
+    "comingSoon": "A mérés szimulátor fejlesztés alatt áll."
+  },
+  "auth": {
+    "login": {
+      "title": "Bejelentkezés",
+      "email": "E-mail cím",
+      "password": "Jelszó",
+      "submit": "Bejelentkezés",
+      "noAccountNote": "Fiókot az oktató vagy az adminisztrátor hoz létre."
+    }
+  },
+  "topic": {
+    "dc-circuits": "Egyenáramú körök",
+    "ohms-law": "Ohm törvénye",
+    "series-parallel-circuits": "Soros és párhuzamos kapcsolás",
+    "power-and-energy": "Teljesítmény és energia",
+    "ac-fundamentals": "Váltakozó áram alapjai",
+    "three-phase-systems": "Háromfázisú rendszerek",
+    "conductors-and-cross-section": "Vezetők és keresztmetszet",
+    "voltage-drop": "Feszültségesés",
+    "overcurrent-protection": "Túláramvédelem, kismegszakító",
+    "rcd-protection": "Áram-védőkapcsoló (ÁVK)",
+    "shock-protection": "Érintésvédelem",
+    "earthing-and-bonding": "Földelés és egyenpotenciálra hozás",
+    "continuity-of-pe": "Védővezető (PE) folytonossága",
+    "insulation-resistance": "Szigetelési ellenállás",
+    "loop-impedance": "Hurokimpedancia",
+    "rcd-testing": "Áram-védőkapcsoló vizsgálata",
+    "earth-resistance": "Földelési ellenállás",
+    "measurement-report": "Mérési jegyzőkönyv"
+  },
+  "topicGroup": {
+    "basics": "Alapok",
+    "installation": "Szerelés",
+    "measurement": "Mérés"
+  },
+  "unit": {
+    "ampere": "A",
+    "metre": "m",
+    "squareMillimetre": "mm²",
+    "volt": "V"
+  },
+  "error": {
+    "UNAUTHENTICATED": "Jelentkezz be a folytatáshoz.",
+    "FORBIDDEN": "Ehhez nincs jogosultságod.",
+    "NOT_FOUND": "A keresett tartalom nem található.",
+    "VALIDATION_FAILED": "Hibás vagy hiányzó adat.",
+    "INVALID_CREDENTIALS": "Hibás e-mail cím vagy jelszó.",
+    "EMAIL_IN_USE": "Ezzel az e-mail címmel már létezik fiók.",
+    "INVALID_STATUS_TRANSITION": "Ez az állapotváltás nem engedélyezett.",
+    "LOCALE_NOT_SUPPORTED": "Ez a nyelv nem támogatott.",
+    "CALCULATION_INPUT_INVALID": "A megadott értékekkel nem végezhető el a számítás.",
+    "RATE_LIMITED": "Túl sok kérés. Próbáld újra később.",
+    "INTERNAL_ERROR": "Váratlan hiba történt.",
+    "pageNotFound": "Ez az oldal nem található.",
+    "backHome": "Vissza a kezdőlapra"
+  }
+}

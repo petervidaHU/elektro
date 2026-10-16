@@ -1,0 +1,14 @@
+node_modules/
+dist/
+build/
+.react-router/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+coverage/
+.DS_Store
+*.log
+
+# Curriculum source PDFs (kept locally, not in git)
+docs/*.pdf
