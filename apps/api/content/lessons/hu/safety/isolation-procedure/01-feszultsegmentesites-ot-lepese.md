@@ -1,56 +1,68 @@
 ---
 title: A feszültségmentesítés öt lépése
-summary: Az öt lépés, amellyel egy villamos berendezést biztonságosan feszültségmentesítünk, és miért nem szabad felcserélni a sorrendjüket.
+summary: Az MSZ 1585 öt biztonsági művelete, amellyel egy villamos berendezést munkavégzés előtt biztonságosan feszültségmentesítünk, és az, hogy miért kötelező a sorrendjük.
 verify:
-  - "Az öt lépés pontos megfogalmazása és sorrendje: 1. leválasztás, 2. visszakapcsolás elleni biztosítás, 3. a feszültségmentesség megállapítása, 4. földelés és rövidrezárás, 5. a szomszédos, feszültség alatt álló részek elleni védelem – MSZ 1585 (MSZ EN 50110-1)"
-  - "Kisfeszültségű berendezésen mikor hagyható el vagy helyettesíthető a földelés és rövidrezárás – MSZ 1585"
+  - "Az öt biztonsági művelet és sorrendje: 1. teljes körű leválasztás, 2. visszakapcsolás elleni biztosítás, 3. a feszültség nélküli állapot ellenőrzése, 4. földelés és rövidre zárás, 5. a közeli, aktív részek elleni védelem – MSZ 1585:2016 6.2.2–6.2.6 (feszultsegmentesites.hu; MEE VÉT kézikönyv VII.3.9)"
+  - "A sorrendtől csak lényeges okból lehet eltérni – MSZ 1585:2016 6.2"
+  - "Leválasztás minden tápforrásról, légközzel vagy azzal egyenértékű szigeteléssel; a kondenzátorokat és kábeleket ki kell sütni – MSZ 1585:2016 6.2.2 (feszultsegmentesites.hu)"
+  - "A feszültségmentesítés műveletei feszültség alatti vagy feszültséghez közeli munkának minősülnek – ITM: Villamos biztonsági ismeretek (2022)"
+  - "Kis- és törpefeszültségen a 4. lépés feltételekkel elhagyható; ilyenkor a berendezés feszültség nélküli, nem feszültségmentes állapotú – Villanylap 2003/3 (MSZ 1585:2001); a 2016-os kiadás feltételeit ellenőrizni kell"
+  - "Kisfeszültségű szabadvezetékes hálózaton az összes vezetőt minden esetben rövidre kell zárni – MSZ 1585:2016 (feszultsegmentesites.hu)"
 ---
 
 :::goals
-- Fel tudod sorolni a feszültségmentesítés öt lépését a helyes sorrendben.
-- Mindegyik lépésnél meg tudod mondani, mit csinálsz, miért, és mivel.
-- Megérted, miért nem szabad a lépések sorrendjét felcserélni.
+- Fel tudod sorolni a feszültségmentesítés öt lépését, pontosan és sorrendben.
+- Mindegyik lépésnél tudod, mit csinálsz, mivel, és miért.
+- Meg tudod magyarázni, miért nem szabad a sorrendet felcserélni.
 :::
 
-## Mit jelent a feszültségmentesítés?
+## Mi a feszültségmentesítés?
 
-**Feszültségmentesítés** az a műveletsor, amellyel egy villamos berendezést vagy annak egy részét biztonságosan, ellenőrzötten és tartósan feszültségmentes állapotba hozunk, hogy dolgozni lehessen rajta.
+**Feszültségmentesítés** az a műveletsor, amellyel egy villamos berendezést vagy annak egy részét biztonságosan, ellenőrzötten és tartósan feszültség nélküli állapotba hozunk, hogy dolgozni lehessen rajta.
 
-A „lekapcsoltam a kismegszakítót” még **nem** feszültségmentesítés. Lehet, hogy rossz kismegszakítót kapcsoltál le, hogy valaki közben visszakapcsolja, vagy hogy egy másik forrásról is jön feszültség. A feszültségmentesítés öt lépése ezeket a veszélyeket egyenként zárja ki.
+A „lekapcsoltam a kismegszakítót” **nem** feszültségmentesítés. Lehet, hogy rossz kismegszakítót kapcsoltál le, hogy valaki közben visszakapcsolja, vagy hogy egy másik forrásról (napelem, szünetmentes táp, visszatáplálás) is jön feszültség. Az öt lépés ezeket a veszélyeket egyenként zárja ki.
 
-Az öt lépést az **MSZ 1585** szabvány írja elő. Minden villamos munka előtt végre kell hajtani, a megadott sorrendben.
+Az öt lépést az **MSZ 1585:2016** szabvány 6.2. szakasza írja elő, **kötelező sorrendben**. A sorrendtől csak lényeges okból szabad eltérni. Maguk a feszültségmentesítő műveletek még feszültség alatti vagy feszültséghez közeli munkának számítanak, ezért csak szakképzett vagy kioktatott személy végezheti őket.
 
 ## Az öt lépés
 
-**1. Leválasztás (teljes körű kikapcsolás).**
-*Mit:* a munkaterületet minden lehetséges táplálási oldalról leválasztod a hálózatról. *Mivel:* kismegszakítóval, főkapcsolóval, szakaszolóval, a biztosító kivételével. *Miért:* hogy a munkaterületre ne juthasson feszültség. Gondolj a „rejtett” forrásokra is: napelemes inverter, szünetmentes táp, aggregátor, visszatápláló motor, kondenzátortelep. Kétfelől táplált vezetéknél mindkét oldalt le kell választani.
+**1. Teljes körű leválasztás.**
+- *Mit:* a munkaterületet **minden** lehetséges betáplálási helyen leválasztod a tápforrásokról.
+- *Mivel:* kapcsolóval, szakaszolóval, kismegszakítóval, a biztosítóbetét kivételével. A leválasztásnak légközzel vagy azzal egyenértékű szigeteléssel kell megszakítania a kört.
+- *Miért:* hogy a munkaterületre semmilyen úton ne juthasson feszültség. Gondolj a rejtett forrásokra is: napelemes inverter, szünetmentes táp, aggregátor, kétoldali betáplálás. A töltést tároló részeket (kondenzátorok, hosszú kábelek) **ki kell sütni**.
 
-**2. Biztosítás visszakapcsolás ellen.**
-*Mit:* gondoskodsz róla, hogy a leválasztó készüléket senki ne kapcsolhassa vissza a munka ideje alatt. *Mivel:* a kapcsoló lelakatolásával, a biztosítóbetét elvételével és elzárásával, valamint figyelmeztető táblával. *Miért:* a balesetek egy része abból adódik, hogy valaki, aki nem tud a munkáról, „visszakapcsolja az áramot”.
+**2. Visszakapcsolás elleni biztosítás.**
+- *Mit:* biztosítod, hogy a leválasztó készülékeket a munka ideje alatt senki ne kapcsolhassa vissza.
+- *Mivel:* a működtető szerkezet reteszelésével, lelakatolással, lezárással, a kezelőfogantyú levételével, a biztosítóbetét elvételével. Minden leválasztó készülékre **„Bekapcsolni tilos!”** figyelmeztető tábla kerül.
+- *Miért:* sok baleset abból adódik, hogy valaki, aki nem tud a munkáról, visszakapcsol.
 
-**3. A feszültségmentesség megállapítása.**
-*Mit:* a munkahelyen, minden pólusnál ellenőrzöd, hogy valóban nincs feszültség. *Mivel:* az adott feszültségszintre alkalmas **feszültségkémlelővel**, amelynek a működését a mérés előtt és után is ellenőrzöd. *Miért:* csak így lehetsz biztos abban, hogy a jó áramkört kapcsoltad le, és nincs más forrás.
+**3. A feszültség nélküli állapot ellenőrzése.**
+- *Mit:* a munkavégzés helyén, **minden fázisán és pólusán** ellenőrzöd, hogy nincs feszültség: a fázisok között, és minden üzemi vezető és a föld között.
+- *Mivel:* szabványos, **kétpólusú feszültségkémlelővel**, amelynek működőképességét közvetlenül előtte és utána kipróbálod.
+- *Miért:* csak így lehetsz biztos benne, hogy a jó áramkört kapcsoltad le, és nincs más forrás.
 
-**4. Földelés és rövidrezárás.**
-*Mit:* a leválasztott vezetőket összekötöd egymással és a földdel. *Mivel:* földelő-rövidrezáró eszközzel, előbb mindig a földelési ponthoz csatlakoztatva. *Miért:* ha a munka közben mégis feszültség jutna a vezetőkre (tévedés, visszatáplálás, indukált feszültség), a rövidzár azonnal működésbe hozza a védelmet, a földelés pedig a munkahelyen veszélytelen szinten tartja a feszültséget. A szabvány meghatározza, mikor kell ezt a lépést kisfeszültségen is elvégezni, és mikor helyettesíthető más megoldással.
+**4. Földelés és rövidre zárás.**
+- *Mit:* a leválasztott vezetőket összekötöd egymással és a földdel.
+- *Mivel:* földelő-rövidrezáró eszközzel, amelyet **először a földelési ponthoz**, csak utána a vezetőkhöz csatlakoztatsz. Lehetőleg a munkahelyről látható helyen legyen.
+- *Miért:* ha a munka közben mégis feszültség jutna a vezetőkre (tévedés, visszatáplálás, indukált feszültség), a rövidzár azonnal kioldja a védelmet, a földelés pedig a munkahelyen veszélytelen szinten tartja a feszültséget. Kisfeszültségen ez a lépés meghatározott feltételekkel elhagyható; ilyenkor a berendezés **feszültség nélküli**, de nem **feszültségmentes**. Kisfeszültségű szabadvezetéken az összes vezetőt minden esetben rövidre kell zárni.
 
-**5. Védelem a szomszédos, feszültség alatt álló részek ellen.**
-*Mit:* ha a munkaterület közelében maradnak feszültség alatt álló részek, ezeket elhatárolod. *Mivel:* szigetelő letakarással, védőburkolattal, elkorlátozással. *Miért:* hogy munka közben véletlenül se érhess hozzájuk szerszámmal vagy testrészeddel.
+**5. A közeli, aktív részek elleni védelem.**
+- *Mit:* ha a munkaterület közelében feszültség alatt maradó (aktív) részek vannak, elhatárolod őket.
+- *Mivel:* védőtávolság betartásával, szigetelő letakarással, védőburkolattal, elkorlátozással.
+- *Miért:* hogy munka közben se szerszámmal, se testrészeddel ne kerülhess a közelükbe.
 
-## Miért nem cserélhető fel a sorrend?
+## Miért kötelező a sorrend?
 
-Minden lépés az előzőre épül:
-
-- **Visszakapcsolás elleni biztosítás nélkül** az ellenőrzés semmit sem ér: lehet, hogy pont az ellenőrzés után kapcsolja vissza valaki.
-- **A feszültségmentesség ellenőrzése a földelés előtt** kötelező. Ha feszültség alatt álló vezetőre teszed fel a földelő-rövidrezárót, az zárlatot és ívet okoz, közvetlenül a kezed mellett.
-- **A szomszédos részek elhatárolása** akkor jön, amikor a saját munkaterületed már biztonságos, és pontosan látod, mi marad feszültség alatt.
+- **A visszakapcsolás elleni biztosítás az ellenőrzés előtt** kell: ha csak utána biztosítasz, közben bárki visszakapcsolhat, és az ellenőrzésed érvényét veszti.
+- **Az ellenőrzés a földelés előtt** kell: ha feszültség alatt álló vezetőre teszed fel a földelő-rövidrezárót, az zárlatot és ívet okoz közvetlenül a kezed mellett.
+- **A közeli aktív részek elhatárolása** a végén jön, amikor a saját munkaterületed már biztonságos, és pontosan tudod, mi maradt feszültség alatt.
 
 :::mistake
-„Úgyis csak egy lámpát cserélek, elég lekapcsolni a kapcsolót.” A fali kapcsoló csak egy vezetőt szakít meg, és nem is biztos, hogy a fázist. A lámpatestben ettől még lehet feszültség. A kis munkákra is ugyanaz az öt lépés vonatkozik.
+„Csak egy lámpát cserélek, elég a fali kapcsolót lekapcsolni.” A fali kapcsoló az áramkört nem választja le teljesen, és ha rosszul kötötték be, a fázist sem szakítja meg. A lámpatestben ettől még lehet feszültség. A kis munkákra is mind az öt lépés vonatkozik.
 :::
 
 :::safety
-Feszültség alatti munkát tanulóként és kezdő szerelőként soha nem végzel. Minden munka előtt végrehajtod a feszültségmentesítés öt lépését, a megadott sorrendben, és csak akkor kezdesz dolgozni, ha a feszültségmentességet a munkahelyen, minden pólusnál magad ellenőrizted.
+Feszültség alatt soha nem dolgozol. Minden munka előtt végrehajtod a feszültségmentesítés öt lépését, a kötelező sorrendben, és csak akkor kezdesz dolgozni, ha a feszültség nélküli állapotot a munkahelyen, minden pólusnál ellenőrizted.
 :::
 
 :::exam

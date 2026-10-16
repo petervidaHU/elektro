@@ -1,76 +1,84 @@
 ---
 title: A feszültségmentesítés eszközei
-summary: A feszültségkémlelő, a földelő-rövidrezáró, a lakatolás és a figyelmeztető táblák helyes használata, valamint az egyéni védőeszközök.
+summary: A feszültségkémlelő, a földelő-rövidrezáró, a lakatolás és a „Bekapcsolni tilos!” tábla helyes használata, valamint az egyéni védőeszközök.
 verify:
-  - "A feszültségkémlelő ellenőrzésének előírt módja (ismert feszültségforráson vagy a beépített önellenőrzővel, mérés előtt és után) – MSZ 1585 / MSZ EN 61243-3"
-  - "Miért nem alkalmas a feszültségmentesség megállapítására az egypólusú (érintős) fáziskereső és a multiméter – MSZ 1585 / tankönyv"
-  - "A figyelmeztető tábla kötelező felirata és kialakítása (a lecke szándékosan nem idézi) – MSZ 1585 / a vonatkozó biztonsági jelzés szabvány"
-  - "A szigetelt kéziszerszám „szabványos jelölése” (kettős háromszög, 1000 V) – MSZ EN 60900; érdemes-e a leckében megnevezni"
+  - "Feszültséget csak feszültségkémlelővel szabad kémlelni, egyéb eszközzel tilos; működőképességét kémlelés előtt és után ellenőrizni kell (próbagombbal vagy ismert feszültségű helyen) – ELMŰ-ÉMÁSZ 5 biztonsági szabály (tomintex.hu); MSZ 1585:2016 (feszultsegmentesites.hu)"
+  - "Kisfeszültségen próbalámpával vagy 20 mA-nél nagyobb fogyasztású, szabványos, kétsarkú feszültségvizsgálóval kell kémlelni; csak hangjelzést adó készülék nem elegendő; EN 61243 szabványsorozat – MSZ 1585:2016 (feszultsegmentesites.hu)"
+  - "Az egysarkú fázisceruza és az érintés nélküli feszültségjelző feszültségmentesség igazolására nem használható – feszultsegmentesites.hu (gyakorlati megjegyzés, nem szabványszöveg)"
+  - "Földelő-rövidrezáró: először a földelési ponthoz, utána az aktív részhez; eltávolítás fordított sorrendben; EN 61219 / EN 61230 – MSZ 1585:2016 (feszultsegmentesites.hu, tomintex.hu)"
+  - "„Bekapcsolni tilos!” figyelmeztető tábla használata – MSZ 1585:2016 (feszultsegmentesites.hu, tomintex.hu)"
+  - "HIÁNYZIK: a szigetelt kéziszerszámok jelölése (MSZ EN 60900) és a szigetelő védőeszközök időszakos vizsgálati ideje"
 ---
 
 :::goals
-- Meg tudod mutatni, hogyan használod helyesen a feszültségkémlelőt, és miért ellenőrzöd előtte és utána is.
-- Tudod, milyen sorrendben teszed fel és veszed le a földelő-rövidrezáró eszközt.
-- Fel tudod sorolni a lakatolás, a táblák és az egyéni védőeszközök szerepét.
+- Tudod, mivel szabad és mivel tilos a feszültség nélküli állapotot ellenőrizni.
+- Hibátlanul végre tudod hajtani a feszültségkémlelést: próba előtte, kémlelés, próba utána.
+- Ismered a földelő-rövidrezáró fel- és leszerelésének sorrendjét, és tudod, miért ez a sorrend.
+- Fel tudod sorolni a visszakapcsolás elleni biztosítás eszközeit és az egyéni védőeszközöket.
 :::
 
 ## A feszültségkémlelő
 
-A **feszültségkémlelő** az az eszköz, amellyel a feszültségmentesség megállapítása (a harmadik lépés) történik. Kisfeszültségen általában **kétpólusú feszültségkémlelőt** használunk: két mérőcsúcsa van, és a köztük lévő feszültséget jelzi.
+A feszültség nélküli állapot ellenőrzése (a 3. lépés) **kizárólag feszültségkémlelővel** történhet. Más eszközzel feszültséget kémlelni **tilos**.
 
-A feszültségmentesség megállapítására **nem alkalmas**:
+Kisfeszültségen a kémlelést **próbalámpával** vagy **20 mA-nél nagyobb fogyasztású, szabványos, kétpólusú (kétsarkú) feszültségvizsgálóval** végzed. A készüléknek meg kell felelnie az EN 61243 szabványsorozatnak. A kis belső fogyasztás miatt a kétpólusú vizsgáló nem mutat „szellemfeszültséget”: azt a kis, ártalmatlan feszültséget, amelyet egy szomszédos vezeték kapacitív úton kelt egy lekapcsolt vezetőn.
 
-- az **egypólusú fáziskereső** (érintős csavarhúzó): a működése függ attól, hogyan állsz, milyen a cipőd és a talaj, ezért megtévesztő eredményt adhat,
-- a **multiméter**: rossz méréshatáron vagy rossz üzemmódban 0 V-ot mutathat feszültség alatt álló vezetőn is. A multiméter mérésre való, nem feszültségmentesség megállapítására.
+**Nem használható** a feszültség nélküli állapot ellenőrzésére:
 
-**A helyes használat menete:**
+- az **egysarkú fázisceruza** (érintős csavarhúzó): a jelzése attól függ, hogyan állsz, milyen a cipőd és a padló, ezért megtévesztő,
+- az **érintés nélküli feszültségjelző**: tájékozódásra sem megbízható,
+- a **multiméter**: nem feszültségkémlelő. Rossz méréshatáron vagy üzemmódban 0 V-ot mutathat feszültség alatt álló vezetőn is,
+- a **csak hangjelzést adó** készülék: zajos környezetben nem hallod meg.
 
-1. **Ellenőrzés előtte.** Győződj meg róla, hogy a kémlelő működik: próbáld ki egy ismerten feszültség alatt álló helyen, vagy használd a beépített önellenőrzőt, ha van.
-2. **Mérés a munkahelyen.** Mérj minden pólus között és minden pólus és a védővezető (PE) között. Egyfázisú körnél: L–N, L–PE, N–PE. Háromfázisú körnél minden fázis egymás között, a nullához és a PE-hez is.
-3. **Ellenőrzés utána.** Próbáld ki újra ismert feszültségen. Ha a kémlelő közben elromlott, az „nincs feszültség” jelzés hamis volt.
+**A kémlelés menete:**
+
+1. **Próba előtte.** Közvetlenül a kémlelés előtt ellenőrizd a működőképességet: nyomd meg a próbagombot, vagy végezz próbakémlelést egy ismerten feszültség alatt álló helyen.
+2. **Kémlelés a munkahelyen.** Minden fázison és pólusón: a fázisok között, és minden üzemi vezető és a föld (PE) között. Egyfázisú körnél: L–N, L–PE, N–PE. Háromfázisú körnél: L1–L2, L2–L3, L1–L3, valamint minden fázis és az N, illetve a PE között, végül N–PE.
+3. **Próba utána.** Közvetlenül utána ismét próbáld ki. Ha a kémlelő közben elromlott, a „nincs feszültség” jelzés hamis volt.
 
 :::mistake
-„A kémlelő nem jelez, tehát nincs feszültség.” Csak akkor igaz, ha a kémlelőt közvetlenül előtte és utána is kipróbáltad, és működött. Egy lemerült elem vagy egy szakadt mérőzsinór halálos tévedéshez vezethet.
+„A kémlelő nem jelez, tehát nincs feszültség.” Ez csak akkor igaz, ha a kémlelőt közvetlenül előtte és utána is kipróbáltad, és működött. Egy lemerült elem vagy egy szakadt mérőzsinór halálos tévedéshez vezet.
 :::
 
 ## A földelő-rövidrezáró eszköz
 
-A **földelő-rövidrezáró** eszköz vezetékekből és csatlakozókból áll. Ezzel kötöd össze a leválasztott vezetőket egymással és a földdel (a negyedik lépés).
+A **földelő-rövidrezáró** szigetelt vezetékekből és szorítókból álló eszköz, amellyel a leválasztott vezetőket egymással és a földdel összekötöd (a 4. lépés). Az EN 61230 (hordozható eszközök), illetve EN 61219 szabványnak megfelelő eszközt használsz.
 
-**Felhelyezés:**
+**Felszerelés:**
 
-1. Ellenőrizd az eszköz épségét (vezetékek, csatlakozók, szorítók).
+1. Ellenőrizd az eszköz épségét: vezetékek, szorítók, csatlakozók.
 2. **Először a földelési ponthoz** csatlakoztasd.
-3. Csak ezután, a feszültségmentesség ismételt ellenőrzése után, csatlakoztasd sorban a vezetőkhöz, szigetelő rúddal vagy szigetelt fogóval, ha a feszültségszint ezt kívánja.
+3. Csak ezután csatlakoztasd sorban a vezetőkhöz (aktív részekhez), a 3. lépés ellenőrzése után.
 
-**Levétel:** fordított sorrendben: **először a vezetőkről**, és csak legvégül a földelési pontról.
+**Eltávolítás:** fordított sorrendben. **Előbb az aktív részekről**, utoljára a földelési pontról.
 
-Miért így? Ha a vezetőn váratlanul mégis feszültség van, a már földelt eszköz azonnal zárlatot okoz, és a védelem lekapcsol. Ha fordítva csinálnád, a még nem földelt eszköz, és vele a kezed, kerülne feszültség alá.
+**Miért így?** Ha a vezetőn váratlanul mégis feszültség van, a már földelt eszköz azonnal zárlatot okoz, és a védelem lekapcsol. Ha előbb az aktív részre csatlakoznál, a kezedben lévő eszköz és annak vezetéke kerülne feszültség alá.
 
-## Lakatolás és figyelmeztető táblák
+Ha a berendezésben beépített földelőkapcsoló van, a földelést annak működtetésével kezded, és csak utána teszed fel a hordozható eszközöket.
 
-A visszakapcsolás elleni biztosítás (a második lépés) eszközei:
+## A visszakapcsolás elleni biztosítás eszközei
 
-- **Lakat és lakatolható zár:** a főkapcsolót vagy a kismegszakítót kikapcsolt helyzetben rögzíti. Kismegszakítóra külön **lakatolóadaptert** kell tenni. A kulcs annál marad, aki a munkát végzi. Ha többen dolgoznak, mindenki teszi fel a saját lakatját, így csak akkor lehet visszakapcsolni, ha mindenki levette a magáét.
-- **Figyelmeztető tábla:** a kapcsolóra vagy mellé kerül, és jelzi, hogy a berendezésen dolgoznak, ezért tilos bekapcsolni. A tábla önmagában **nem** akadályozza meg a visszakapcsolást, ezért ahol lehet, a lakat mellé kell tenni.
-- **Biztosítóbetét elvétele:** olvadóbiztosítóknál a betétet kiveszed, és magadnál tartod vagy elzárod. A foglalatba vakbetétet vagy záróelemet teszel.
+- **Lakat:** a kapcsoló működtető szerkezetét kikapcsolt helyzetben rögzíti. Kismegszakítóra **lakatolóadaptert** teszel. A kulcs annál marad, aki a munkát végzi. Ha többen dolgoztok, mindenki a saját lakatját teszi fel, így csak akkor lehet visszakapcsolni, ha mindenki levette a magáét.
+- **„Bekapcsolni tilos!” tábla:** a leválasztó készülékre vagy közvetlenül mellé kerül. A tábla önmagában nem akadályozza meg a visszakapcsolást, ezért a lakat mellé tedd, ne helyette.
+- **Biztosítóbetét elvétele:** az olvadóbiztosító betétjét kiveszed, és magadnál tartod vagy elzárod.
+- **Távműködtetésű készülék:** helyi működtetésre kell átállítani, és arra is „Bekapcsolni tilos!” tábla kerül.
 
 ## Egyéni védőeszközök
 
-Az egyéni védőeszközök nem helyettesítik a feszültségmentesítést, de csökkentik a sérülés veszélyét, ha valami mégis rosszul megy.
+Az egyéni védőeszköz nem helyettesíti a feszültségmentesítést, de csökkenti a sérülést, ha valami mégis rosszul megy.
 
-- **Szigetelt kéziszerszámok:** csavarhúzó, fogó, kés, a szabványos jelöléssel. Sérült szigetelésű szerszámot nem szabad használni.
-- **Villamos szigetelő kesztyű:** használat előtt ellenőrizd, hogy ép-e (nincs rajta szakadás, lyuk).
-- **Arcvédő vagy védőszemüveg:** a zárlati ív fénye és fröccsenő fémrészei ellen.
+- **Szigetelt kéziszerszámok:** csavarhúzó, fogó, kés, szabványos szigeteléssel. Sérült szigetelésű szerszámot nem használsz.
+- **Villamos szigetelő kesztyű:** használat előtt ellenőrzöd, hogy nincs-e rajta szakadás vagy lyuk.
+- **Arcvédő vagy védőszemüveg:** a zárlati ív fénye és a fröccsenő olvadt fém ellen.
 - **Íválló munkaruha** és **szigetelő talpú védőcipő**.
 - **Védősisak**, ha fejsérülés veszélye áll fenn.
 
-Minden védőeszközt használat előtt szemrevételezéssel ellenőrizni kell. A szigetelő védőeszközöknek időszakos vizsgálata is van, ennek idejét az eszközön vagy a nyilvántartásban találod.
+Minden védőeszközt használat előtt szemrevételezéssel ellenőrzöl.
 
 :::safety
-A feszültségkémlelőt minden mérés előtt és után kipróbálod. A földelő-rövidrezárót mindig a földelési ponton kezded felhelyezni, és ott fejezed be a levételét. A lakat kulcsa a munka végéig nálad marad.
+A feszültségkémlelőt minden kémlelés előtt és után kipróbálod. A földelő-rövidrezárót mindig a földelési ponton kezded felszerelni, és ott fejezed be a leszerelését. A lakatod kulcsa a munka végéig nálad marad.
 :::
 
 :::exam
-A vizsga IV. részében előfordul, hogy fel kell sorolnod a feszültségmentesítés eszközeit, vagy le kell írnod a feszültségkémlelő helyes használatát.
+A vizsga IV. részében előfordul, hogy fel kell sorolnod a feszültségmentesítés eszközeit, le kell írnod a feszültségkémlelés helyes menetét, vagy meg kell adnod a földelő-rövidrezáró felszerelésének sorrendjét.
 :::

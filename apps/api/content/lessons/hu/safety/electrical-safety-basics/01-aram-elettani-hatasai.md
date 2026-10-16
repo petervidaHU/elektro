@@ -1,70 +1,78 @@
 ---
 title: A villamos áram élettani hatásai
-summary: Mi történik az emberi testben áramütéskor, és mitől függ, mennyire súlyos a sérülés.
+summary: Mi történik az emberi testben áramütéskor, mekkora áram milyen hatást okoz, és mitől függ a sérülés súlyossága.
 verify:
-  - "Az áram hatásának küszöbértékei (érzékelési küszöb kb. 0,5 mA, elengedési küszöb kb. 10 mA, kamrafibrilláció veszélye kb. 30–50 mA felett) – MSZ IEC/TS 60479-1, illetve a tankönyv"
-  - "Az emberi test ellenállásának nagyságrendje (kb. 1000 Ω, száraz és nedves bőr különbsége) – MSZ IEC/TS 60479-1"
-  - "A 15–100 Hz közötti frekvencia (benne az 50 Hz) a legveszélyesebb tartomány – MSZ IEC/TS 60479-1"
+  - "Érzékelési küszöb: 0,5 mA, a behatási időtől függetlenül – IEC/TS 60479-1 (EMF-Portal összefoglaló)"
+  - "Elengedési küszöb: 5 mA (6 s-nál hosszabb behatásnál) és 200 mA (10 ms-os behatásnál) között, időfüggő – IEC/TS 60479-1 (EMF-Portal összefoglaló)"
+  - "Kamrafibrilláció: kb. 40 mA már halálos lehet, ha 2 s-nál tovább folyik – IEC/TS 60479-1 (EMF-Portal összefoglaló)"
+  - "Az ábrák és határértékek a 15–100 Hz-es váltakozó áramra és bal kéz – két láb áramútra érvényesek – IEC/TS 60479-1 (EMF-Portal összefoglaló)"
+  - "Áramütés után orvosi megfigyelés szükséges panaszmentesség esetén is, és orvosi engedély nélkül nem szabad itatni – ITM: Villamos biztonsági ismeretek (2022)"
+  - "HIÁNYZIK: az emberi test impedanciájának értékei (kéz–kéz, 230 V) – IEC/TS 60479-1 táblázata"
 ---
 
 :::goals
 - Megérted, mi történik a testben, amikor áram folyik át rajta.
-- Fel tudod sorolni, mitől függ az áramütés súlyossága.
-- Meg tudod magyarázni, miért veszélyes az áramütés akkor is, ha a sérült utána jól érzi magát.
+- Ismered az áram hatásainak küszöbértékeit: 0,5 mA, 5 mA, 40 mA.
+- Fel tudod sorolni a hat tényezőt, amelytől az áramütés súlyossága függ.
+- Meg tudod magyarázni, miért kell orvoshoz menni akkor is, ha a sérült jól érzi magát.
 :::
 
 ## Mi az áramütés?
 
-**Áramütésről** beszélünk, amikor az emberi testen keresztül villamos áram folyik. Ehhez két pontnak kell érintkeznie a testtel, amelyek között feszültség van. Ilyen például a megérintett fázisvezető és a talaj, vagy a fázisvezető és egy földelt fémcső.
+**Áramütés** akkor történik, amikor az emberi testen keresztül villamos áram folyik. Ehhez a testnek két olyan ponton kell érintkeznie, amelyek között feszültség van. Tipikus eset: a kezeddel megérintesz egy fázisvezetőt, és közben a lábad a földön áll. Ekkor az áram a kezeden be-, a lábadon kilép.
 
-A test nem szigetelő: a szövetekben sok a víz és az oldott só, ezért az áram át tud folyni rajta. Az áram útját a test **áramútnak** hívjuk, például bal kéz – láb vagy kéz – kéz.
+Az áram útját a testben **áramútnak** nevezzük: például bal kéz – két láb, kéz – kéz, kéz – láb.
 
-Fontos: a sérülést az **áram** okozza, nem közvetlenül a feszültség. A feszültség azért számít, mert Ohm törvénye szerint (`I = U / R`) a test ellenállásán annál nagyobb áramot hajt át, minél nagyobb.
+A sérülést az **áram** okozza. A feszültség azért döntő, mert Ohm törvénye szerint ez hajtja át az áramot a testen:
 
-- I: a testen átfolyó áram, A (a gyakorlatban mA, azaz milliamper),
-- U: az érintési feszültség, vagyis a két érintett pont közötti feszültség, V,
-- R: a test ellenállása az áramút mentén, Ω.
+`I = Uₑ / Rₜ`
 
-## Mit okoz az áram a testben?
+- I: a testen átfolyó áram, A (az áramütésnél mA, azaz milliamper nagyságrendű),
+- Uₑ: az érintési feszültség, vagyis a két érintett pont közötti feszültség, V,
+- Rₜ: a test ellenállása az áramút mentén, Ω.
 
-Az áram hatásai az erősségétől függően egymásra épülnek:
+Minél nagyobb az érintési feszültség, és minél kisebb a test ellenállása, annál nagyobb áram folyik.
 
-1. **Érzékelés.** Kis áramnál bizsergést érzel. Ez még nem okoz sérülést, de figyelmeztető jel.
-2. **Izomgörcs.** Az izmokat idegi jelek, vagyis kis villamos impulzusok vezérlik. A kívülről érkező áram ezt felülírja, és az izmok összehúzódnak. Ha a kezed rámarkol egy vezetőre, előfordulhat, hogy **nem tudod elengedni**. Ilyenkor az áram tovább folyik, és a helyzet egyre súlyosabb lesz.
-3. **Légzési nehézség.** Ha az áram a mellkason folyik át, a légzőizmok is görcsbe rándulhatnak.
-4. **Szívritmuszavar.** A szív is villamos jelekre húzódik össze. A testen átfolyó áram megzavarhatja a ritmusát. A legsúlyosabb eset a **kamrafibrilláció**: a szívkamrák összehangolt összehúzódás helyett csak remegnek, így a szív nem pumpál vért. Ez azonnali újraélesztés nélkül perceken belül halálhoz vezet.
-5. **Égés.** Ahol az áram belép a testbe és kilép belőle, ott a bőr átmeneti ellenállásán hő keletkezik. Ezek az égési sérülések kívülről kicsinek látszhatnak, de az áram útja mentén a mély szövetek is megsérülhetnek. Villamos ív esetén a hő és a fény is súlyos égést okozhat, akkor is, ha az áram nem folyik át a testen.
+## Mekkora áram mit okoz?
 
-Másodlagos sérülés is gyakori: az áramütéstől megriadva valaki leesik a létráról, vagy a görcs miatt elesik.
+Az áram élettani hatásait az **IEC/TS 60479-1** szabvány írja le. Az itt megadott értékek az 50 Hz-es hálózati váltakozó áramra és a bal kéz – két láb áramútra vonatkoznak.
 
-A tankönyvek az egyes hatásokhoz áramerősség-határokat rendelnek. Nagyságrendileg már néhány tized mA érezhető, kb. 10 mA felett a vezetőt sokan már nem tudják elengedni, és néhányszor 10 mA felett megjelenik a kamrafibrilláció veszélye. A pontos értékeket és azok feltételeit mindig a tankönyvből vagy a vonatkozó szabványból tanuld.
+**0,5 mA – érzékelési küszöb.** Eddig az áramerősségig az áramot nem, vagy alig érzed, akármeddig folyik.
+
+**5 mA felett – elengedési küszöb.** Az izmokat idegi jelek, vagyis kis villamos impulzusok vezérlik. A kívülről érkező áram ezt felülírja: az izmok görcsösen összehúzódnak. Ha a kezed rámarkol a vezetőre, nem tudod elengedni, és az áram tovább folyik. Az elengedési küszöb a behatási időtől függ: hosszú (6 s-nál hosszabb) behatásnál már 5 mA, nagyon rövid (10 ms-os) behatásnál 200 mA.
+
+**40 mA – kamrafibrilláció.** A szív is villamos jelekre húzódik össze. Ha kb. 40 mA 2 másodpercnél tovább folyik a testen át, **kamrafibrilláció** alakulhat ki: a szívkamrák összehangolt összehúzódás helyett csak remegnek, a szív nem pumpál vért. Azonnali újraélesztés és defibrillálás nélkül ez perceken belül halálhoz vezet.
+
+Vesd össze: egy 230 V-os konnektorról egy fogyasztó ampereket vesz fel. A halálos áram ennek csak néhány század része.
+
+Az áram további hatásai:
+
+- **Légzésbénulás:** ha az áram a mellkason folyik át, a légzőizmok görcsbe rándulnak.
+- **Égés:** az áram be- és kilépési helyén a bőr ellenállásán hő keletkezik. Az áram útja mentén a mély szövetek is megéghetnek, ezért a sérülés belül súlyosabb, mint amilyennek kívülről látszik.
+- **Ívhatás:** zárlati ívnél a hő és a fény akkor is súlyos égést és szemsérülést okoz, ha az áram nem folyik át a testen.
+- **Másodlagos sérülés:** az áramütéstől megrándulva leesel a létráról, vagy elesel.
 
 ## Mitől függ az áramütés súlyossága?
 
-**Az áramerősségtől.** Minél nagyobb az áram, annál súlyosabb a hatás. Az áramerősséget a feszültség és a test ellenállása együtt határozza meg.
-
-**Az áramúttól.** A legveszélyesebb az az áramút, amely a **szíven át** vezet, például bal kéz – láb vagy kéz – kéz. Egy ujjon belüli áramút ugyanakkora áramnál kevésbé veszélyes.
-
-**A behatási időtől.** Minél tovább folyik az áram, annál nagyobb a szívritmuszavar és az égés veszélye. Ezért kell a védelmi készülékeknek, például a kismegszakítónak vagy az áram-védőkapcsolónak (ÁVK) hiba esetén **gyorsan** lekapcsolniuk.
-
-**A frekvenciától.** A hálózati 50 Hz-es váltakozó áram az élettani hatás szempontjából különösen veszélyes tartományba esik. Az egyenáram más módon hat, de szintén veszélyes.
-
-**A test ellenállásától.** Ezt főleg a bőr állapota határozza meg. Nedves, izzadt vagy sérült bőr esetén az ellenállás jóval kisebb, így ugyanakkora feszültség nagyobb áramot hajt át. Ezért különösen veszélyes a fürdőszoba, a kültér és minden nedves környezet. A test ellenállása a feszültség növekedésével is csökken.
-
-**Az egyéni állapottól.** A fáradtság, a betegség, a szívprobléma vagy az alkohol mind növeli a kockázatot.
+1. **Az áramerősség.** Minél nagyobb, annál súlyosabb a hatás (lásd a küszöbértékeket).
+2. **A behatási idő.** Minél tovább folyik az áram, annál nagyobb a kamrafibrilláció és az égés veszélye. A 40 mA-es érték is 2 s-nál hosszabb behatásra vonatkozik. Ezért kell a kismegszakítónak és az áram-védőkapcsolónak (ÁVK) a hibás áramkört **gyorsan** lekapcsolnia.
+3. **Az áramút.** A legveszélyesebb az az áramút, amely a **szíven** át vezet: bal kéz – láb, kéz – kéz.
+4. **A frekvencia.** Az élettani határértékek a 15–100 Hz-es tartományra vonatkoznak. A hálózati 50 Hz ebbe a tartományba esik.
+5. **A test ellenállása.** Ezt főleg a bőr állapota és az érintkezési felület határozza meg. Nedves, izzadt vagy sérült bőrnél és nagy érintkezési felületnél az ellenállás sokkal kisebb, így ugyanaz a feszültség nagyobb áramot hajt át. Ezért különösen veszélyes a fürdőszoba, a kültér és minden nedves környezet.
+6. **Az egyéni állapot.** A fáradtság, a betegség, a szívprobléma és az alkohol növeli a kockázatot.
 
 :::mistake
-„A 230 V nem halálos, engem már sokszor megrázott.” Ez téves. Hogy egy áramütés milyen következményekkel jár, azt a pillanatnyi körülmények döntik el: az áramút, a bőr nedvessége, a talaj, az időtartam. Ugyanaz a 230 V egyszer csak megráz, máskor halálos.
+„A 230 V nem halálos, engem már sokszor megrázott.” Ez téves. A 230 V nedves bőrön, szíven át vezető áramúttal könnyen 40 mA-nél nagyobb áramot hajt át a testen. Hogy egy áramütés csak megráz vagy megöl, azt a pillanatnyi körülmények döntik el, nem a feszültség „mérete”.
 :::
 
-## Utólagos veszélyek
+## Áramütés után
 
-Áramütés után a sérült gyakran jól érzi magát, mégis **orvosi vizsgálatra van szükség**. A szívritmuszavar később is jelentkezhet, és a belső égési sérülések kívülről nem látszanak. Az áramütést a munkahelyen is jelenteni kell.
+Az áramütött embert **mindig orvosi megfigyelés alá kell helyezni**, akkor is, ha nincs panasza. A szívritmuszavar az áramütés után később is kialakulhat, a belső égési sérülések pedig kívülről nem látszanak. Az orvos engedélye nélkül a sérültnek nem szabad inni adni. Az áramütést a munkahelyen jelenteni kell a munkahelyi vezetőnek.
 
 :::safety
-Áramütés után mindig orvoshoz kell fordulni, akkor is, ha a sérült panaszmentesnek tűnik. Saját magadra is igaz: ha megrázott az áram, ne folytasd a munkát, szólj a munkavezetődnek, és menj orvoshoz.
+Ha megrázott az áram, azonnal hagyd abba a munkát, szólj a munkavezetődnek, és menj orvoshoz. A biztonság alapja: villamos berendezésen csak feszültségmentesített állapotban dolgozol, így áram a testeden nem folyhat át.
 :::
 
 :::exam
-Az ágazati alapvizsgán és a központi interaktív vizsga IV. (villamos biztonsági) részében számíthatsz arra, hogy fel kell sorolnod az áramütés súlyosságát befolyásoló tényezőket, vagy meg kell magyaráznod, miért a szíven át vezető áramút a legveszélyesebb.
+Az ágazati alapvizsgán és a központi interaktív vizsga IV. (villamos biztonsági) részében kérdezik: az áramütés súlyosságát befolyásoló tényezőket, az áram élettani hatásait, és azt, miért a szíven át vezető áramút a legveszélyesebb.
 :::

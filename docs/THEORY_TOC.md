@@ -36,6 +36,16 @@ plan wins: fix this file.
   számítani…", "Figyelj arra, hogy…"). Use short sentences and plain words, and
   explain every technical term the first time it appears. Respectful, never
   childish.
+- **Be decisive and exact.** The lesson *is* the learning material: state facts,
+  values, steps and rules plainly and completely, as a good instructor would. No
+  hedging ("általában", "nagyjából", "kb." where an exact value exists) and no
+  deferring to other material: never write "a tankönyvből tanuld", "nézd meg a
+  szabványban", "a pontos értéket a tankönyv tartalmazza" or similar. Name the
+  source of a rule in the text where it helps the learner (e.g. "az MSZ 1585
+  szerint"), but give the rule itself.
+- **Be thorough.** Cover every point in the table's *Content* column in full depth:
+  definitions, the exact values with units, the steps in order, the reason behind
+  each rule, and what goes wrong if it is broken.
 
 ### File format
 
@@ -112,15 +122,22 @@ it, and add a `verify` entry asking for the figure.
 
 ### Rules (non-negotiable)
 
-1. **Never invent values from standards, regulations or tables.** This covers limit
-   values, current-carrying capacities, disconnection times, test voltages, minimum
-   insulation resistances, RCD trip values, body-current thresholds, cable laying
-   depths, voltage-level boundaries, IP digit meanings and first-aid protocol
-   details. You have two options for each:
-   - Explain the concept and say where the value comes from ("a vonatkozó szabvány
-     táblázata szerint", "a tankönyvi táblázatból"), **without the number**; or
-   - Give the number **and** add a `verify` entry naming the claim and its expected
-     source (e.g. "Törpefeszültség felső határa, MSZ 1").
+1. **Check every value against a source before you write it; never invent one.**
+   This covers limit values, current-carrying capacities, disconnection times, test
+   voltages, minimum insulation resistances, RCD trip values, body-current
+   thresholds, cable laying depths, voltage-level boundaries, IP digit meanings,
+   wording of standard procedures and first-aid protocol details.
+   - **Verified** (you found it in a source you could actually read, see *Checked
+     sources* below): write the **exact value** in the lesson, decisively, and add
+     a `verify` entry naming the claim and the source you checked it against, e.g.
+     "Törpefeszültség: legfeljebb 50 V AC / 120 V DC – MEE VÉT kézikönyv VII.1.1
+     (MSZ 1)". The teacher confirms it against the standard during review.
+   - **Not verifiable**: leave the claim out of the lesson entirely (don't replace
+     it with a vague sentence or a pointer to the textbook) and add a `verify` entry
+     starting with `HIÁNYZIK:` that names the missing value and where it should come
+     from, so the teacher can add it.
+   - In the *Content* column below, "`verify`-jal" means exactly this: exact value
+     in the text plus a `verify` entry with its source.
 2. **Physics is fine**: Ohm's law, power, Kirchhoff, √3 in three-phase, RMS,
    reactance and so on. Check every worked example's arithmetic twice. Use the
    Hungarian decimal comma (`2,5 mm²`, `0,0225 Ω·mm²/m`) and a space between a
@@ -140,6 +157,23 @@ it, and add a `verify` entry asking for the figure.
 6. **Length**: 500–1200 words per lesson. One lesson should take a phone reader
    about 5–10 minutes. Split rather than cram.
 7. Every lesson stands on its own, but may refer to earlier lessons by title.
+
+### Checked sources
+
+Sources that were read and used to check values so far (add to this list when you
+verify against a new one):
+
+- MEE Villamos biztonsági felülvizsgálók kézikönyve, VII. fejezet (Műszaki alapok):
+  feszültségszintek, SELV/PELV, MSZ 1585 öt biztonsági művelete, megengedett
+  érintési feszültség, lekapcsolási idők.
+- ITM: Villamos biztonsági ismeretek (munkavédelmi jegyzet, 2022): feszültségszintek,
+  MSZ 1585:2016 személycsoportok, feszültségmentesítés, mentés és elsősegély.
+- feszultsegmentesites.hu (az MSZ 1585:2016 6.2. szakaszának összefoglalója): az öt
+  biztonsági művelet, feszültségkémlelés, földelés-rövidrezárás sorrendje,
+  feszültség alá helyezés.
+- European Resuscitation Council Guidelines 2021: Basic Life Support.
+- IEC/TS 60479-1 (az EMF-Portal összefoglalója alapján): az áram élettani hatásainak
+  küszöbértékei.
 
 ### A complete example
 
@@ -166,16 +200,16 @@ Exam: alapvizsga, IV · PTT 3.3.1.6.4, 3.5.1.6.1
 
 | File | Title | Content |
 | --- | --- | --- |
-| `hu/safety/electrical-safety-basics/01-aram-elettani-hatasai.md` | A villamos áram élettani hatásai | Mi történik a testben áramütéskor (izomgörcs, szívritmuszavar, égés); az áramütés súlyosságát befolyásoló tényezők: áramerősség, áramút, behatási idő, frekvencia, a test ellenállása. Számértékek csak `verify`-jal. |
-| `hu/safety/electrical-safety-basics/02-feszultsegszintek-es-munkavegzok.md` | Feszültségszintek és a munkavégzők | Feszültségszintek az MSZ 1 szerint (törpe-, kis-, nagyfeszültség; határok csak `verify`-jal); laikus, kioktatott és szakképzett személy (MSZ 1585): ki mit végezhet. |
-| `hu/safety/electrical-safety-basics/03-mentes-es-elsosegely.md` | Műszaki mentés és elsősegély áramütésnél | A sérült kiszabadítása saját veszélyeztetés nélkül (lekapcsolás, szigetelt eszköz); segélyhívás (112); eszmélet és légzés vizsgálata; újraélesztés – a protokoll részletei `verify`-jal (aktuális ERC/OMSZ ajánlás). |
+| `hu/safety/electrical-safety-basics/01-aram-elettani-hatasai.md` | A villamos áram élettani hatásai | Mi történik a testben áramütéskor (izomgörcs, szívritmuszavar, égés); az áramütés súlyosságát befolyásoló tényezők: áramerősség, áramút, behatási idő, frekvencia, a test ellenállása. Az IEC/TS 60479-1 küszöbértékei (érzékelési, elengedési, kamrafibrillációs) pontos számmal, `verify`-jal. |
+| `hu/safety/electrical-safety-basics/02-feszultsegszintek-es-munkavegzok.md` | Feszültségszintek és a munkavégzők | Feszültségszintek az MSZ 1 szerint (törpe-, kis-, nagyfeszültség váltakozó és egyenfeszültségen; a KIF/KÖF/NAF üzemi felosztás; határok `verify`-jal); képzetlen (laikus), kioktatott és szakképzett személy, az MSZ 1585:2016 I–V. személycsoportjai: ki mit végezhet. |
+| `hu/safety/electrical-safety-basics/03-mentes-es-elsosegely.md` | Műszaki mentés és elsősegély áramütésnél | A sérült kiszabadítása saját veszélyeztetés nélkül (lekapcsolás, szigetelt eszköz); segélyhívás (112); eszmélet és légzés vizsgálata; újraélesztés pontos protokollal (arány, ütem, mélység, AED; ERC 2021, `verify`-jal); a teendők sorrendje; orvosi megfigyelés. |
 
 #### `isolation-procedure`: Feszültségmentesítés 🛡
 Exam: IV · KKK 6.3/12 · PTT 3.11.2.6.6
 
 | File | Title | Content |
 | --- | --- | --- |
-| `hu/safety/isolation-procedure/01-feszultsegmentesites-ot-lepese.md` | A feszültségmentesítés öt lépése | Az öt lépés az MSZ 1585 szerint, a helyes sorrendben, mindegyiknél: mit, miért, mivel; miért nem cserélhető fel a sorrend. A lépések pontos megfogalmazása `verify`. |
+| `hu/safety/isolation-procedure/01-feszultsegmentesites-ot-lepese.md` | A feszültségmentesítés öt lépése | Az öt lépés az MSZ 1585 szerint, a helyes sorrendben, mindegyiknél: mit, miért, mivel; miért nem cserélhető fel a sorrend. A lépések pontos megfogalmazása az MSZ 1585:2016 6.2. szakasza szerint (`verify`). |
 | `hu/safety/isolation-procedure/02-eszkozok-es-vedoeszkozok.md` | A feszültségmentesítés eszközei | Feszültségkémlelő és használata (ellenőrzés előtte és utána), földelő-rövidrezáró eszköz, lakatolás és figyelmeztető táblák, egyéni védőeszközök. |
 | `hu/safety/isolation-procedure/03-feszultseg-ala-helyezes.md` | Feszültség alá helyezés és a munkaterület átadása | A visszakapcsolás menete fordított sorrendben; ki adhat engedélyt; a munkaterület átadása-átvétele; tipikus hibák. |
 

@@ -1,68 +1,80 @@
 ---
 title: Feszültségszintek és a munkavégzők
-summary: Milyen feszültségszinteket különböztetünk meg, és ki milyen villamos munkát végezhet a képzettsége szerint.
+summary: A törpe-, kis- és nagyfeszültség pontos határai, a hálózatok üzemi felosztása, és az, hogy ki milyen villamos munkát végezhet.
 verify:
-  - "A feszültségszintek elnevezése és határai (törpefeszültség legfeljebb 50 V váltakozó feszültség, kisfeszültség legfeljebb 1000 V, nagyfeszültség 1000 V felett) – MSZ 1"
-  - "A középfeszültségű elosztóhálózat jellemző feszültségei (10–35 kV) – tankönyv"
-  - "A személyek kategóriái (laikus, kioktatott, villamos szakképzett személy) és megnevezésük – MSZ 1585"
-  - "Mit végezhet a kioktatott személy önállóan, és mit csak felügyelet mellett – MSZ 1585"
+  - "Törpefeszültség (ELV): váltakozó áramnál legfeljebb 50 V, hullámosságmentes egyenáramnál legfeljebb 120 V; ide tartozik a SELV, a PELV és a FELV – MEE VÉT kézikönyv VII.1.1–VII.1.2 (MSZ 1)"
+  - "Kisfeszültség (LV): váltakozó áramnál legfeljebb 1000 V, egyenáramnál legfeljebb 1500 V; nagyfeszültség (HV): ezek felett – MEE VÉT kézikönyv VII.1.1 (MSZ 1)"
+  - "KIF: legfeljebb 1 kV; KÖF: 1 kV felett, legfeljebb 35 kV; NAF: 35 kV felett – MEE VÉT kézikönyv VII.1.1"
+  - "Az MSZ 1585:2016 I–V. személycsoportjai és meghatározásuk – ITM: Villamos biztonsági ismeretek (2022)"
+  - "Villamos munkát csak szakképzett vagy kioktatott személy végezhet, vagy ilyen személy felügyelete alatt – MSZ 1585:2016 (feszultsegmentesites.hu összefoglaló)"
+  - "HIÁNYZIK: az egyes személycsoportok által végezhető munkák pontos listája – MSZ 1585:2016"
 ---
 
 :::goals
-- Meg tudod nevezni a feszültségszinteket, és tudod, hol találod a határaikat.
-- Megérted, miért a feszültségszinttől függnek a biztonsági szabályok.
-- Ki tudod mondani, mi a különbség a laikus, a kioktatott és a villamos szakképzett személy között.
+- Pontosan meg tudod adni a törpe-, kis- és nagyfeszültség határait váltakozó és egyenfeszültségen.
+- Ismered a KIF, KÖF és NAF hálózatok feszültséghatárait.
+- Ki tudod mondani, mi a különbség a képzetlen, a kioktatott és a szakképzett személy között.
+- Ismered az MSZ 1585 öt személycsoportját.
 :::
 
 ## Miért osztjuk szintekre a feszültséget?
 
-A villamos berendezéseket a feszültségük szerint csoportokba soroljuk. Ennek gyakorlati oka van: a feszültségszinttől függ, hogy
+A villamos berendezéseket életvédelmi szempontból a feszültségük szerint csoportokba soroljuk. A feszültségszinttől függ, hogy milyen szigetelés és védőtávolság kell, milyen áramütés elleni védelmet kell alkalmazni, és ki dolgozhat a berendezésen. A besorolás mindig a **névleges feszültség** alapján történik: azon az értéken, amelyre a hálózatot tervezték.
 
-- milyen szigetelés és milyen távolság kell a feszültség alatt álló részek körül,
-- milyen védelmi megoldás szükséges az áramütés ellen,
-- ki dolgozhat a berendezésen, és milyen eszközökkel.
+## A három feszültségszint
 
-A feszültségszinteket Magyarországon az **MSZ 1** szabvány határozza meg. A szinteket mindig a **névleges feszültség** alapján soroljuk be, vagyis azon az értéken, amelyre a hálózatot tervezték.
+Az MSZ 1 szabvány három feszültségszintet határoz meg.
 
-## A feszültségszintek
+**Törpefeszültség (ELV).** Váltakozó áramnál legfeljebb **50 V**, hullámosságmentes egyenáramnál legfeljebb **120 V**. Ide tartozik:
 
-**Törpefeszültség.** A legkisebb feszültségszint. Az MSZ 1 szerint váltakozó feszültségnél legfeljebb 50 V. Ilyen feszültségről működik például a csengő, sok vezérlőáramkör és a LED-szalagok egy része. Az áramütés elleni védelemben fontos szerepe van: a törpefeszültségű, biztonsági transzformátorról táplált áramkörök (SELV, PELV) bizonyos helyiségekben a legbiztonságosabb megoldást jelentik. Ezekről az áramütés elleni védelemnél részletesen tanulsz.
+- **SELV:** biztonsági törpefeszültség, földeletlen áramkör,
+- **PELV:** védelmi törpefeszültség, földelt áramkör,
+- **FELV:** üzemi törpefeszültség, amelyet üzemi okból alkalmazunk, de nem biztonsági forrásról táplálunk.
 
-**Kisfeszültség.** A törpefeszültség felső határától 1000 V-ig tart. Ide tartozik a lakások és az ipari üzemek **230/400 V**-os hálózata, vagyis szinte minden, amin villanyszerelőként dolgozol. A „kis” szó ne tévesszen meg: a kisfeszültség **életveszélyes**.
+A SELV és a PELV önmagában is áramütés elleni védelem. Ezekről az áramütés elleni védelemnél részletesen tanulsz.
 
-**Nagyfeszültség.** 1000 V felett. Ide tartoznak az áramszolgáltatók közép- és nagyfeszültségű hálózatai, alállomásai. A köznyelv és a szakma a nagyfeszültségen belül gyakran beszél **középfeszültségről** is, ilyen a településeket ellátó 10–35 kV-os hálózat. Nagyfeszültségű berendezés közelében már az is veszélyes lehet, ha valaki túl közel megy hozzá, mert a feszültség a levegőn át is átívelhet.
+**Kisfeszültség (LV).** Váltakozó áramnál legfeljebb **1000 V**, egyenáramnál legfeljebb **1500 V**. Ide tartozik a lakások és az üzemek **230/400 V**-os hálózata, vagyis szinte minden, amin villanyszerelőként dolgozol. A „kis” szó ne tévesszen meg: a kisfeszültség **életveszélyes**.
 
-A pontos határokat mindig a szabványból vagy a tankönyvből ellenőrizd. Ezek a vizsgán is gyakran előkerülnek.
+**Nagyfeszültség (HV).** Váltakozó áramnál **1000 V felett**, egyenáramnál **1500 V felett**. Nagyfeszültségű berendezés közelében már a megközelítés is életveszélyes, mert a feszültség a levegőn át is átívelhet.
+
+## A hálózatok üzemi felosztása
+
+Az áramszolgáltatók és a villamos hálózatokkal dolgozók a nagyfeszültséget tovább bontják:
+
+- **KIF – kisfeszültségű hálózat:** legfeljebb 1 kV névleges feszültség (például a 230/400 V-os elosztóhálózat),
+- **KÖF – középfeszültségű hálózat:** 1 kV felett, legfeljebb 35 kV (a településeket ellátó hálózatok),
+- **NAF – nagyfeszültségű hálózat:** 35 kV felett (az országos átviteli és főelosztó hálózat).
+
+Biztonsági szempontból a KÖF is nagyfeszültség: minden nagyfeszültségre vonatkozó szabály érvényes rá.
 
 :::mistake
-„A 24 V-os áramkör veszélytelen, azon bármit csinálhatok.” A törpefeszültség valóban kisebb áramütési kockázatot jelent, de rövidzárlatkor nagy áram folyhat, ami égést vagy tüzet okozhat. És gyakran ugyanabban az elosztóban vagy dobozban 230 V-os részek is vannak.
+„A 24 V-os áramkör veszélytelen, azon bármit csinálhatok.” A törpefeszültség áramütés szempontjából valóban kisebb kockázat, de rövidzárlatkor nagy áram folyhat, ami égést vagy tüzet okoz. Ráadásul ugyanabban a dobozban vagy elosztóban gyakran 230 V-os részek is vannak.
 :::
 
-## Kik dolgozhatnak villamos berendezésen?
+## Ki dolgozhat villamos berendezésen?
 
-A villamos berendezések üzemeltetésének és a rajtuk végzett munkának a szabályait az **MSZ 1585** szabvány írja le. Ez a személyeket aszerint sorolja be, hogy mennyire ismerik a villamosság veszélyeit.
+A villamos berendezések üzemeltetésének és a rajtuk végzett munkának a szabályait az **MSZ 1585:2016** szabvány írja elő. Alapszabálya: villamos munkában csak **szakképzett** vagy **kioktatott** személy vehet részt, vagy olyan, aki ilyen személy **felügyelete alatt** dolgozik.
 
-**Laikus (villamos szempontból képzetlen) személy.** Nincs villamos szakképzettsége és nem kapott oktatást. Ő csak **használhatja** a berendezéseket a rendeltetésük szerint: bekapcsolja a lámpát, bedugja a hálózati dugót. Villamos munkát nem végezhet.
+A három alapkategória:
 
-**Kioktatott személy.** Villamos szakképzett személytől megfelelő oktatást kapott az adott munkára és annak veszélyeire. Például egy karbantartó, akit kioktattak, hogyan cserélje a lámpatestben a fényforrást. A szabvány pontosan meghatározza, mit végezhet önállóan, és mit csak felügyelet mellett. A kioktatás mindig **egy adott munkára** szól, nem általános felhatalmazás.
+- **Képzetlen (laikus) személy:** nincs villamos szakképzettsége, és nem kapott kioktatást. A berendezéseket csak rendeltetésszerűen használhatja (lámpát kapcsol, dugót dug be). Villamos munkát önállóan nem végezhet.
+- **Kioktatott személy:** nincs villamos szakképzettsége, de az általa végzendő munka villamos veszélyeire és az ezzel kapcsolatos helyes magatartásra bizonyítottan kioktatták. A kioktatás mindig egy adott munkakörre szól.
+- **Szakképzett személy:** igazolt villamos szakmai képesítéssel, tudással és gyakorlattal rendelkezik, amely képessé teszi a villamosság okozta kockázatok értékelésére és a veszélyek elkerülésére.
 
-**Villamos szakképzett személy.** Megfelelő szakmai képzettséggel és tapasztalattal rendelkezik, így fel tudja ismerni és el tudja kerülni a villamosság okozta veszélyeket. A villanyszerelő szakmai vizsga után ebbe a körbe kerülsz, de a munkáltatónak ezen felül is meg kell győződnie arról, hogy az adott feladatra alkalmas vagy.
+Az MSZ 1585:2016 ezt öt **személycsoportra** bontja:
 
-Tanulóként, a képzés ideje alatt villamos munkát csak **felügyelet mellett** végezhetsz. A felügyeletet egy villamos szakképzett személy látja el, aki a munkát irányítja és ellenőrzi.
+1. **I. csoport:** semmilyen szakképzettségük nincs, és kioktatást sem kaptak (képzetlen személyek).
+2. **II. csoport:** az általuk végzendő tevékenységre műszaki, de nem villamos jellegű kioktatást kaptak.
+3. **III. csoport:** villamos szakképzettségük nincs, de a munkájuk villamos veszélyeire bizonyítottan kioktatták őket (kioktatott személyek).
+4. **IV. csoport:** villamos energetikai (erősáramú) szakképzettségű személyek. Ez hat alcsoportra (IV/a–IV/f) oszlik, például IV/e: az érintésvédelmi szabványossági felülvizsgáló.
+5. **V. csoport:** erősáramú szakképzettségű villamosmérnök, villamos technikus vagy villamos szakmunkás, akit a munkáltatója villamos munkák irányításával vagy vezetésével bízott meg.
 
-## Mit jelent ez a gyakorlatban?
-
-A munka megkezdése előtt mindig tisztázni kell:
-
-1. Milyen feszültségszintű a berendezés?
-2. Feszültségmentes állapotban, feszültség közelében vagy feszültség alatt kell-e dolgozni? (Tanulóként és kezdő szerelőként **csak feszültségmentes** berendezésen dolgozol.)
-3. Ki a munka irányítója, és ki végzi a feszültségmentesítést?
-4. Megvan-e mindenkinek a megfelelő képzettsége és kioktatása ehhez a munkához?
+A villanyszerelő szakmai vizsga után a IV. csoportba kerülhetsz. Tanulóként villamos munkát kizárólag szakképzett személy **felügyelete alatt** végzel.
 
 :::safety
-Soha ne végezz olyan munkát, amelyre nincs képzettséged vagy kioktatásod, akkor sem, ha valaki megkér rá. Villamos munka előtt mindig feszültségmentesíts, és ellenőrizd a feszültségmentességet. A feszültségmentesítés lépéseit a következő témában részletesen tanulod.
+Soha ne végezz olyan munkát, amelyre nincs képzettséged vagy kioktatásod, akkor sem, ha valaki megkér rá. Tanulóként csak feszültségmentesített berendezésen, felügyelet alatt dolgozol. A feszültségmentesítés öt lépését a következő témában tanulod.
 :::
 
 :::exam
-A vizsgán gyakori kérdés a feszültségszintek határainak megnevezése, és az, hogy egy adott munkát ki végezhet: laikus, kioktatott vagy villamos szakképzett személy.
+A vizsgán gyakori kérdés: a feszültségszintek határai (50 V, 120 V, 1000 V, 1500 V), a KIF/KÖF/NAF felosztás, és az, hogy egy adott munkát képzetlen, kioktatott vagy szakképzett személy végezhet-e.
 :::
