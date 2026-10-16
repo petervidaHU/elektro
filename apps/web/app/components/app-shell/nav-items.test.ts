@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { navItems } from "./nav-items";
+import { isNavItemActive, navItems } from "./nav-items";
 
 /** docs/DEVELOPMENT_PLAN.md §3.2: the tabs differ for guests and users. */
 describe("navItems", () => {
@@ -27,5 +27,22 @@ describe("navItems", () => {
   it("matches the home tab exactly, so it is not active on every page", () => {
     const home = navItems(null).find((item) => item.key === "home");
     expect(home).toMatchObject({ path: "", end: true });
+  });
+});
+
+describe("isNavItemActive", () => {
+  const [home, lessons] = navItems(null);
+
+  it("matches the home tab only on the locale root", () => {
+    expect(isNavItemActive(home!, "hu", "/hu")).toBe(true);
+    expect(isNavItemActive(home!, "hu", "/hu/syllabus")).toBe(false);
+  });
+
+  it("keeps the lessons tab active inside topics and lessons", () => {
+    for (const path of ["/hu/syllabus", "/hu/topics/voltage-drop", "/hu/lessons/x", "/hu/lessons/x/summary"]) {
+      expect(isNavItemActive(lessons!, "hu", path), path).toBe(true);
+    }
+    expect(isNavItemActive(lessons!, "hu", "/hu/calculators")).toBe(false);
+    expect(isNavItemActive(lessons!, "hu", "/hu/syllabusx")).toBe(false);
   });
 });

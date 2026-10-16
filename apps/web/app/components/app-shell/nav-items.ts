@@ -1,4 +1,5 @@
-import type { Role } from "@elektro/shared";
+import type { Locale, Role } from "@elektro/shared";
+import { localePath } from "../../i18n/locale";
 import type { IconName } from "../icons";
 
 export interface NavItem {
@@ -10,10 +11,19 @@ export interface NavItem {
   icon: IconName;
   /** Active only on an exact match (the home tab). */
   end?: boolean;
+  /** Further sections that belong to this tab. */
+  alsoActiveOn?: string[];
 }
 
 const HOME: NavItem = { key: "home", path: "", labelKey: "nav.home", icon: "home", end: true };
-const LESSONS: NavItem = { key: "lessons", path: "lessons", labelKey: "nav.lessons", icon: "book" };
+/** "Tananyag" opens the syllabus (plan §3.3); lessons are reached through it. */
+const LESSONS: NavItem = {
+  key: "lessons",
+  path: "syllabus",
+  labelKey: "nav.lessons",
+  icon: "book",
+  alsoActiveOn: ["topics", "lessons"],
+};
 const CALCULATORS: NavItem = {
   key: "calculators",
   path: "calculators",
@@ -38,4 +48,16 @@ export function navItems(user: { role: Role } | null): NavItem[] {
   return user
     ? [HOME, LESSONS, CALCULATORS, SIMULATOR, ACCOUNT]
     : [HOME, LESSONS, CALCULATORS, LOGIN];
+}
+
+/** Whether the tab is the current one: its own section or one it covers. */
+export function isNavItemActive(item: NavItem, locale: Locale, pathname: string): boolean {
+  const within = (path: string) => {
+    const target = localePath(locale, path);
+    return pathname === target || pathname.startsWith(`${target}/`);
+  };
+  if (item.end) {
+    return pathname === localePath(locale, item.path);
+  }
+  return within(item.path) || (item.alsoActiveOn ?? []).some(within);
 }

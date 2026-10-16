@@ -98,6 +98,11 @@ export function applyContentAction(
   return { ok: true, status: rule.to, recordsApproval: rule.recordsApproval };
 }
 
+/** The actions `role` may take on content in `status` - what a review panel offers. */
+export function availableContentActions(status: ContentStatus, role: Role): ContentAction[] {
+  return CONTENT_ACTIONS.filter((action) => applyContentAction(status, action, role).ok);
+}
+
 /**
  * Whether a (version, locale) pair may be shown to a student.
  *

@@ -64,7 +64,9 @@
       "resultPercent": "Feszültségesés a névleges feszültség százalékában",
       "limitNote": "A megengedett feszültségesés értékét a tananyag adja meg; az alkalmazás nem feltételez határértéket.",
       "invalidInput": "Minden érték legyen nullánál nagyobb szám.",
-      "steps": "A számítás lépései"
+      "steps": "A számítás lépései",
+      "resistivityWarning": "A számítás a vezető üzemi hőmérsékletére vonatkozó fajlagos ellenállással készül (réz: {{copper}}, alumínium: {{aluminium}} Ω·mm²/m; MSZ HD 60364-5-52, G melléklet). Ha a tankönyvetek a 20 °C-os értékkel számol, az eredmény kb. 22 %-kal kisebb lesz.",
+      "practice": "Gyakorold feladatokkal"
     }
   },
   "simulator": {
@@ -179,7 +181,8 @@
     "watt": "W",
     "metre": "m",
     "squareMillimetre": "mm²",
-    "percent": "%"
+    "percent": "%",
+    "ohmSquareMillimetrePerMetre": "Ω·mm²/m"
   },
   "error": {
     "UNAUTHENTICATED": "Jelentkezz be a folytatáshoz.",
@@ -194,7 +197,14 @@
     "RATE_LIMITED": "Túl sok kérés. Próbáld újra később.",
     "INTERNAL_ERROR": "Váratlan hiba történt.",
     "pageNotFound": "Ez az oldal nem található.",
-    "backHome": "Vissza a kezdőlapra"
+    "backHome": "Vissza a kezdőlapra",
+    "PRACTICE_NOT_AVAILABLE": "Ehhez a témához még nincsenek gyakorló feladatok.",
+    "PRACTICE_STEP_LOCKED": "Előbb az előző lépést oldd meg.",
+    "PRACTICE_STEP_DONE": "Ezt a lépést már megoldottad.",
+    "PRACTICE_SOLUTION_LOCKED": "A megoldást két hibás próbálkozás után nézheted meg.",
+    "PRACTICE_NO_MORE_HINTS": "Ennél a lépésnél nincs több tipp.",
+    "PRACTICE_SESSION_CLOSED": "Ez a gyakorlás már lezárult.",
+    "PRACTICE_NOT_COMPLETE": "Előbb fejezd be az összes feladatot."
   },
   "landing": {
     "title": "Gyakorold a villanyszerelő szakmát lépésről lépésre",
@@ -205,7 +215,9 @@
   },
   "dashboard": {
     "greeting": "Szia, {{name}}!",
-    "subtitle": "Mit szeretnél ma gyakorolni?"
+    "subtitle": "Mit szeretnél ma gyakorolni?",
+    "progressLink": "Haladásom",
+    "progressHint": "Nézd meg, hol tartasz az egyes témákban."
   },
   "privacy": {
     "notice": "Az oktatók látják a tanulási előrehaladásodat és a gyakorlásaid előzményeit. Az adataidat a fiókod törléséig őrizzük meg."
@@ -233,6 +245,198 @@
     "phase-factor": "Fázistényező (b)",
     "conductor-resistance": "Egy vezető ellenállása (R)",
     "voltage-drop": "Feszültségesés (ΔU)",
-    "voltage-drop-percent": "Százalékos feszültségesés (ΔU%)"
+    "voltage-drop-percent": "Százalékos feszültségesés (ΔU%)",
+    "permitted-voltage-drop": "Megengedett feszültségesés voltban (ΔUₘₐₓ)",
+    "minimum-cross-section": "Szükséges legkisebb keresztmetszet (Sₘᵢₙ)",
+    "standard-cross-section": "Választott szabványos keresztmetszet (S)"
+  },
+  "syllabus": {
+    "title": "Tananyag",
+    "intro": "A villanyszerelő képzés témakörei a képzési program szerint, modulokba rendezve.",
+    "comingSoon": "Hamarosan",
+    "safetyCritical": "Biztonságkritikus",
+    "exam": "Vizsga: {{parts}}"
+  },
+  "topicHub": {
+    "lessons": "Leckék",
+    "noLessons": "Ehhez a témához még nincs jóváhagyott lecke.",
+    "calculator": "Kalkulátor",
+    "calculatorDescription": "Számold ki a saját értékeiddel, lépésenként.",
+    "practice": "Gyakorlás",
+    "practiceDescription": "Lépésenként ellenőrzött számítási feladatok.",
+    "simulator": "Mérés szimulátor",
+    "simulatorDescription": "Hamarosan.",
+    "myProgress": "Haladásom",
+    "comingSoon": "Ennek a témának a tananyaga hamarosan érkezik.",
+    "completed": "Elvégezve",
+    "locked": "Jelentkezz be",
+    "examParts": "Vizsgarész"
+  },
+  "mastery": {
+    "none": "Még nem kezdted el",
+    "started": "Elkezdve",
+    "practising": "Gyakorlás alatt",
+    "mastered": "Elsajátítva"
+  },
+  "examPartShort": {
+    "base": "alapvizsga",
+    "I": "I.",
+    "II": "II.",
+    "III": "III.",
+    "IV": "IV.",
+    "project": "projekt"
+  },
+  "lesson": {
+    "progress": "Haladás a leckében",
+    "resume": "Folytatás innen: {{section}}",
+    "done": "Kész vagyok",
+    "next": "Tovább",
+    "nextSteps": "Hogyan tovább?",
+    "toCalculator": "Próbáld ki a kalkulátorban",
+    "toPractice": "Gyakorold feladatokkal",
+    "toTopic": "Vissza a témához",
+    "nextLesson": "Következő lecke: {{title}}",
+    "completed": "Ezt a leckét már elvégezted."
+  },
+  "lessonBlock": {
+    "goals": "Mit tanulsz meg?",
+    "example": "Példa",
+    "safety": "Biztonság",
+    "mistake": "Gyakori hiba",
+    "exam": "A vizsgán",
+    "formula": "Képlet"
+  },
+  "lessonSummary": {
+    "title": "Összefoglaló",
+    "learned": "Amit megtanultál",
+    "completed": "Elvégezted a leckét."
+  },
+  "review": {
+    "title": "Ellenőrzés",
+    "status": "Állapot: {{status}}",
+    "note": "Megjegyzés a szerzőnek",
+    "noteHint": "Írd le, mit kell javítani.",
+    "lastNote": "Legutóbbi megjegyzés: {{note}}",
+    "version": "{{version}}. változat",
+    "action": {
+      "submit_for_review": "Ellenőrzésre küldés",
+      "approve": "Jóváhagyás",
+      "request_changes": "Javítás kérése"
+    }
+  },
+  "practice": {
+    "start": {
+      "title": "Gyakorlás: {{topic}}",
+      "intro": "A feladatokat lépésenként ellenőrizzük. Ha elakadsz, kérhetsz tippet. Bármikor abbahagyhatod, és később folytathatod.",
+      "length": "Feladatok száma",
+      "start": "Kezdés",
+      "resume": "Folytatás",
+      "resumeHint": "Van befejezetlen gyakorlásod ebben a témában ({{done}} / {{total}} feladat kész)."
+    },
+    "difficulty": {
+      "1": "könnyű",
+      "2": "közepes",
+      "3": "nehéz"
+    },
+    "task": {
+      "title": "{{n}}. feladat / {{total}}",
+      "difficulty": "Nehézség: {{level}}",
+      "given": "Adatok",
+      "done": "A feladat kész.",
+      "next": "Következő feladat",
+      "finish": "Összesítés"
+    },
+    "step": {
+      "answer": "Válasz",
+      "check": "Ellenőrzés",
+      "hint": "Tipp",
+      "solution": "Mutasd a megoldást",
+      "tolerance": "Elfogadott eltérés: ±{{value}}",
+      "toleranceExact": "Válaszd ki a helyes értéket.",
+      "locked": "Előbb az előző lépést oldd meg.",
+      "accepted": "Elfogadva: {{value}}",
+      "solutionShown": "Megoldás: {{value}}",
+      "choose": "Válassz"
+    },
+    "feedback": {
+      "correct": "Helyes!",
+      "close": "Majdnem! Kerekíts pontosabban.",
+      "incorrect": "Ez még nem jó. Próbáld újra!"
+    },
+    "hint": {
+      "formula": "Képlet:",
+      "substitution": "Behelyettesítve:"
+    },
+    "resistivityNote": "Mindig a feladatban megadott fajlagos ellenállással számolj (itt a vezető üzemi hőmérsékletére vonatkozó érték).",
+    "percentagePoint": "százalékpont"
+  },
+  "practiceSummary": {
+    "title": "Összesítés",
+    "headline": "{{unaided}} / {{total}} feladat segítség nélkül",
+    "task": "{{n}}. feladat",
+    "outcome": {
+      "unaided": "Segítség nélkül",
+      "with_help": "Tippel",
+      "solution_shown": "Megoldással",
+      "in_progress": "Befejezetlen"
+    },
+    "wrongTries": "Hibás próbálkozás: {{count}}",
+    "hints": "Tipp: {{count}}",
+    "watchOut": "Erre figyelj",
+    "noMistakes": "Nem volt tipikus hiba. Szép munka!",
+    "again": "Új gyakorlás",
+    "toTopic": "Vissza a témához",
+    "toProgress": "Haladásom",
+    "count": "{{count}}×",
+    "masteryLabel": "A téma állapota:"
+  },
+  "progressPage": {
+    "title": "Haladásom",
+    "empty": "Még nincs haladásod. Kezdd egy leckével!",
+    "toSyllabus": "Irány a tananyag",
+    "lessons": "Leckék: {{done}} / {{total}}",
+    "tasks": "Megoldott feladatok: {{count}}",
+    "unaided": "Segítség nélkül: {{rate}}"
+  },
+  "given": {
+    "current": "Áramerősség (I)",
+    "length": "Vezetékhossz, egy irányban (L)",
+    "crossSection": "Keresztmetszet (S)",
+    "resistivity": "Fajlagos ellenállás (ρ)",
+    "nominalVoltage": "Névleges feszültség (Uₙ)",
+    "powerFactor": "Teljesítménytényező (cos φ)",
+    "limitPercent": "Megengedett feszültségesés (ΔU%ₘₐₓ)"
+  },
+  "material": {
+    "copper": "réz",
+    "aluminium": "alumínium"
+  },
+  "practiceScenario": {
+    "voltage-drop.single-phase-basic": "Egy {{material}}vezetékes, egyfázisú, {{nominalVoltage}}-os áramkör {{current}} ohmos terhelést táplál. A vezeték egyirányú hossza {{length}}, keresztmetszete {{crossSection}}. Mekkora a feszültségesés voltban és százalékban?",
+    "voltage-drop.phase-and-power-factor.single-phase": "Egy egyfázisú, {{nominalVoltage}}-os áramkör {{material}}vezetéke {{length}} hosszú, {{crossSection}} keresztmetszetű. A terhelés árama {{current}}, teljesítménytényezője cos φ = {{powerFactor}}. Mekkora a feszültségesés voltban és százalékban?",
+    "voltage-drop.phase-and-power-factor.three-phase": "Egy szimmetrikusan terhelt háromfázisú, {{nominalVoltage}}-os áramkör {{material}}vezetéke {{length}} hosszú, {{crossSection}} keresztmetszetű. A terhelés árama {{current}}, teljesítménytényezője cos φ = {{powerFactor}}. Mekkora a feszültségesés voltban és százalékban?",
+    "voltage-drop.cross-section-selection.single-phase": "Egy egyfázisú, {{nominalVoltage}}-os áramkört rézvezetékkel kell kiépíteni. A vezeték egyirányú hossza {{length}}, a terhelés árama {{current}} (cos φ = {{powerFactor}}). A tervező előírása szerint ezen a szakaszon legfeljebb {{limitPercent}} feszültségesés megengedett. Mekkora szabványos keresztmetszetet válassz, és mekkora lesz vele a feszültségesés?",
+    "voltage-drop.cross-section-selection.three-phase": "Egy szimmetrikusan terhelt háromfázisú, {{nominalVoltage}}-os áramkört rézvezetékkel kell kiépíteni. A vezeték egyirányú hossza {{length}}, a terhelés árama {{current}} (cos φ = {{powerFactor}}). A tervező előírása szerint ezen a szakaszon legfeljebb {{limitPercent}} feszültségesés megengedett. Mekkora szabványos keresztmetszetet válassz, és mekkora lesz vele a feszültségesés?"
+  },
+  "practiceHint": {
+    "phase-factor": "Egyfázisú körben az áram az egyik vezetőn oda, a másikon vissza folyik. Szimmetrikusan terhelt háromfázisú körben a vonali feszültségre számolunk.",
+    "conductor-resistance": "Egy vezető ellenállása a fajlagos ellenállástól, a hossztól és a keresztmetszettől függ. A hossz az egyirányú vezetékhossz.",
+    "voltage-drop": "A feszültségesés egy vezető ellenállásából, a terhelő áramból, a b tényezőből és a cos φ-ből adódik.",
+    "voltage-drop-percent": "Viszonyítsd a feszültségesést a névleges feszültséghez, és fejezd ki százalékban.",
+    "permitted-voltage-drop": "Váltsd át a megengedett százalékos feszültségesést voltra a névleges feszültség alapján.",
+    "minimum-cross-section": "Rendezd át a feszültségesés képletét a keresztmetszetre: a megengedett feszültségesésnél ekkora keresztmetszet kell legalább.",
+    "standard-cross-section": "A szabványos keresztmetszet-sorból azt válaszd, amelyik legalább akkora, mint a szükséges legkisebb keresztmetszet."
+  },
+  "misconception": {
+    "resistance-inverted": "Úgy tűnik, felcserélted a hosszt és a keresztmetszetet: R = ρ · L / S.",
+    "length-doubled-in-resistance": "Egy vezető ellenállásánál az egyirányú hosszal számolj. Az oda-vissza utat a b tényező veszi figyelembe.",
+    "phase-factor-missing": "Kimaradt a b tényező: egyfázisú körben 2, szimmetrikusan terhelt háromfázisú körben √3.",
+    "phase-factor-wrong-system": "Rossz a b tényező: egyfázisú körben 2 (oda-vissza vezető), szimmetrikusan terhelt háromfázisú körben √3.",
+    "power-factor-ignored": "Kimaradt a cos φ szorzó.",
+    "percent-as-fraction": "Ez arány, nem százalék: szorozd meg 100-zal.",
+    "percent-not-divided": "A százalékot el kell osztani 100-zal, mielőtt a névleges feszültséggel szorzol.",
+    "wrong-reference-voltage": "Rossz feszültséghez viszonyítottál: egyfázisú körben 230 V-hoz, háromfázisúban a 400 V-os vonali feszültséghez.",
+    "limit-percent-used-as-volts": "A megengedett feszültségesést voltban kell behelyettesíteni (ΔUₘₐₓ), nem százalékban.",
+    "chose-below-minimum": "Ez kisebb a szükségesnél. A szabványos sorból a legalább akkorát válaszd, mint a szükséges legkisebb keresztmetszet."
   }
 }

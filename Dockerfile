@@ -40,6 +40,8 @@ COPY apps/api/package.json ./apps/api/
 COPY --from=build /app/packages/shared/dist ./packages/shared/dist
 COPY --from=build /app/apps/api/dist ./apps/api/dist
 COPY --from=build /app/apps/api/drizzle ./apps/api/drizzle
+# Bundled lesson drafts, loaded with `node dist/scripts/seed-content.js` (working directory apps/api).
+COPY --from=build /app/apps/api/content ./apps/api/content
 COPY --from=build /app/apps/web/build ./apps/web/build
 
 USER node

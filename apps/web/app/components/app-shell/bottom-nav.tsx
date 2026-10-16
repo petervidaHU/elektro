@@ -1,27 +1,28 @@
 import { useTranslation } from "react-i18next";
-import { NavLink } from "react-router";
+import { Link, useLocation } from "react-router";
 import type { Locale } from "@elektro/shared";
 import { localePath } from "../../i18n/locale";
 import { Icon } from "../icons";
-import type { NavItem } from "./nav-items";
+import { isNavItemActive, type NavItem } from "./nav-items";
 import classes from "./bottom-nav.module.css";
 
-/** Phone tab bar. `NavLink` marks the active tab with `aria-current="page"`. */
+/** Phone tab bar; the active tab carries `aria-current="page"`. */
 export function BottomNav({ items, locale }: { items: NavItem[]; locale: Locale }) {
   const { t } = useTranslation();
+  const { pathname } = useLocation();
 
   return (
     <nav aria-label={t("nav.bottomBar")} className={classes.bar}>
       {items.map((item) => (
-        <NavLink
+        <Link
           key={item.key}
           to={localePath(locale, item.path)}
-          end={item.end}
+          aria-current={isNavItemActive(item, locale, pathname) ? "page" : undefined}
           className={classes.tab}
         >
           <Icon name={item.icon} />
           <span>{t(item.labelKey)}</span>
-        </NavLink>
+        </Link>
       ))}
     </nav>
   );

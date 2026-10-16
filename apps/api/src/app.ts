@@ -1,22 +1,21 @@
-import fastify, {
-  type FastifyError,
-  type FastifyInstance,
-  type FastifyServerOptions,
-} from "fastify";
+import fastify, { type FastifyInstance, type FastifyServerOptions } from "fastify";
 import cookie from "@fastify/cookie";
 import helmet from "@fastify/helmet";
 import rateLimit from "@fastify/rate-limit";
-import { ZodError } from "zod";
 import { ERROR_CODES } from "@elektro/shared";
 import { env, type Env } from "./env.js";
 import authPlugin from "./plugins/auth.js";
-import { HttpError, sendError, validationFailed } from "./lib/http-error.js";
+import { installErrorHandler } from "./lib/error-handler.js";
 import { adminRoutes } from "./routes/admin.js";
 import { authRoutes } from "./routes/auth.js";
 import { calcRoutes } from "./routes/calc.js";
 import { contentRoutes } from "./routes/content.js";
 import { healthRoutes } from "./routes/health.js";
 import { meRoutes } from "./routes/me.js";
+import { practiceRoutes } from "./routes/practice.js";
+import { progressRoutes } from "./routes/progress.js";
+import { drizzlePracticeRepository } from "./practice/drizzle-repository.js";
+import { drizzleProgress } from "./lib/progress.js";
 import { topicRoutes } from "./routes/topics.js";
 
 /** JSON logs in production, pretty logs in development, silence in tests. */
@@ -60,26 +59,7 @@ export async function buildApp(): Promise<FastifyInstance> {
     timeWindow: "1 minute",
   });
 
-  app.setErrorHandler((error, request, reply) => {
-    if (error instanceof HttpError) {
-      return sendError(reply, error);
-    }
-    if (error instanceof ZodError) {
-      return sendError(reply, validationFailed(error));
-    }
-    // Everything else is a Fastify error (or an unexpected throw).
-    const fastifyError = error as FastifyError;
-
-    if (fastifyError.statusCode === 429) {
-      return reply.code(429).send({ code: ERROR_CODES.RATE_LIMITED });
-    }
-    if (fastifyError.validation) {
-      return reply.code(400).send({ code: ERROR_CODES.VALIDATION_FAILED });
-    }
-
-    request.log.error({ err: error }, "unhandled error");
-    return reply.code(500).send({ code: ERROR_CODES.INTERNAL_ERROR });
-  });
+  installErrorHandler(app);
 
   // Everything the API owns lives under /api, in its own encapsulated context
   // so that unknown /api paths answer with a code instead of the SSR page.
@@ -105,6 +85,11 @@ export async function buildApp(): Promise<FastifyInstance> {
       await api.register(calcRoutes);
       await api.register(contentRoutes);
       await api.register(adminRoutes);
+      await api.register(practiceRoutes, {
+        repo: drizzlePracticeRepository,
+        progress: drizzleProgress,
+      });
+      await api.register(progressRoutes);
     },
     { prefix: "/api" },
   );

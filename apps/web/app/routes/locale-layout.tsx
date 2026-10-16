@@ -1,10 +1,10 @@
 import { AppShell, Badge, Button, Container, Group, Text, Title } from "@mantine/core";
 import { useTranslation } from "react-i18next";
-import { Link, NavLink, Outlet, useLoaderData, useLocation } from "react-router";
-import { isLocale, type Locale } from "@elektro/shared";
+import { Link, Outlet, useLoaderData, useLocation } from "react-router";
+import { isLocale } from "@elektro/shared";
 import { BottomNav } from "../components/app-shell/bottom-nav";
 import { Breadcrumbs } from "../components/app-shell/breadcrumbs";
-import { navItems, type NavItem } from "../components/app-shell/nav-items";
+import { isNavItemActive, navItems } from "../components/app-shell/nav-items";
 import { localePath } from "../i18n/locale";
 import { getCurrentUser } from "../lib/session";
 import type { Route } from "./+types/locale-layout";
@@ -32,11 +32,6 @@ export type LocaleLayoutData = Awaited<ReturnType<typeof loader>>;
 
 const BOTTOM_BAR_HEIGHT = 64;
 
-/** Same rule as `NavLink`: exact for `end` items, otherwise the whole subtree. */
-function isActive(item: NavItem, locale: Locale, pathname: string): boolean {
-  const target = localePath(locale, item.path);
-  return item.end ? pathname === target : pathname === target || pathname.startsWith(`${target}/`);
-}
 
 export default function LocaleLayout() {
   const { t } = useTranslation();
@@ -63,10 +58,10 @@ export default function LocaleLayout() {
               {items.map((item) => (
                 <Button
                   key={item.key}
-                  component={NavLink}
+                  component={Link}
                   to={localePath(locale, item.path)}
-                  end={item.end}
-                  variant={isActive(item, locale, pathname) ? "light" : "subtle"}
+                  aria-current={isNavItemActive(item, locale, pathname) ? "page" : undefined}
+                  variant={isNavItemActive(item, locale, pathname) ? "light" : "subtle"}
                 >
                   {t(item.labelKey)}
                 </Button>

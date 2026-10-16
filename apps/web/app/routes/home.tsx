@@ -8,7 +8,7 @@ import { useLayoutData } from "../lib/use-layout-data";
 
 /** The three v1 modules. The simulator needs a login (plan §3.3). */
 const MODULES = [
-  { path: "lessons", key: "lessons", requiresLogin: false },
+  { path: "syllabus", key: "lessons", requiresLogin: false },
   { path: "calculators", key: "calculators", requiresLogin: false },
   { path: "simulator", key: "simulator", requiresLogin: true },
 ] as const;
@@ -25,9 +25,17 @@ export default function Home() {
   return (
     <Stack gap="xl">
       {user ? (
-        <Stack gap={4}>
-          <Title order={2}>{t("dashboard.greeting", { name: user.name })}</Title>
-          <Text c="dimmed">{t("dashboard.subtitle")}</Text>
+        <Stack gap="sm">
+          <Stack gap={4}>
+            <Title order={2}>{t("dashboard.greeting", { name: user.name })}</Title>
+            <Text c="dimmed">{t("dashboard.subtitle")}</Text>
+          </Stack>
+          <Card component={Link} to={localePath(locale, "progress")} withBorder padding="md" radius="md" maw={420}>
+            <Text fw={600}>{t("dashboard.progressLink")}</Text>
+            <Text size="sm" c="dimmed">
+              {t("dashboard.progressHint")}
+            </Text>
+          </Card>
         </Stack>
       ) : (
         <Stack gap="md">

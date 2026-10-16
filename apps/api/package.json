@@ -12,7 +12,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx --env-file-if-exists=../../.env src/scripts/migrate.ts",
-    "db:seed": "tsx --env-file-if-exists=../../.env src/scripts/seed.ts"
+    "db:seed": "tsx --env-file-if-exists=../../.env src/scripts/seed.ts",
+    "db:seed:content": "tsx --env-file-if-exists=../../.env src/scripts/seed-content.ts"
   },
   "dependencies": {
     "@elektro/shared": "*",

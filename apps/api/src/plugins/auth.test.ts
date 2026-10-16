@@ -1,89 +1,62 @@
-import { describe, expect, it } from "vitest";
-import type { FastifyRequest } from "fastify";
-import { hasAtLeastRole, type Role } from "@elektro/shared";
-import { HttpError, forbidden, unauthenticated } from "../lib/http-error.js";
-import type { AuthenticatedUser } from "./auth.js";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import type { FastifyInstance, FastifyPluginAsync } from "fastify";
+import { as, buildTestApp } from "../test/test-app.js";
 
 /**
- * The guards are the server-side security boundary, so their logic is tested
- * directly - without a database or a live better-auth session.
- *
- * These reimplement exactly what `authPlugin` decorates onto the instance; if
- * the plugin changes, these must change with it.
+ * The guards are the server-side security boundary. These tests run the real
+ * `registerGuards` (via the test app) - without a database or a live
+ * better-auth session.
  */
-function requireUser(request: Pick<FastifyRequest, "currentUser">): AuthenticatedUser {
-  if (!request.currentUser) {
-    throw unauthenticated();
-  }
-  return request.currentUser;
-}
+const guarded: FastifyPluginAsync = async (app) => {
+  app.get("/user", async (request) => ({ role: app.requireUser(request).role }));
+  app.get("/teacher", async (request) => ({ role: app.requireRole(request, "teacher").role }));
+  app.get("/admin", async (request) => ({ role: app.requireRole(request, "admin").role }));
+};
 
-function requireRole(
-  request: Pick<FastifyRequest, "currentUser">,
-  role: Role,
-): AuthenticatedUser {
-  const user = requireUser(request);
-  if (!hasAtLeastRole(user.role, role)) {
-    throw forbidden();
-  }
-  return user;
-}
+let app: FastifyInstance;
 
-function requestAs(role: Role | null): Pick<FastifyRequest, "currentUser"> {
-  return {
-    currentUser:
-      role === null
-        ? null
-        : { id: `user-${role}`, email: `${role}@example.com`, name: role, role },
-  };
-}
+beforeAll(async () => {
+  app = await buildTestApp(guarded, {});
+});
+
+afterAll(async () => {
+  await app.close();
+});
+
+const call = (url: string, headers = {}) => app.inject({ method: "GET", url, headers });
 
 describe("requireUser", () => {
-  it("rejects anonymous requests with a 401 code", () => {
-    try {
-      requireUser(requestAs(null));
-      expect.unreachable("expected an HttpError");
-    } catch (error) {
-      expect(error).toBeInstanceOf(HttpError);
-      expect((error as HttpError).statusCode).toBe(401);
-      expect((error as HttpError).code).toBe("UNAUTHENTICATED");
-    }
+  it("rejects anonymous requests with a 401 code", async () => {
+    const response = await call("/user");
+    expect(response.statusCode).toBe(401);
+    expect(response.json()).toEqual({ code: "UNAUTHENTICATED" });
   });
 
-  it("returns the session user", () => {
-    expect(requireUser(requestAs("student")).role).toBe("student");
+  it("returns the session user", async () => {
+    expect((await call("/user", as("s", "student"))).json()).toEqual({ role: "student" });
   });
 });
 
 describe("requireRole", () => {
-  it("lets a role through for its own level and below", () => {
-    expect(requireRole(requestAs("admin"), "admin").role).toBe("admin");
-    expect(requireRole(requestAs("admin"), "teacher").role).toBe("admin");
-    expect(requireRole(requestAs("teacher"), "student").role).toBe("teacher");
+  it("lets a role through for its own level and below", async () => {
+    expect((await call("/admin", as("a", "admin"))).json()).toEqual({ role: "admin" });
+    expect((await call("/teacher", as("a", "admin"))).json()).toEqual({ role: "admin" });
+    expect((await call("/teacher", as("t", "teacher"))).json()).toEqual({ role: "teacher" });
   });
 
-  it("blocks students from teacher-only and admin-only routes", () => {
-    for (const required of ["teacher", "admin"] as const) {
-      try {
-        requireRole(requestAs("student"), required);
-        expect.unreachable("expected an HttpError");
-      } catch (error) {
-        expect((error as HttpError).statusCode).toBe(403);
-        expect((error as HttpError).code).toBe("FORBIDDEN");
-      }
+  it("blocks students from teacher-only and admin-only routes", async () => {
+    for (const url of ["/teacher", "/admin"]) {
+      const response = await call(url, as("s", "student"));
+      expect(response.statusCode).toBe(403);
+      expect(response.json()).toEqual({ code: "FORBIDDEN" });
     }
   });
 
-  it("blocks teachers from admin-only routes", () => {
-    expect(() => requireRole(requestAs("teacher"), "admin")).toThrow(HttpError);
+  it("blocks teachers from admin-only routes", async () => {
+    expect((await call("/admin", as("t", "teacher"))).statusCode).toBe(403);
   });
 
-  it("answers 401 - not 403 - when there is no session at all", () => {
-    try {
-      requireRole(requestAs(null), "admin");
-      expect.unreachable("expected an HttpError");
-    } catch (error) {
-      expect((error as HttpError).statusCode).toBe(401);
-    }
+  it("answers 401 - not 403 - when there is no session at all", async () => {
+    expect((await call("/admin")).statusCode).toBe(401);
   });
 });

@@ -1,4 +1,4 @@
-import type { FastifyPluginAsync, FastifyRequest } from "fastify";
+import type { FastifyInstance, FastifyPluginAsync, FastifyRequest } from "fastify";
 import fp from "fastify-plugin";
 import { DEFAULT_ROLE, hasAtLeastRole, isRole, type Role } from "@elektro/shared";
 import { auth } from "../lib/auth.js";
@@ -43,6 +43,29 @@ function toHeaders(request: FastifyRequest): Headers {
 }
 
 /**
+ * The role guards. Exported so tests can put them on a bare instance with a
+ * stubbed `currentUser` and exercise routes without better-auth.
+ */
+export function registerGuards(app: FastifyInstance): void {
+  app.decorate("requireUser", (request: FastifyRequest): AuthenticatedUser => {
+    if (!request.currentUser) {
+      throw unauthenticated();
+    }
+    return request.currentUser;
+  });
+
+  app.decorate("requireRole", (request: FastifyRequest, role: Role): AuthenticatedUser => {
+    const user = app.requireUser(request);
+
+    if (!hasAtLeastRole(user.role, role)) {
+      throw forbidden();
+    }
+
+    return user;
+  });
+}
+
+/**
  * Resolves the session on every request and exposes the role guards.
  *
  * This is the security boundary: the frontend only hides what a role cannot
@@ -69,22 +92,7 @@ const authPlugin: FastifyPluginAsync = async (app) => {
     };
   });
 
-  app.decorate("requireUser", (request: FastifyRequest): AuthenticatedUser => {
-    if (!request.currentUser) {
-      throw unauthenticated();
-    }
-    return request.currentUser;
-  });
-
-  app.decorate("requireRole", (request: FastifyRequest, role: Role): AuthenticatedUser => {
-    const user = app.requireUser(request);
-
-    if (!hasAtLeastRole(user.role, role)) {
-      throw forbidden();
-    }
-
-    return user;
-  });
+  registerGuards(app);
 };
 
 export default fp(authPlugin, { name: "elektro-auth" });

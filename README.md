@@ -49,10 +49,11 @@ http://localhost:5173.
 | `npm run build` | build shared, API and web |
 | `npm start` | run the production server (one process, `PORT`) |
 | `npm run test` | all workspaces |
-| `npm run test:e2e` | Playwright milestone acceptance tests on a phone viewport, against the running app (default: the dev container; override with `E2E_BASE_URL`). First time: `npx -w @elektro/e2e playwright install chromium` |
+| `npm run test:e2e` | Playwright milestone acceptance tests on a phone viewport, against the running app (default: the dev container; override with `E2E_BASE_URL`). First time: `npx -w @elektro/e2e playwright install chromium`. The global setup signs in as the seeded admin (`E2E_ADMIN_EMAIL`/`E2E_ADMIN_PASSWORD`, else `SEED_ADMIN_*` from `.env`) to create an e2e teacher and a temporary lesson |
 | `npm run lint` / `npm run typecheck` | ESLint / TypeScript |
 | `npm run db:generate` | generate a Drizzle migration from schema changes |
 | `npm run db:migrate` / `npm run db:seed` | apply migrations / create the first admin |
+| `npm run db:seed:content` | load the bundled lesson drafts (`apps/api/content/`) as `ai_draft` for teacher review; existing lessons are left alone. In the production container (working directory `apps/api`): `node dist/scripts/seed-content.js` |
 
 ## Production
 

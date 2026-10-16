@@ -9,6 +9,11 @@ import {
   ROLES,
   TOPIC_IDS,
   UNITS,
+  CONTENT_ACTIONS,
+  MASTERY_LEVELS,
+  MISCONCEPTION_IDS,
+  TEMPLATES,
+  buildTask,
   calculateVoltageDrop,
 } from "@elektro/shared";
 import hu from "./locales/hu/common.json";
@@ -74,6 +79,38 @@ describe("hu translations", () => {
   it("covers every API error code", () => {
     for (const code of Object.values(ERROR_CODES)) {
       expect(hu.error, `missing error.${code}`).toHaveProperty(code);
+    }
+  });
+
+  it("covers every misconception, mastery level and review action", () => {
+    for (const id of MISCONCEPTION_IDS) {
+      expect(hu.misconception, `missing misconception.${id}`).toHaveProperty(id);
+    }
+    for (const level of MASTERY_LEVELS) {
+      expect(hu.mastery, `missing mastery.${level}`).toHaveProperty(level);
+    }
+    for (const action of CONTENT_ACTIONS) {
+      expect(hu.review.action, `missing review.action.${action}`).toHaveProperty(action);
+    }
+  });
+
+  it("covers every practice scenario, given value, step and hint", () => {
+    for (const template of TEMPLATES) {
+      for (let seed = 1; seed <= 40; seed++) {
+        const { params } = buildTask(template.id, seed);
+        const scenario = template.scenarioKey(params);
+        expect(hu.practiceScenario, `missing practiceScenario.${scenario}`).toHaveProperty([scenario]);
+        for (const given of template.givens(params)) {
+          expect(hu.given, `missing given.${given.id}`).toHaveProperty(given.id);
+        }
+        if (typeof params["material"] === "string") {
+          expect(hu.material, `missing material.${params["material"]}`).toHaveProperty(params["material"]);
+        }
+      }
+      for (const step of template.steps) {
+        expect(hu.calcStep, `missing calcStep.${step.id}`).toHaveProperty([step.id]);
+        expect(hu.practiceHint, `missing practiceHint.${step.id}`).toHaveProperty([step.id]);
+      }
     }
   });
 

@@ -43,7 +43,7 @@ test("guest registers, lands on the dashboard, navigates with the bottom bar", a
 
   // Every tab of the bottom bar opens its page.
   const tabs = [
-    { label: hu.nav.lessons, url: /\/hu\/lessons$/, heading: hu.lessons.title },
+    { label: hu.nav.lessons, url: /\/hu\/syllabus$/, heading: hu.syllabus.title },
     { label: hu.nav.calculators, url: /\/hu\/calculators$/, heading: hu.calculators.title },
     { label: hu.nav.simulator, url: /\/hu\/simulator$/, heading: hu.simulator.title },
     { label: hu.nav.account, url: /\/hu\/account$/, heading: hu.account.title },

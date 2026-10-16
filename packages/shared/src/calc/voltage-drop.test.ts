@@ -2,6 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   CalculationInputError,
   calculateVoltageDrop,
+  conductorResistance,
+  minimumCrossSection,
+  permittedVoltageDrop,
+  phaseFactor,
+  voltageDropFromResistance,
+  voltageDropPercentOf,
   type VoltageDropInput,
   isWithinVoltageDropLimit,
   requiredCrossSectionForLimit,
@@ -213,5 +219,62 @@ describe("calculateVoltageDrop steps", () => {
         expect(FORMULAS, step.formulaId).toHaveProperty(step.formulaId);
       }
     }
+  });
+});
+
+describe("voltage-drop step functions", () => {
+  it("phaseFactor: 2 for single-phase, sqrt(3) for three-phase", () => {
+    expect(phaseFactor("single-phase")).toBe(2);
+    expect(phaseFactor("three-phase")).toBeCloseTo(Math.sqrt(3), 12);
+  });
+
+  it("conductorResistance: R = rho * L / S", () => {
+    // 0.0225 * 25 / 2.5 = 0.225 ohm
+    expect(conductorResistance(0.0225, 25, 2.5)).toBeCloseTo(0.225, 12);
+  });
+
+  it("voltageDropFromResistance: dU = b * R * I * cos(phi)", () => {
+    expect(voltageDropFromResistance(2, 0.225, 16, 1)).toBeCloseTo(7.2, 12);
+    expect(voltageDropFromResistance(2, 0.225, 16, 0.8)).toBeCloseTo(5.76, 12);
+  });
+
+  it("voltageDropPercentOf: dU / Un * 100", () => {
+    expect(voltageDropPercentOf(4.6, 230)).toBeCloseTo(2, 12);
+  });
+
+  it("permittedVoltageDrop: the limit in volts, limit% * Un / 100", () => {
+    expect(permittedVoltageDrop(3, 230)).toBeCloseTo(6.9, 12);
+    expect(permittedVoltageDrop(5, 400)).toBeCloseTo(20, 12);
+  });
+
+  it("minimumCrossSection: S = b * rho * L * I * cos(phi) / dUmax", () => {
+    // 2 * 0.0225 * 25 * 16 * 1 / 6.9 = 2.6087 mm2
+    expect(minimumCrossSection(2, 0.0225, 25, 16, 1, 6.9)).toBeCloseTo(18 / 6.9, 12);
+  });
+
+  it("composes to the same result as calculateVoltageDrop and requiredCrossSectionForLimit", () => {
+    const input = {
+      current_A: 20,
+      length_m: 30,
+      crossSection_mm2: 4,
+      resistivity_ohm_mm2_per_m: copper,
+      nominalVoltage_V: 400,
+      system: "three-phase",
+      powerFactor: 0.9,
+    } as const;
+    const b = phaseFactor(input.system);
+    const r = conductorResistance(copper, input.length_m, input.crossSection_mm2);
+    const dU = voltageDropFromResistance(b, r, input.current_A, input.powerFactor);
+
+    expect(dU).toBeCloseTo(drop(input).voltageDrop_V, 12);
+    expect(
+      minimumCrossSection(b, copper, input.length_m, input.current_A, input.powerFactor, permittedVoltageDrop(2, 400)),
+    ).toBeCloseTo(requiredCrossSectionForLimit(input, 2), 12);
+  });
+
+  it("rejects non-positive inputs", () => {
+    expect(() => conductorResistance(0.0225, 0, 2.5)).toThrow(CalculationInputError);
+    expect(() => permittedVoltageDrop(0, 230)).toThrow(CalculationInputError);
+    expect(() => voltageDropFromResistance(2, 0.2, 16, 1.5)).toThrow(CalculationInputError);
   });
 });

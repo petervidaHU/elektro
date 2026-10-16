@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createLessonSchema } from "./content.js";
+import { createLessonSchema, upsertLessonTranslationSchema } from "./content.js";
 
 describe("createLessonSchema", () => {
   const base = { topicId: "voltage-drop", slug: "feszultsegeses-alapjai" };
@@ -21,5 +21,19 @@ describe("createLessonSchema", () => {
     expect(createLessonSchema.safeParse({ ...base, topicId: "isolation-procedure" }).success).toBe(
       true,
     );
+  });
+});
+
+describe("upsertLessonTranslationSchema", () => {
+  const base = { locale: "hu", title: "Feszültségesés" };
+
+  it("accepts a body with the supported lesson blocks", () => {
+    const body = ':::safety\nVigyázz!\n:::\n\n::formula{id="voltage-drop"}';
+    expect(upsertLessonTranslationSchema.safeParse({ ...base, body }).success).toBe(true);
+  });
+
+  it("rejects a body with an unknown block", () => {
+    const body = ":::quiz\nKérdés\n:::";
+    expect(upsertLessonTranslationSchema.safeParse({ ...base, body }).success).toBe(false);
   });
 });

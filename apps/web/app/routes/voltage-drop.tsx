@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import {
   Alert,
+  Button,
   Card,
   Divider,
   Group,
@@ -12,7 +13,8 @@ import {
   Title,
 } from "@mantine/core";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
+import { localePath } from "../i18n/locale";
 import { CalcSteps } from "../components/calc-steps";
 import type { BreadcrumbHandle } from "../components/app-shell/breadcrumbs";
 import {
@@ -20,6 +22,7 @@ import {
   CalculationInputError,
   CONDUCTOR_MATERIALS,
   DEFAULT_LOCALE,
+  formatNumber,
   formatPercent,
   formatQuantity,
   isLocale,
@@ -218,6 +221,18 @@ export default function VoltageDrop() {
       <Alert variant="light" color="blue">
         {t("calculators.voltageDrop.limitNote")}
       </Alert>
+
+      {/* Plan §2.4: the resistivity convention is undecided, so it is stated. */}
+      <Alert variant="light" color="yellow" data-testid="resistivity-warning">
+        {t("calculators.voltageDrop.resistivityWarning", {
+          copper: formatNumber(RESISTIVITY_AT_OPERATING_TEMPERATURE.copper, locale, { maximumFractionDigits: 4 }),
+          aluminium: formatNumber(RESISTIVITY_AT_OPERATING_TEMPERATURE.aluminium, locale, { maximumFractionDigits: 4 }),
+        })}
+      </Alert>
+
+      <Button component={Link} to={localePath(locale, "practice/voltage-drop")} variant="light">
+        {t("calculators.voltageDrop.practice")}
+      </Button>
     </Stack>
   );
 }

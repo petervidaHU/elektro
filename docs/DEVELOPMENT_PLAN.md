@@ -409,9 +409,11 @@ interface StepSpec {
 
 **Deterministic and server-checked.**
 - A task instance = `templateId + templateVersion + seed`. Client and server generate identical parameters.
-- The client checks steps for instant feedback. On submit, **the server re-generates
-  the task from the seed, re-checks every step and stores the verdict.** The
-  client's verdict is never trusted.
+- **Every step is checked by the API** (built in M1b): the client sends only the
+  number or the choice, the server rebuilds the task from its seed, checks the
+  step and stores the verdict. The client never computes a verdict. (The first
+  draft had the client check first and the server re-check on submit; checking
+  only on the server is simpler and gives the same instant feedback.)
 
 **Tolerance (Q4: common sense, visible, configurable later).**
 
@@ -588,7 +590,7 @@ All under `/:locale`. 🔓 = public, 👤 = student+, 🎓 = teacher+, 🛠 = ad
 2. Task screen, per task:
    - Scenario text + given values in a compact table, including any **table excerpt** (with source) and ρ as a given value.
    - Steps listed vertically. The current step is expanded, later steps are collapsed, and earlier ones show ✓/≈/✗.
-   - The step shows the formula (expandable), an answer field with `<NumericKeypad>`, the fixed unit, **"Elfogadott eltérés: ±1 %"**, and "Ellenőrzés".
+   - The step shows an answer field with `<NumericKeypad>` (or a touch picker for choices), the fixed unit, **"Elfogadott eltérés: ±1 %"**, and "Ellenőrzés". The formula is hint level 2, not shown up front, so looking at it counts as help (built in M1b).
    - Feedback is inline: ✓ + short confirmation; ≈ "kerekítsd pontosabban"; ✗ + misconception message if detected; "Tipp" (levels 1 → 3); after 2 tries, "Mutasd a megoldást".
    - After the last step: task recap (the correct path) → "Következő feladat".
 3. Leaving mid-session: the state is saved, and a toast says "Elmentettük, bármikor folytathatod".

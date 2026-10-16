@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   applyContentAction,
+  availableContentActions,
   CONTENT_STATUSES,
   INITIAL_CONTENT_STATUS,
   isVisibleToStudent,
@@ -100,5 +101,18 @@ describe("isVisibleToStudent", () => {
       expect(isVisibleToStudent(status, false)).toBe(false);
       expect(isVisibleToStudent(status, true)).toBe(true);
     }
+  });
+});
+
+describe("availableContentActions", () => {
+  it("offers a teacher submit for a draft, approve or request changes in review", () => {
+    expect(availableContentActions("ai_draft", "teacher")).toEqual(["submit_for_review"]);
+    expect(availableContentActions("changes_requested", "admin")).toEqual(["submit_for_review"]);
+    expect(availableContentActions("in_review", "teacher")).toEqual(["approve", "request_changes"]);
+  });
+
+  it("offers nothing for an approved version or to a student", () => {
+    expect(availableContentActions("approved", "admin")).toEqual([]);
+    expect(availableContentActions("in_review", "student")).toEqual([]);
   });
 });

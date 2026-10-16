@@ -1,5 +1,5 @@
-import type { FastifyPluginAsync } from "fastify";
-import { and, desc, eq, sql } from "drizzle-orm";
+import type { FastifyPluginAsync, FastifyRequest } from "fastify";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import {
   applyContentAction,
@@ -12,9 +12,12 @@ import {
   localeSchema,
   topicIdSchema,
   upsertLessonTranslationSchema,
+  type Locale,
 } from "@elektro/shared";
 import { db } from "../db/index.js";
+import { lessonReads } from "../db/schema/app.js";
 import { lessons, lessonTranslations, lessonVersions } from "../db/schema/content.js";
+import { recomputeTopicProgress } from "../lib/progress.js";
 import { forbidden, HttpError, notFound, parseBody } from "../lib/http-error.js";
 import { allowUnapprovedDrafts } from "../lib/settings.js";
 
@@ -24,6 +27,15 @@ const listQuerySchema = z.object({
 });
 
 const readQuerySchema = z.object({ locale: localeSchema });
+
+const slugParamsSchema = z.object({ slug: z.string().min(1) });
+
+/** Reading progress: opened, reached a section (for resume), or completed. */
+const lessonProgressSchema = z.object({
+  locale: localeSchema,
+  event: z.enum(["open", "section", "complete"]),
+  section: z.string().trim().min(1).max(120).optional(),
+});
 
 function parseQuery<T>(schema: z.ZodType<T>, query: unknown): T {
   return parseBody(schema, query);
@@ -46,6 +58,7 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
 
     const rows = await db()
       .select({
+        lessonId: lessons.id,
         slug: lessons.slug,
         topicId: lessons.topicId,
         position: lessons.position,
@@ -83,12 +96,32 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
         a.slug.localeCompare(b.slug),
     );
 
-    return { lessons: visible };
+    const completed = new Set<string>();
+    if (user && visible.length > 0) {
+      const reads = await db()
+        .select({ lessonId: lessonReads.lessonId, completedAt: lessonReads.completedAt })
+        .from(lessonReads)
+        .where(
+          and(
+            eq(lessonReads.userId, user.id),
+            inArray(
+              lessonReads.lessonId,
+              visible.map((row) => row.lessonId),
+            ),
+          ),
+        );
+      for (const read of reads) {
+        if (read.completedAt) completed.add(read.lessonId);
+      }
+    }
+
+    return {
+      lessons: visible.map((row) => ({ ...row, completed: completed.has(row.lessonId) })),
+    };
   });
 
-  app.get("/lessons/:slug", async (request) => {
-    const { slug } = parseBody(z.object({ slug: z.string().min(1) }), request.params);
-    const query = parseQuery(readQuerySchema, request.query);
+  /** The newest translation of a lesson the requester may see, or 404. */
+  async function findVisibleLesson(request: FastifyRequest, slug: string, locale: Locale) {
     const user = request.currentUser;
     const isReviewer = user !== null && user.role !== "student";
     const draftsVisible = isReviewer || (await allowUnapprovedDrafts());
@@ -96,6 +129,8 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
     const rows = await db()
       .select({
         id: lessonTranslations.id,
+        lessonId: lessons.id,
+        lessonVersionId: lessonVersions.id,
         topicId: lessons.topicId,
         version: lessonVersions.version,
         locale: lessonTranslations.locale,
@@ -103,21 +138,93 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
         summary: lessonTranslations.summary,
         body: lessonTranslations.body,
         status: lessonTranslations.status,
+        reviewNote: lessonTranslations.reviewNote,
         approvedAt: lessonTranslations.approvedAt,
       })
       .from(lessonTranslations)
       .innerJoin(lessonVersions, eq(lessonTranslations.lessonVersionId, lessonVersions.id))
       .innerJoin(lessons, eq(lessonVersions.lessonId, lessons.id))
-      .where(and(eq(lessons.slug, slug), eq(lessonTranslations.locale, query.locale)))
+      .where(and(eq(lessons.slug, slug), eq(lessonTranslations.locale, locale)))
       .orderBy(desc(lessonVersions.version));
 
     const lesson = rows.find((row) => isVisibleToStudent(row.status, draftsVisible));
-
     if (!lesson) {
       throw notFound();
     }
+    return lesson;
+  }
 
-    return { lesson };
+  async function readStateOf(userId: string, lessonId: string) {
+    const [read] = await db()
+      .select({
+        lastSection: lessonReads.lastSection,
+        firstOpenedAt: lessonReads.firstOpenedAt,
+        completedAt: lessonReads.completedAt,
+      })
+      .from(lessonReads)
+      .where(and(eq(lessonReads.userId, userId), eq(lessonReads.lessonId, lessonId)))
+      .limit(1);
+    return read ?? null;
+  }
+
+  app.get("/lessons/:slug", async (request, reply) => {
+    const { slug } = parseBody(slugParamsSchema, request.params);
+    const query = parseQuery(readQuerySchema, request.query);
+    const { lessonVersionId: _version, ...lesson } = await findVisibleLesson(request, slug, query.locale);
+    const user = request.currentUser;
+
+    reply.header("cache-control", "no-store");
+    return { lesson, read: user ? await readStateOf(user.id, lesson.lessonId) : null };
+  });
+
+  /**
+   * Records reading: opening a lesson, the section reached (to resume there)
+   * and completing it. Updates the topic progress on open and complete.
+   */
+  app.post("/lessons/:slug/progress", async (request) => {
+    const user = app.requireUser(request);
+    const { slug } = parseBody(slugParamsSchema, request.params);
+    const input = parseBody(lessonProgressSchema, request.body);
+    const lesson = await findVisibleLesson(request, slug, input.locale);
+    const now = new Date();
+
+    const changes = {
+      lessonVersionId: lesson.lessonVersionId,
+      updatedAt: now,
+      ...(input.section ? { lastSection: input.section } : {}),
+      ...(input.event === "complete" ? { completedAt: now } : {}),
+    };
+
+    await db()
+      .insert(lessonReads)
+      .values({ userId: user.id, lessonId: lesson.lessonId, ...changes })
+      .onConflictDoUpdate({
+        target: [lessonReads.userId, lessonReads.lessonId],
+        // A lesson stays completed: re-opening it never clears the completion.
+        set: input.event === "complete" ? changes : { ...changes, completedAt: sql`${lessonReads.completedAt}` },
+      });
+
+    if (input.event !== "section") {
+      await recomputeTopicProgress(user.id, lesson.topicId);
+    }
+
+    return { read: await readStateOf(user.id, lesson.lessonId) };
+  });
+
+  /** Admin housekeeping (and e2e cleanup): removes a lesson with all versions. */
+  app.delete("/lessons/:slug", async (request, reply) => {
+    app.requireRole(request, "admin");
+    const { slug } = parseBody(slugParamsSchema, request.params);
+
+    const deleted = await db()
+      .delete(lessons)
+      .where(eq(lessons.slug, slug))
+      .returning({ id: lessons.id });
+
+    if (deleted.length === 0) {
+      throw notFound();
+    }
+    return reply.code(204).send();
   });
 
   app.post("/lessons", async (request, reply) => {

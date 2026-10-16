@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { lessonBodySchema } from "../content/lesson-body.js";
 import { CONTENT_ACTIONS } from "../content/status.js";
 import { LOCALES } from "../locales.js";
 import { TOPIC_IDS } from "../syllabus/topics.js";
@@ -30,7 +31,8 @@ export const upsertLessonTranslationSchema = z.object({
   locale: localeSchema,
   title: z.string().trim().min(1).max(200),
   summary: z.string().trim().max(1000).optional(),
-  body: z.string().min(1),
+  /** Markdown with the lesson blocks; unknown blocks are rejected. */
+  body: lessonBodySchema,
 });
 
 export const contentActionSchema = z.object({

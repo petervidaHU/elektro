@@ -12,6 +12,7 @@ export const UNITS = [
   "watt",
   "metre",
   "squareMillimetre",
+  "ohmSquareMillimetrePerMetre",
   "percent",
 ] as const;
 

@@ -76,6 +76,97 @@ function requirePositive(value: number, field: string): number {
   return value;
 }
 
+function requirePowerFactor(value: number): number {
+  if (!Number.isFinite(value) || value <= 0 || value > 1) {
+    throw new CalculationInputError("powerFactor");
+  }
+  return value;
+}
+
+/*
+ * The calculation as separate steps. Practice tasks check a student's answer
+ * for each step against these functions, fed with the student's own earlier
+ * answers (docs/DEVELOPMENT_PLAN.md §2.5) - so the maths lives only here.
+ */
+
+/** b of Annex G: 2 for single-phase (out and back), sqrt(3) for balanced three-phase. */
+export function phaseFactor(system: PhaseSystem): number {
+  const factor = PHASE_FACTORS[system];
+  if (factor === undefined) {
+    throw new CalculationInputError("system");
+  }
+  return factor;
+}
+
+/** R = rho * L / S: resistance of one conductor, ohm (rho in ohm*mm2/m, L in m, S in mm2). */
+export function conductorResistance(
+  resistivity_ohm_mm2_per_m: number,
+  length_m: number,
+  crossSection_mm2: number,
+): number {
+  return (
+    (requirePositive(resistivity_ohm_mm2_per_m, "resistivity_ohm_mm2_per_m") *
+      requirePositive(length_m, "length_m")) /
+    requirePositive(crossSection_mm2, "crossSection_mm2")
+  );
+}
+
+/** dU = b * R * I * cos(phi), V. */
+export function voltageDropFromResistance(
+  phaseFactor_: number,
+  conductorResistance_ohm: number,
+  current_A: number,
+  powerFactor: number,
+): number {
+  return (
+    requirePositive(phaseFactor_, "phaseFactor") *
+    requirePositive(conductorResistance_ohm, "conductorResistance_ohm") *
+    requirePositive(current_A, "current_A") *
+    requirePowerFactor(powerFactor)
+  );
+}
+
+/** dU% = dU / Un * 100. */
+export function voltageDropPercentOf(voltageDrop_V: number, nominalVoltage_V: number): number {
+  return (
+    (requirePositive(voltageDrop_V, "voltageDrop_V") /
+      requirePositive(nominalVoltage_V, "nominalVoltage_V")) *
+    100
+  );
+}
+
+/** dUmax = dU%max * Un / 100: a permitted drop given in percent, in volts. */
+export function permittedVoltageDrop(limitPercent: number, nominalVoltage_V: number): number {
+  return (
+    (requirePositive(limitPercent, "limitPercent") *
+      requirePositive(nominalVoltage_V, "nominalVoltage_V")) /
+    100
+  );
+}
+
+/**
+ * Smin = b * rho * L * I * cos(phi) / dUmax: the cross-section (mm2,
+ * unrounded) at which the drop equals dUmax. Round up with
+ * `nextStandardCrossSection`.
+ */
+export function minimumCrossSection(
+  phaseFactor_: number,
+  resistivity_ohm_mm2_per_m: number,
+  length_m: number,
+  current_A: number,
+  powerFactor: number,
+  permittedVoltageDrop_V: number,
+): number {
+  return (
+    (requirePositive(phaseFactor_, "phaseFactor") *
+      requirePositive(resistivity_ohm_mm2_per_m, "resistivity_ohm_mm2_per_m") *
+      requirePositive(length_m, "length_m") *
+      requirePositive(current_A, "current_A") *
+      requirePowerFactor(powerFactor)) /
+    requirePositive(permittedVoltageDrop_V, "permittedVoltageDrop_V")
+  );
+}
+
 /**
  * Returns the drop plus the steps a student works through:
  *
@@ -85,42 +176,33 @@ function requirePositive(value: number, field: string): number {
  * one conductor.
  */
 export function calculateVoltageDrop(input: VoltageDropInput): CalcResult<VoltageDropResult> {
-  const current = requirePositive(input.current_A, "current_A");
-  const length = requirePositive(input.length_m, "length_m");
-  const crossSection = requirePositive(input.crossSection_mm2, "crossSection_mm2");
-  const resistivity = requirePositive(
+  const b = phaseFactor(input.system);
+  const resistance = conductorResistance(
     input.resistivity_ohm_mm2_per_m,
-    "resistivity_ohm_mm2_per_m",
+    input.length_m,
+    input.crossSection_mm2,
   );
-  const nominalVoltage = requirePositive(input.nominalVoltage_V, "nominalVoltage_V");
-
-  const powerFactor = input.powerFactor ?? 1;
-  if (!Number.isFinite(powerFactor) || powerFactor <= 0 || powerFactor > 1) {
-    throw new CalculationInputError("powerFactor");
-  }
-
-  const phaseFactor = PHASE_FACTORS[input.system];
-  if (phaseFactor === undefined) {
-    throw new CalculationInputError("system");
-  }
-
-  const conductorResistance_ohm = (resistivity * length) / crossSection;
-  const voltageDrop_V = phaseFactor * conductorResistance_ohm * current * powerFactor;
-  const voltageDropPercent = (voltageDrop_V / nominalVoltage) * 100;
+  const voltageDrop_V = voltageDropFromResistance(
+    b,
+    resistance,
+    input.current_A,
+    input.powerFactor ?? 1,
+  );
+  const voltageDropPercent = voltageDropPercentOf(voltageDrop_V, input.nominalVoltage_V);
 
   return {
-    result: { voltageDrop_V, voltageDropPercent, phaseFactor },
+    result: { voltageDrop_V, voltageDropPercent, phaseFactor: b },
     steps: [
       {
         id: "phase-factor",
-        value: phaseFactor,
+        value: b,
         unit: "dimensionless",
         formulaId:
           input.system === "three-phase" ? "phase-factor-three-phase" : "phase-factor-single-phase",
       },
       {
         id: "conductor-resistance",
-        value: conductorResistance_ohm,
+        value: resistance,
         unit: "ohm",
         formulaId: "conductor-resistance",
       },
@@ -158,9 +240,12 @@ export function requiredCrossSectionForLimit(
   input: Omit<VoltageDropInput, "crossSection_mm2">,
   limitPercent: number,
 ): number {
-  const limit = requirePositive(limitPercent, "limitPercent");
-  const { result: unit } = calculateVoltageDrop({ ...input, crossSection_mm2: 1 });
-
-  // dU% is inversely proportional to S, so S_min = dU%(S = 1 mm2) / limit%.
-  return unit.voltageDropPercent / limit;
+  return minimumCrossSection(
+    phaseFactor(input.system),
+    input.resistivity_ohm_mm2_per_m,
+    input.length_m,
+    input.current_A,
+    input.powerFactor ?? 1,
+    permittedVoltageDrop(limitPercent, input.nominalVoltage_V),
+  );
 }

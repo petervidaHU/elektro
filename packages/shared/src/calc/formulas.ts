@@ -17,7 +17,11 @@ export const FORMULAS = {
   "phase-factor-three-phase": { expression: "b = √3" },
   "conductor-resistance": { expression: "R = ρ · L / S" },
   "voltage-drop": { expression: "ΔU = b · R · I · cos φ" },
+  "voltage-drop-direct": { expression: "ΔU = b · ρ · L / S · I · cos φ" },
   "voltage-drop-percent": { expression: "ΔU% = ΔU / Uₙ · 100" },
+  "permitted-voltage-drop": { expression: "ΔUₘₐₓ = ΔU%ₘₐₓ · Uₙ / 100" },
+  "minimum-cross-section": { expression: "Sₘᵢₙ = b · ρ · L · I · cos φ / ΔUₘₐₓ" },
+  "standard-cross-section": { expression: "S ≥ Sₘᵢₙ" },
 } as const satisfies Record<string, Formula>;
 
 export type FormulaId = keyof typeof FORMULAS;
