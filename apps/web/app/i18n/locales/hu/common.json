@@ -68,6 +68,61 @@
       "steps": "A számítás lépései",
       "resistivityWarning": "A számítás a vezető üzemi hőmérsékletére vonatkozó fajlagos ellenállással készül (réz: {{copper}}, alumínium: {{aluminium}} Ω·mm²/m; MSZ HD 60364-5-52, G melléklet). Ha a tankönyvetek a 20 °C-os értékkel számol, az eredmény kb. 22 %-kal kisebb lesz.",
       "practice": "Gyakorold feladatokkal"
+    },
+    "invalidInput": "A megadott értékekkel nem végezhető el a számítás.",
+    "result": "Eredmény",
+    "steps": "Lépések",
+    "practice": "Gyakorlás feladatokkal",
+    "quantity": {
+      "voltage": "Feszültség (U)",
+      "current": "Áramerősség (I)",
+      "resistance": "Ellenállás (R)",
+      "supplyVoltage": "Tápfeszültség (U)",
+      "powerFactor": "Teljesítménytényező (cos φ)",
+      "lineVoltage": "Vonali feszültség (U)",
+      "activePower": "Hatásos teljesítmény (P)",
+      "apparentPower": "Látszólagos teljesítmény (S)",
+      "reactivePower": "Meddő teljesítmény (Q)"
+    },
+    "ohmsLaw": {
+      "unknown": "Mit számoljunk ki?"
+    },
+    "equivalent": {
+      "mode": "Kapcsolás",
+      "series": "Soros",
+      "parallel": "Párhuzamos",
+      "mixed": "Vegyes",
+      "count": "Ellenállások száma",
+      "mixedHint": "R₁ sorba van kötve az R₂ és R₃ párhuzamos csoportjával.",
+      "resistorN": "{{n}}. ellenállás (R{{n}})",
+      "current": "Áramerősség",
+      "totalCurrent": "Összáram",
+      "voltageN": "Feszültség az R{{n}} ellenálláson",
+      "branchN": "Ágáram az R{{n}} ellenálláson",
+      "parallelVoltage": "Feszültség a párhuzamos csoporton"
+    },
+    "powerDc": {
+      "known": "Ismert mennyiségek",
+      "duration": "Üzemidő (nem kötelező)",
+      "useful": "Hasznos teljesítmény a hatásfokhoz (nem kötelező)",
+      "energy": "Energia",
+      "efficiency": "Hatásfok"
+    },
+    "loadDemand": {
+      "voltageNote": "Számítási feszültség: {{voltage}} V.",
+      "loadN": "{{n}}. fogyasztó",
+      "power": "Teljesítmény",
+      "hours": "Napi üzemidő",
+      "add": "Fogyasztó hozzáadása",
+      "remove": "Törlés",
+      "days": "Napok száma egy hónapban",
+      "totalPower": "Összteljesítmény",
+      "dailyEnergy": "Napi energia",
+      "monthlyEnergy": "Havi energia",
+      "noFactors": "Egyidejűségi és kihasználtsági tényező nélkül: a fogyasztók teljesítménye egyszerűen összeadódik."
+    },
+    "ac": {
+      "known": "Ismert mennyiség"
     }
   },
   "simulator": {
@@ -186,7 +241,9 @@
     "ohmSquareMillimetrePerMetre": "Ω·mm²/m",
     "voltampere": "VA",
     "var": "var",
-    "kilowattHour": "kWh"
+    "kilowattHour": "kWh",
+    "hour": "h",
+    "day": "nap"
   },
   "error": {
     "UNAUTHENTICATED": "Jelentkezz be a folytatáshoz.",
@@ -278,7 +335,22 @@
     "voltage-drop-percent": "Százalékos feszültségesés (ΔU%)",
     "permitted-voltage-drop": "Megengedett feszültségesés voltban (ΔUₘₐₓ)",
     "minimum-cross-section": "Szükséges legkisebb keresztmetszet (Sₘᵢₙ)",
-    "standard-cross-section": "Választott szabványos keresztmetszet (S)"
+    "standard-cross-section": "Választott szabványos keresztmetszet (S)",
+    "current": "Áramerősség (I)",
+    "voltage": "Feszültség (U)",
+    "resistance": "Ellenállás (R)",
+    "total-resistance": "Eredő ellenállás (R)",
+    "parallel-resistance": "Párhuzamos csoport eredője (R₂₃)",
+    "total-current": "Összáram (I)",
+    "power": "Teljesítmény (P)",
+    "energy": "Energia (W)",
+    "total-power": "Összteljesítmény (P)",
+    "daily-energy": "Napi energia (W)",
+    "monthly-energy": "Havi energia (Wₘ)",
+    "design-current": "Tervezési áram (Ib)",
+    "apparent-power": "Látszólagos teljesítmény (S)",
+    "active-power": "Hatásos teljesítmény (P)",
+    "reactive-power": "Meddő teljesítmény (Q)"
   },
   "syllabus": {
     "title": "Tananyag",
@@ -437,7 +509,20 @@
     "resistivity": "Fajlagos ellenállás (ρ)",
     "nominalVoltage": "Névleges feszültség (Uₙ)",
     "powerFactor": "Teljesítménytényező (cos φ)",
-    "limitPercent": "Megengedett feszültségesés (ΔU%ₘₐₓ)"
+    "limitPercent": "Megengedett feszültségesés (ΔU%ₘₐₓ)",
+    "voltage": "Feszültség (U)",
+    "resistance": "Ellenállás (R)",
+    "resistance1": "Első ellenállás (R₁)",
+    "resistance2": "Második ellenállás (R₂)",
+    "resistance3": "Harmadik ellenállás (R₃)",
+    "duration": "Üzemidő (t)",
+    "power": "Hatásos teljesítmény (P)",
+    "load1Power": "1. fogyasztó teljesítménye",
+    "load1Hours": "1. fogyasztó napi üzemideje",
+    "load2Power": "2. fogyasztó teljesítménye",
+    "load2Hours": "2. fogyasztó napi üzemideje",
+    "load3Power": "3. fogyasztó teljesítménye",
+    "load3Hours": "3. fogyasztó napi üzemideje"
   },
   "material": {
     "copper": "réz",
@@ -448,7 +533,21 @@
     "voltage-drop.phase-and-power-factor.single-phase": "Egy egyfázisú, {{nominalVoltage}}-os áramkör {{material}}vezetéke {{length}} hosszú, {{crossSection}} keresztmetszetű. A terhelés árama {{current}}, teljesítménytényezője cos φ = {{powerFactor}}. Mekkora a feszültségesés voltban és százalékban?",
     "voltage-drop.phase-and-power-factor.three-phase": "Egy szimmetrikusan terhelt háromfázisú, {{nominalVoltage}}-os áramkör {{material}}vezetéke {{length}} hosszú, {{crossSection}} keresztmetszetű. A terhelés árama {{current}}, teljesítménytényezője cos φ = {{powerFactor}}. Mekkora a feszültségesés voltban és százalékban?",
     "voltage-drop.cross-section-selection.single-phase": "Egy egyfázisú, {{nominalVoltage}}-os áramkört rézvezetékkel kell kiépíteni. A vezeték egyirányú hossza {{length}}, a terhelés árama {{current}} (cos φ = {{powerFactor}}). A tervező előírása szerint ezen a szakaszon legfeljebb {{limitPercent}} feszültségesés megengedett. Mekkora szabványos keresztmetszetet válassz, és mekkora lesz vele a feszültségesés?",
-    "voltage-drop.cross-section-selection.three-phase": "Egy szimmetrikusan terhelt háromfázisú, {{nominalVoltage}}-os áramkört rézvezetékkel kell kiépíteni. A vezeték egyirányú hossza {{length}}, a terhelés árama {{current}} (cos φ = {{powerFactor}}). A tervező előírása szerint ezen a szakaszon legfeljebb {{limitPercent}} feszültségesés megengedett. Mekkora szabványos keresztmetszetet válassz, és mekkora lesz vele a feszültségesés?"
+    "voltage-drop.cross-section-selection.three-phase": "Egy szimmetrikusan terhelt háromfázisú, {{nominalVoltage}}-os áramkört rézvezetékkel kell kiépíteni. A vezeték egyirányú hossza {{length}}, a terhelés árama {{current}} (cos φ = {{powerFactor}}). A tervező előírása szerint ezen a szakaszon legfeljebb {{limitPercent}} feszültségesés megengedett. Mekkora szabványos keresztmetszetet válassz, és mekkora lesz vele a feszültségesés?",
+    "ohms-law.current": "Egy {{resistance}} ellenállású fogyasztóra {{voltage}} feszültség kapcsolódik. Mekkora áram folyik át rajta?",
+    "ohms-law.voltage": "Egy {{resistance}} ellenállású fogyasztón {{current}} áram folyik át. Mekkora feszültség esik rajta?",
+    "ohms-law.resistance": "Egy fogyasztóra {{voltage}} feszültséget kapcsolva {{current}} áram folyik. Mekkora az ellenállása?",
+    "series-parallel.parallel-two": "Két ellenállást, {{resistance1}} és {{resistance2}} értékűt, párhuzamosan kötünk. Mekkora az eredő ellenállás?",
+    "series-parallel.series-divider": "Két ellenállást, R₁ = {{resistance1}} és R₂ = {{resistance2}} értékűt, sorba kötünk és {{voltage}} feszültségre kapcsolunk. Mekkora feszültség esik az R₂ ellenálláson?",
+    "series-parallel.mixed": "R₁ = {{resistance1}} sorba van kötve az R₂ = {{resistance2}} és R₃ = {{resistance3}} párhuzamos csoportjával, a tápfeszültség {{voltage}}. Mekkora az összáram?",
+    "power-dc.basic": "Egy egyenáramú fogyasztóra {{voltage}} feszültség van kapcsolva, árama {{current}}. Mekkora a teljesítménye?",
+    "power-dc.resistance-energy": "Egy {{resistance}} ellenállású fűtőbetéten {{current}} áram folyik, {{duration}} ideig. Mekkora a teljesítménye wattban, és mennyi energiát vesz fel kWh-ban?",
+    "load-demand.single-phase": "Egy egyfázisú, 230 V-os fogyasztó három ellenállás jellegű (cos φ = 1) terhelésből áll: az elsőé {{load1Power}}, naponta {{load1Hours}} üzemidővel; a másodiké {{load2Power}}, {{load2Hours}}; a harmadiké {{load3Power}}, {{load3Hours}}. Mekkora az összteljesítmény, a napi energia és a tervezési áram (Ib)?",
+    "power-ac-single.active": "Egy egyfázisú, {{voltage}}-os fogyasztó árama {{current}}, teljesítménytényezője cos φ = {{powerFactor}}. Mekkora a látszólagos és a hatásos teljesítménye?",
+    "power-ac-single.reactive": "Egy egyfázisú, {{voltage}}-os fogyasztó árama {{current}}, teljesítménytényezője cos φ = {{powerFactor}}. Mekkora a látszólagos, a hatásos és a meddő teljesítménye?",
+    "power-ac-single.current": "Egy egyfázisú, {{voltage}}-os fogyasztó hatásos teljesítménye {{power}}, teljesítménytényezője cos φ = {{powerFactor}}. Mekkora áramot vesz fel?",
+    "power-three-phase.active": "Egy szimmetrikus háromfázisú fogyasztó vonali feszültsége {{voltage}}, vonali árama {{current}}, teljesítménytényezője cos φ = {{powerFactor}}. Mekkora a látszólagos és a hatásos teljesítménye?",
+    "power-three-phase.current": "Egy szimmetrikus háromfázisú fogyasztó vonali feszültsége {{voltage}}, hatásos teljesítménye {{power}}, teljesítménytényezője cos φ = {{powerFactor}}. Mekkora a vonali árama?"
   },
   "practiceHint": {
     "phase-factor": "Egyfázisú körben az áram az egyik vezetőn oda, a másikon vissza folyik. Szimmetrikusan terhelt háromfázisú körben a vonali feszültségre számolunk.",
@@ -457,7 +556,22 @@
     "voltage-drop-percent": "Viszonyítsd a feszültségesést a névleges feszültséghez, és fejezd ki százalékban.",
     "permitted-voltage-drop": "Váltsd át a megengedett százalékos feszültségesést voltra a névleges feszültség alapján.",
     "minimum-cross-section": "Rendezd át a feszültségesés képletét a keresztmetszetre: a megengedett feszültségesésnél ekkora keresztmetszet kell legalább.",
-    "standard-cross-section": "A szabványos keresztmetszet-sorból azt válaszd, amelyik legalább akkora, mint a szükséges legkisebb keresztmetszet."
+    "standard-cross-section": "A szabványos keresztmetszet-sorból azt válaszd, amelyik legalább akkora, mint a szükséges legkisebb keresztmetszet.",
+    "current": "Az Ohm-törvény szerint az áram a feszültség és az ellenállás hányadosa. Egyfázisú és háromfázisú körben a teljesítményből is kiszámolható, a feszültség és a cos φ ismeretében.",
+    "voltage": "Az Ohm-törvény szerint a feszültség az áram és az ellenállás szorzata.",
+    "resistance": "Az Ohm-törvény szerint az ellenállás a feszültség és az áram hányadosa.",
+    "total-resistance": "Soros kapcsolásban az ellenállások összeadódnak, párhuzamosban a reciprokaik összege adja az eredő reciprokát.",
+    "parallel-resistance": "Párhuzamos kapcsolásban a reciprok ellenállások (vezetések) összeadódnak. Az eredő mindig kisebb a legkisebb ágnál.",
+    "total-current": "Az összáram a tápfeszültség és az eredő ellenállás hányadosa.",
+    "power": "A teljesítmény a feszültség és az áram szorzata; ellenállásból P = I²·R vagy P = U²/R.",
+    "energy": "Az energia a teljesítmény és az idő szorzata. A kWh-hoz a wattot ezerrel kell osztani.",
+    "total-power": "A fogyasztók teljesítménye összeadódik.",
+    "daily-energy": "Fogyasztónként szorozd a teljesítményt az üzemidővel, add össze, majd oszd el ezerrel a kWh-hoz.",
+    "monthly-energy": "A napi energiát szorozd a hónap napjainak számával.",
+    "design-current": "Az összteljesítményből: Ib = P / (U · cos φ) egyfázisú, P / (√3 · U · cos φ) háromfázisú rendszerben.",
+    "apparent-power": "Egyfázisban S = U·I, háromfázisban S = √3·U·I (vonali feszültséggel).",
+    "active-power": "A hatásos teljesítmény a látszólagos teljesítmény és a cos φ szorzata.",
+    "reactive-power": "A teljesítménydiagramból: Q = √(S² − P²)."
   },
   "misconception": {
     "resistance-inverted": "Úgy tűnik, felcserélted a hosszt és a keresztmetszetet: R = ρ · L / S.",
@@ -469,7 +583,11 @@
     "percent-not-divided": "A százalékot el kell osztani 100-zal, mielőtt a névleges feszültséggel szorzol.",
     "wrong-reference-voltage": "Rossz feszültséghez viszonyítottál: egyfázisú körben 230 V-hoz, háromfázisúban a 400 V-os vonali feszültséghez.",
     "limit-percent-used-as-volts": "A megengedett feszültségesést voltban kell behelyettesíteni (ΔUₘₐₓ), nem százalékban.",
-    "chose-below-minimum": "Ez kisebb a szükségesnél. A szabványos sorból a legalább akkorát válaszd, mint a szükséges legkisebb keresztmetszet."
+    "chose-below-minimum": "Ez kisebb a szükségesnél. A szabványos sorból a legalább akkorát válaszd, mint a szükséges legkisebb keresztmetszet.",
+    "ohms-law-inverted": "Az Ohm-törvényben fordítva osztottál: U = I·R, I = U/R, R = U/I. Gondold végig, melyik mennyiséget kell a másikkal osztani.",
+    "parallel-resistance-added": "Párhuzamos kapcsolásban az ellenállások nem egyszerűen összeadódnak: a reciprokaik összege adja az eredő reciprokát, és az eredő kisebb a legkisebb ágnál.",
+    "current-not-squared": "A P = I²·R képletben az áramot négyzetre kell emelni, mielőtt az ellenállással szorzod.",
+    "root-three-missing": "Háromfázisú rendszerben a vonali feszültséggel és vonali árammal √3-szoros szorzó jár: S = √3·U·I."
   },
   "contentAdmin": {
     "saved": "Mentve.",
@@ -520,7 +638,13 @@
       "removeConfirm": "Igen, leveszem a listáról"
     },
     "calculatorIds": {
-      "voltage-drop": "Feszültségesés"
+      "voltage-drop": "Feszültségesés",
+      "ohms-law": "Ohm-törvény",
+      "equivalent-resistance": "Eredő ellenállás",
+      "power-dc": "Egyenáramú teljesítmény és energia",
+      "load-demand": "Fogyasztói igény",
+      "power-ac-single": "Egyfázisú váltakozó áramú teljesítmény",
+      "power-three-phase": "Háromfázisú teljesítmény"
     },
     "fieldName": {
       "slug": "Azonosító",

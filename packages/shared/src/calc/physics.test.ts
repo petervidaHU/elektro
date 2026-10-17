@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { CalculationInputError } from "./voltage-drop.js";
 import {
+  calculateLoadDemand,
+  solveMixedCircuit,
   currentFromVoltageResistance,
   parallelResistance,
   powerDc,
@@ -112,5 +114,51 @@ describe("AC power", () => {
 
   it("rejects a power factor outside (0, 1]", () => {
     expect(() => powerSinglePhase({ voltage_V: 230, current_A: 1, powerFactor: 1.2 })).toThrow(CalculationInputError);
+  });
+});
+
+describe("load demand (power and energy of a consumer)", () => {
+  const loads = [
+    { power_W: 2000, hoursPerDay: 1.5 },
+    { power_W: 100, hoursPerDay: 8 },
+    { power_W: 1000, hoursPerDay: 0.5 },
+  ];
+
+  it("sums the power and the daily and monthly energy", () => {
+    const { result } = calculateLoadDemand({ loads, voltage_V: 230, system: "single-phase", powerFactor: 1 });
+    expect(result.totalPower_W).toBe(3100);
+    // 2000*1.5 + 100*8 + 1000*0.5 = 4300 Wh
+    expect(result.dailyEnergy_kWh).toBeCloseTo(4.3, 12);
+    expect(result.monthlyEnergy_kWh).toBeCloseTo(4.3 * 30, 12);
+  });
+
+  it("design current Ib = P / (U cos phi), single-phase", () => {
+    const { result } = calculateLoadDemand({ loads, voltage_V: 230, system: "single-phase", powerFactor: 0.9 });
+    expect(result.designCurrent_A).toBeCloseTo(3100 / (230 * 0.9), 9);
+  });
+
+  it("design current Ib = P / (sqrt(3) U cos phi), three-phase with line voltage", () => {
+    const { result } = calculateLoadDemand({ loads, voltage_V: 400, system: "three-phase", powerFactor: 1 });
+    expect(result.designCurrent_A).toBeCloseTo(3100 / (Math.sqrt(3) * 400), 9);
+  });
+
+  it("uses the given days per month, and rejects empty or invalid loads", () => {
+    const { result } = calculateLoadDemand({ loads, voltage_V: 230, system: "single-phase", powerFactor: 1, daysPerMonth: 31 });
+    expect(result.monthlyEnergy_kWh).toBeCloseTo(4.3 * 31, 12);
+    expect(() => calculateLoadDemand({ loads: [], voltage_V: 230, system: "single-phase", powerFactor: 1 })).toThrow(CalculationInputError);
+    expect(() => calculateLoadDemand({ loads: [{ power_W: 100, hoursPerDay: 25 }], voltage_V: 230, system: "single-phase", powerFactor: 1 })).toThrow(CalculationInputError);
+  });
+});
+
+describe("mixed circuit: R1 in series with R2 parallel R3", () => {
+  it("combines the resistances and finds the currents and the divided voltage", () => {
+    const { result } = solveMixedCircuit({ supplyVoltage_V: 24, seriesResistance_ohm: 4, parallelResistances_ohm: [6, 3] });
+    // 4 + (6 || 3) = 4 + 2 = 6 ohm
+    expect(result.totalResistance_ohm).toBeCloseTo(6, 12);
+    expect(result.totalCurrent_A).toBeCloseTo(4, 12);
+    expect(result.seriesVoltage_V).toBeCloseTo(16, 12);
+    expect(result.parallelVoltage_V).toBeCloseTo(8, 12);
+    expect(result.branchCurrents_A[0]).toBeCloseTo(8 / 6, 12);
+    expect(result.branchCurrents_A[1]).toBeCloseTo(8 / 3, 12);
   });
 });

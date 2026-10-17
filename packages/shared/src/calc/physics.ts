@@ -273,3 +273,109 @@ export function powerThreePhase(input: PowerThreePhaseInput): CalcResult<AcPower
     active: "active-power-three-phase",
   });
 }
+
+export interface LoadInput {
+  power_W: number;
+  /** Average operating time per day, h (0 < t <= 24). */
+  hoursPerDay: number;
+}
+
+export interface LoadDemandInput {
+  loads: LoadInput[];
+  /** 230 V line-to-neutral for single-phase, line-to-line (e.g. 400 V) for three-phase. */
+  voltage_V: number;
+  system: "single-phase" | "three-phase";
+  powerFactor: number;
+  /** Days used for the monthly energy; defaults to 30. */
+  daysPerMonth?: number;
+}
+
+export interface LoadDemandResult {
+  totalPower_W: number;
+  dailyEnergy_kWh: number;
+  monthlyEnergy_kWh: number;
+  /** Design current Ib of the supply, A. */
+  designCurrent_A: number;
+}
+
+export const DEFAULT_DAYS_PER_MONTH = 30;
+
+/**
+ * Consumer power and energy demand: the plain sum of the loads (no demand or
+ * diversity factors - plan decision, K7), daily energy as the sum of P*t,
+ * monthly energy as daily * days, and the design current
+ * Ib = P / (U cos phi) (single-phase) or P / (sqrt(3) U cos phi) (three-phase).
+ */
+export function calculateLoadDemand(input: LoadDemandInput): CalcResult<LoadDemandResult> {
+  if (input.loads.length === 0) throw new CalculationInputError("loads");
+  for (const load of input.loads) {
+    positive(load.power_W, "power_W");
+    if (!Number.isFinite(load.hoursPerDay) || load.hoursPerDay <= 0 || load.hoursPerDay > 24) {
+      throw new CalculationInputError("hoursPerDay");
+    }
+  }
+  const days = positive(input.daysPerMonth ?? DEFAULT_DAYS_PER_MONTH, "daysPerMonth");
+  const k = input.system === "three-phase" ? Math.sqrt(3) : 1;
+
+  const totalPower = input.loads.reduce((sum, load) => sum + load.power_W, 0);
+  const daily = input.loads.reduce((sum, load) => sum + load.power_W * load.hoursPerDay, 0) / 1000;
+  const monthly = daily * days;
+  const current = totalPower / (k * positive(input.voltage_V, "voltage_V") * powerFactorOf(input.powerFactor));
+
+  return {
+    result: { totalPower_W: totalPower, dailyEnergy_kWh: daily, monthlyEnergy_kWh: monthly, designCurrent_A: current },
+    steps: [
+      { id: "total-power", value: totalPower, unit: "watt", formulaId: "total-power" },
+      { id: "daily-energy", value: daily, unit: "kilowattHour", formulaId: "daily-energy" },
+      { id: "monthly-energy", value: monthly, unit: "kilowattHour", formulaId: "monthly-energy" },
+      {
+        id: "design-current",
+        value: current,
+        unit: "ampere",
+        formulaId: input.system === "three-phase" ? "current-three-phase" : "current-single-phase",
+      },
+    ],
+  };
+}
+
+export interface MixedCircuitInput {
+  supplyVoltage_V: number;
+  /** R1, in series with the parallel group. */
+  seriesResistance_ohm: number;
+  /** R2, R3 (...), in parallel with each other. */
+  parallelResistances_ohm: number[];
+}
+
+export interface MixedCircuitResult {
+  parallelResistance_ohm: number;
+  totalResistance_ohm: number;
+  totalCurrent_A: number;
+  seriesVoltage_V: number;
+  parallelVoltage_V: number;
+  branchCurrents_A: number[];
+}
+
+/** R1 in series with a parallel group: R = R1 + R2 || R3, then the voltages and branch currents. */
+export function solveMixedCircuit(input: MixedCircuitInput): CalcResult<MixedCircuitResult> {
+  const r1 = positive(input.seriesResistance_ohm, "seriesResistance_ohm");
+  const parallel = parallelResistance(input.parallelResistances_ohm);
+  const total = r1 + parallel;
+  const current = currentFromVoltageResistance(input.supplyVoltage_V, total);
+  const parallelVoltage = current * parallel;
+
+  return {
+    result: {
+      parallelResistance_ohm: parallel,
+      totalResistance_ohm: total,
+      totalCurrent_A: current,
+      seriesVoltage_V: current * r1,
+      parallelVoltage_V: parallelVoltage,
+      branchCurrents_A: input.parallelResistances_ohm.map((r) => parallelVoltage / r),
+    },
+    steps: [
+      { id: "parallel-resistance", value: parallel, unit: "ohm", formulaId: "parallel-resistance" },
+      { id: "total-resistance", value: total, unit: "ohm", formulaId: "mixed-resistance" },
+      { id: "total-current", value: current, unit: "ampere", formulaId: "ohms-law-current" },
+    ],
+  };
+}

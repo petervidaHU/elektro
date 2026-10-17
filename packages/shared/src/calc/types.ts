@@ -13,6 +13,7 @@ export const UNITS = [
   "voltampere",
   "var",
   "kilowattHour",
+  "hour",
   "metre",
   "squareMillimetre",
   "ohmSquareMillimetrePerMetre",

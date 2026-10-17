@@ -26,6 +26,7 @@ export default [
       route("report", "routes/report.tsx"),
       route("calculators", "routes/calculators.tsx"),
       route("calculators/voltage-drop", "routes/voltage-drop.tsx"),
+      route("calculators/:calculatorId", "routes/calculator.tsx"),
       route("simulator", "routes/simulator.tsx"),
       route("login", "routes/login.tsx"),
       route("register", "routes/register.tsx"),

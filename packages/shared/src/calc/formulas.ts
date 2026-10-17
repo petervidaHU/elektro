@@ -38,6 +38,13 @@ export const FORMULAS = {
   "reactive-power": { expression: "Q = √(S² − P²)" },
   "apparent-power-three-phase": { expression: "S = √3 · U · I" },
   "active-power-three-phase": { expression: "P = √3 · U · I · cos φ" },
+  "current-single-phase": { expression: "I = P / (U · cos φ)" },
+  "current-three-phase": { expression: "I = P / (√3 · U · cos φ)" },
+  "total-power": { expression: "P = P₁ + P₂ + …" },
+  "daily-energy": { expression: "W = Σ (Pₙ · tₙ)" },
+  "monthly-energy": { expression: "Wₘ = W · n" },
+  "mixed-resistance": { expression: "R = R₁ + R₂ ∥ R₃" },
+  "voltage-divider": { expression: "Uₙ = U · Rₙ / R" },
 } as const satisfies Record<string, Formula>;
 
 export type FormulaId = keyof typeof FORMULAS;

@@ -20,6 +20,10 @@ export const MISCONCEPTION_IDS = [
   "wrong-reference-voltage",
   "limit-percent-used-as-volts",
   "chose-below-minimum",
+  "ohms-law-inverted",
+  "parallel-resistance-added",
+  "current-not-squared",
+  "root-three-missing",
 ] as const;
 
 export type MisconceptionId = (typeof MISCONCEPTION_IDS)[number];

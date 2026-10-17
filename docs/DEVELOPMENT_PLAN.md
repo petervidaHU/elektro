@@ -570,7 +570,7 @@ transaction as each write, and an admin script can rebuild all of it.
 | K4 | Practice API: create session, get task, check step, finish session (server re-check, persist, update progress) |
 | K5 | Practice UI: task screen, step feedback, tolerance display, hints, solution reveal, session summary |
 | K6 | Voltage-drop templates (difficulty 1–3) + misconception detectors + ρ warning, which completes **milestone 1** |
-| K7 | P1 physics calculators + templates: ohms-law, equivalent-resistance, power-dc, load-demand, power-ac-single, power-three-phase |
+| K7 | P1 physics calculators + templates: ohms-law, equivalent-resistance, power-dc, load-demand, power-ac-single, power-three-phase. Done: engine in `calc/physics.ts`, one page route `calculators/:calculatorId`, 14 practice templates in `practice/templates/physics.ts` (`load-demand` has no demand or diversity factors, plain sum), registry rows seeded by migration `0009` |
 | K8 | Reference-tables entity: schema, versioning, verify workflow, teacher table editor, table-excerpt component |
 | K8a | Pre-fill candidate reference tables as `unverified`, with citations: current-carrying capacity, correction factors, permitted voltage drop, material constants |
 | K9 | `conductor-resistance` + `cable-selection` (exam III), once the tables are verified |
