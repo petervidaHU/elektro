@@ -2,7 +2,10 @@ import { useState } from "react";
 import { Button, Group, SegmentedControl, Stack, Text } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import {
+  balancePhases,
+  calculateConnectionPower,
   calculateLoadDemand,
+  calculatePhaseLoad,
   formatPercent,
   formatQuantity,
   powerDc,
@@ -350,6 +353,125 @@ function AcPower({ locale, threePhase }: Props & { threePhase: boolean }) {
   );
 }
 
+// ---- Connection power --------------------------------------------------------
+
+function ConnectionPower({ locale }: Props) {
+  const { t } = useTranslation();
+  const q = useQ(locale);
+  const [system, setSystem] = useState<"single-phase" | "three-phase">("single-phase");
+  const [breaker, setBreaker] = useState<number | string>(25);
+  const [demand, setDemand] = useState<number | string>(0);
+  const voltage = system === "three-phase" ? 400 : 230;
+
+  const outcome = attempt(() =>
+    calculateConnectionPower({
+      system,
+      voltage_V: voltage,
+      mainBreaker_A: num(breaker),
+      ...(optional(demand) !== undefined && { demandPower_W: optional(demand)! }),
+    }),
+  );
+
+  return (
+    <Stack gap="md">
+      <Choice
+        label={t("calculators.voltageDrop.system")}
+        value={system}
+        onChange={setSystem}
+        options={[
+          { value: "single-phase", label: t("calculators.voltageDrop.singlePhase") },
+          { value: "three-phase", label: t("calculators.voltageDrop.threePhase") },
+        ]}
+      />
+      <Text size="sm" c="dimmed">{t("calculators.loadDemand.voltageNote", { voltage })}</Text>
+      <NumField label={t("calculators.connection.breaker")} unit={t("unit.ampere")} value={breaker} onChange={setBreaker} decimals={0} />
+      <NumField label={t("calculators.connection.demand")} unit={t("unit.watt")} value={demand} onChange={setDemand} step={100} />
+      <ResultCard outcome={outcome} steps={outcome?.steps ?? []} locale={locale}>
+        {outcome && q(outcome.result.availablePower_W, "watt")}
+      </ResultCard>
+      {outcome?.result.sufficient !== undefined && (
+        <Text size="sm" fw={600} c={outcome.result.sufficient ? "green" : "red"} data-testid="connection-verdict">
+          {outcome.result.sufficient ? "✓ " : "✗ "}
+          {t(outcome.result.sufficient ? "calculators.connection.enough" : "calculators.connection.notEnough", {
+            margin: q(Math.abs(outcome.result.margin_W!), "watt"),
+          })}
+        </Text>
+      )}
+    </Stack>
+  );
+}
+
+// ---- Phase balancing ---------------------------------------------------------
+
+const MAX_CIRCUITS = 12;
+
+function PhaseBalancing({ locale }: Props) {
+  const { t } = useTranslation();
+  const q = useQ(locale);
+  const [circuits, setCircuits] = useState<{ current: number | string; phase: "0" | "1" | "2" }[]>([
+    { current: 10, phase: "0" },
+    { current: 16, phase: "0" },
+    { current: 6, phase: "1" },
+    { current: 13, phase: "2" },
+  ]);
+
+  const update = (index: number, change: Partial<(typeof circuits)[number]>) =>
+    setCircuits((current) => current.map((c, k) => (k === index ? { ...c, ...change } : c)));
+
+  const parsed = circuits.map((c) => ({ current_A: num(c.current), phase: Number(c.phase) }));
+  const load = attempt(() => calculatePhaseLoad(parsed));
+  const suggestion = attempt(() => balancePhases(parsed.map((c) => c.current_A)));
+  const names = ["L1", "L2", "L3"];
+
+  return (
+    <Stack gap="md">
+      {circuits.map((circuit, index) => (
+        <Stack key={index} gap="xs" data-circuit-index={index}>
+          <Group justify="space-between">
+            <Text fw={500}>{t("calculators.balancing.circuitN", { n: index + 1 })}</Text>
+            {circuits.length > 1 && (
+              <Button variant="subtle" size="xs" color="red" onClick={() => setCircuits((c) => c.filter((_x, k) => k !== index))}>
+                {t("calculators.loadDemand.remove")}
+              </Button>
+            )}
+          </Group>
+          <NumField label={t("calculators.quantity.current")} unit={t("unit.ampere")} value={circuit.current} onChange={(v) => update(index, { current: v })} step={1} />
+          <SegmentedControl
+            fullWidth
+            aria-label={t("calculators.balancing.phase")}
+            value={circuit.phase}
+            onChange={(v) => update(index, { phase: v as "0" | "1" | "2" })}
+            data={names.map((name, k) => ({ value: String(k), label: name }))}
+          />
+        </Stack>
+      ))}
+      {circuits.length < MAX_CIRCUITS && (
+        <Button variant="light" onClick={() => setCircuits((c) => [...c, { current: 10, phase: "0" }])}>
+          {t("calculators.balancing.add")}
+        </Button>
+      )}
+      <ResultCard outcome={load} steps={load?.steps ?? []} locale={locale}>
+        {load && t("calculators.balancing.mostLoaded", { phase: names[load.result.mostLoadedPhase], value: q(load.result.phaseCurrents_A[load.result.mostLoadedPhase]!, "ampere") })}
+      </ResultCard>
+      {suggestion && load && (
+        <Stack gap={2} data-testid="balancing-suggestion">
+          <Text fw={600}>{t("calculators.balancing.suggestion")}</Text>
+          {suggestion.result.suggestedPhases.map((phase, index) => (
+            <Text size="sm" key={index}>
+              {t("calculators.balancing.circuitN", { n: index + 1 })}: {names[phase]}
+              {phase !== Number(circuits[index]!.phase) ? ` (${t("calculators.balancing.move")})` : ""}
+            </Text>
+          ))}
+          <Text size="sm">
+            {t("calculators.balancing.after", { before: q(load.result.imbalance_A, "ampere"), after: q(suggestion.result.after.imbalance_A, "ampere") })}
+          </Text>
+          <Text size="xs" c="dimmed">{t("calculators.balancing.note")}</Text>
+        </Stack>
+      )}
+    </Stack>
+  );
+}
+
 /** The calculator pages of the physics set, by calculator id. */
 export const PHYSICS_CALCULATORS: Partial<Record<CalculatorId, (props: Props) => React.ReactNode>> = {
   "ohms-law": (props) => <OhmsLaw {...props} />,
@@ -358,4 +480,6 @@ export const PHYSICS_CALCULATORS: Partial<Record<CalculatorId, (props: Props) =>
   "load-demand": (props) => <LoadDemand {...props} />,
   "power-ac-single": (props) => <AcPower {...props} threePhase={false} />,
   "power-three-phase": (props) => <AcPower {...props} threePhase />,
+  "connection-power": (props) => <ConnectionPower {...props} />,
+  "phase-balancing": (props) => <PhaseBalancing {...props} />,
 };

@@ -71,6 +71,13 @@
       "when": 1792266826176,
       "tag": "0009_m3_seed_physics_calculators",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792267204768,
+      "tag": "0010_m3_seed_installation_calculators",
+      "breakpoints": true
     }
   ]
 }

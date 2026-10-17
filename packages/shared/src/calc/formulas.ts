@@ -45,6 +45,12 @@ export const FORMULAS = {
   "monthly-energy": { expression: "Wₘ = W · n" },
   "mixed-resistance": { expression: "R = R₁ + R₂ ∥ R₃" },
   "voltage-divider": { expression: "Uₙ = U · Rₙ / R" },
+  "available-power-single-phase": { expression: "P = U · I" },
+  "available-power-three-phase": { expression: "P = √3 · U · I" },
+  "power-margin": { expression: "ΔP = Pₐ − Pᵢ" },
+  "phase-current": { expression: "I_L = ΣIₙ" },
+  "phase-imbalance": { expression: "ΔI = Iₘₐₓ − Iₘᵢₙ" },
+  "most-loaded-phase": { expression: "I_L = max" },
 } as const satisfies Record<string, Formula>;
 
 export type FormulaId = keyof typeof FORMULAS;

@@ -15,6 +15,8 @@ export const CALCULATOR_IDS = [
   "load-demand",
   "power-ac-single",
   "power-three-phase",
+  "connection-power",
+  "phase-balancing",
 ] as const;
 
 export type CalculatorId = (typeof CALCULATOR_IDS)[number];
@@ -41,6 +43,8 @@ const DEFINITIONS: Record<CalculatorId, CalculatorDefinition> = {
   "load-demand": define("load-demand", "power-and-energy"),
   "power-ac-single": define("power-ac-single", "ac-fundamentals"),
   "power-three-phase": define("power-three-phase", "three-phase-systems"),
+  "connection-power": define("connection-power", "service-connection-and-metering"),
+  "phase-balancing": define("phase-balancing", "distribution-boards"),
 };
 
 export function isCalculatorId(value: unknown): value is CalculatorId {

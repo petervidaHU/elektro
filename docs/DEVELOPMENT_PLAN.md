@@ -577,7 +577,7 @@ transaction as each write, and an admin script can rebuild all of it.
 | K10 | P2 calculators (physics first, then table-dependent ones once verified) |
 | K11 | Calculator ↔ lesson links (`:::example` opens the calculator pre-filled; calculator shows "learn the theory" link) |
 | K12 | `practice_templates` / `practice_task_texts` tables + i18n → DB sync script (unused at runtime in v1). Done: `npm run db:sync:practice-texts` (Q25) |
-| K13 | P1 calculators from the TOC review: `connection-power`, `phase-balancing` + templates |
+| K13 | P1 calculators from the TOC review: `connection-power`, `phase-balancing` + templates. Done: `calc/installation.ts`, 6 templates in `practice/templates/installation.ts`, migration `0010`; phase balancing suggests a split with the "largest circuit first onto the least loaded phase" rule |
 
 ---
 

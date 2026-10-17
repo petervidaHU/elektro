@@ -123,6 +123,22 @@
     },
     "ac": {
       "known": "Ismert mennyiség"
+    },
+    "connection": {
+      "breaker": "Mérőhelyi kismegszakító névleges árama",
+      "demand": "Fogyasztói igény (nem kötelező)",
+      "enough": "Az igényt fedezi, a tartalék {{margin}}.",
+      "notEnough": "Az igényt nem fedezi, {{margin}} hiányzik."
+    },
+    "balancing": {
+      "circuitN": "{{n}}. áramkör",
+      "phase": "Fázis",
+      "add": "Áramkör hozzáadása",
+      "mostLoaded": "Legterheltebb fázis: {{phase}}, {{value}}",
+      "suggestion": "Javasolt, egyenletesebb elosztás",
+      "move": "áttéve",
+      "after": "Fázisok közti eltérés: {{before}} → {{after}}",
+      "note": "A javaslat a legnagyobb áramú áramkörtől kezdve mindig a legkevésbé terhelt fázisra teszi a következőt; kiindulópont, a végleges elosztást a kábelezés és a fogyasztók jellege is befolyásolja."
     }
   },
   "simulator": {
@@ -350,7 +366,14 @@
     "design-current": "Tervezési áram (Ib)",
     "apparent-power": "Látszólagos teljesítmény (S)",
     "active-power": "Hatásos teljesítmény (P)",
-    "reactive-power": "Meddő teljesítmény (Q)"
+    "reactive-power": "Meddő teljesítmény (Q)",
+    "available-power": "Rendelkezésre álló teljesítmény (P)",
+    "power-margin": "Teljesítménytartalék (ΔP)",
+    "phase-current-l1": "Az L1 fázis árama",
+    "phase-current-l2": "Az L2 fázis árama",
+    "phase-current-l3": "Az L3 fázis árama",
+    "most-loaded-phase": "Legterheltebb fázis",
+    "phase-imbalance": "Fázisok közti eltérés (ΔI)"
   },
   "syllabus": {
     "title": "Tananyag",
@@ -522,7 +545,14 @@
     "load2Power": "2. fogyasztó teljesítménye",
     "load2Hours": "2. fogyasztó napi üzemideje",
     "load3Power": "3. fogyasztó teljesítménye",
-    "load3Hours": "3. fogyasztó napi üzemideje"
+    "load3Hours": "3. fogyasztó napi üzemideje",
+    "mainBreaker": "Mérőhelyi kismegszakító névleges árama",
+    "demand": "Fogyasztói igény (P)",
+    "circuit1Current": "1. áramkör árama",
+    "circuit2Current": "2. áramkör árama",
+    "circuit3Current": "3. áramkör árama",
+    "circuit4Current": "4. áramkör árama",
+    "circuit5Current": "5. áramkör árama"
   },
   "material": {
     "copper": "réz",
@@ -547,7 +577,13 @@
     "power-ac-single.reactive": "Egy egyfázisú, {{voltage}}-os fogyasztó árama {{current}}, teljesítménytényezője cos φ = {{powerFactor}}. Mekkora a látszólagos, a hatásos és a meddő teljesítménye?",
     "power-ac-single.current": "Egy egyfázisú, {{voltage}}-os fogyasztó hatásos teljesítménye {{power}}, teljesítménytényezője cos φ = {{powerFactor}}. Mekkora áramot vesz fel?",
     "power-three-phase.active": "Egy szimmetrikus háromfázisú fogyasztó vonali feszültsége {{voltage}}, vonali árama {{current}}, teljesítménytényezője cos φ = {{powerFactor}}. Mekkora a látszólagos és a hatásos teljesítménye?",
-    "power-three-phase.current": "Egy szimmetrikus háromfázisú fogyasztó vonali feszültsége {{voltage}}, hatásos teljesítménye {{power}}, teljesítménytényezője cos φ = {{powerFactor}}. Mekkora a vonali árama?"
+    "power-three-phase.current": "Egy szimmetrikus háromfázisú fogyasztó vonali feszültsége {{voltage}}, hatásos teljesítménye {{power}}, teljesítménytényezője cos φ = {{powerFactor}}. Mekkora a vonali árama?",
+    "connection-power.single-phase": "Egy lakás egyfázisú, {{voltage}}-os csatlakozását {{mainBreaker}} névleges áramú mérőhelyi kismegszakító védi. Mekkora teljesítmény vehető fel a csatlakozáson?",
+    "connection-power.three-phase": "Egy épület háromfázisú, {{voltage}}-os (vonali) csatlakozását fázisonként {{mainBreaker}} névleges áramú mérőhelyi kismegszakító védi. Mekkora teljesítmény vehető fel a csatlakozáson?",
+    "connection-power.margin": "Egy épület háromfázisú, {{voltage}}-os csatlakozását fázisonként {{mainBreaker}} névleges áramú mérőhelyi kismegszakító védi. A fogyasztói igény {{demand}}. Mekkora a rendelkezésre álló teljesítmény, és mekkora tartalék marad?",
+    "phase-balancing.one-phase": "Egy elosztóban öt áramkör árama: 1. {{circuit1Current}}, 2. {{circuit2Current}}, 3. {{circuit3Current}}, 4. {{circuit4Current}}, 5. {{circuit5Current}}. Az 1. és 2. áramkör az L1, a 3. az L2, a 4. és 5. az L3 fázisra csatlakozik. Mekkora az L1 fázis árama?",
+    "phase-balancing.all-phases": "Egy elosztóban öt áramkör árama: 1. {{circuit1Current}}, 2. {{circuit2Current}}, 3. {{circuit3Current}}, 4. {{circuit4Current}}, 5. {{circuit5Current}}. Az 1. és 2. áramkör az L1, a 3. az L2, a 4. és 5. az L3 fázisra csatlakozik. Mekkora az egyes fázisok árama?",
+    "phase-balancing.imbalance": "Egy elosztóban öt áramkör árama: 1. {{circuit1Current}}, 2. {{circuit2Current}}, 3. {{circuit3Current}}, 4. {{circuit4Current}}, 5. {{circuit5Current}}. Az 1. és 2. áramkör az L1, a 3. az L2, a 4. és 5. az L3 fázisra csatlakozik. Számold ki a fázisáramokat, válaszd ki a legterheltebb fázist, és add meg a legnagyobb és a legkisebb fázisáram különbségét."
   },
   "practiceHint": {
     "phase-factor": "Egyfázisú körben az áram az egyik vezetőn oda, a másikon vissza folyik. Szimmetrikusan terhelt háromfázisú körben a vonali feszültségre számolunk.",
@@ -571,7 +607,14 @@
     "design-current": "Az összteljesítményből: Ib = P / (U · cos φ) egyfázisú, P / (√3 · U · cos φ) háromfázisú rendszerben.",
     "apparent-power": "Egyfázisban S = U·I, háromfázisban S = √3·U·I (vonali feszültséggel).",
     "active-power": "A hatásos teljesítmény a látszólagos teljesítmény és a cos φ szorzata.",
-    "reactive-power": "A teljesítménydiagramból: Q = √(S² − P²)."
+    "reactive-power": "A teljesítménydiagramból: Q = √(S² − P²).",
+    "available-power": "A csatlakozás teljesítménye a feszültség és a mérőhelyi kismegszakító áramának szorzata; háromfázisú rendszerben √3-szoros.",
+    "power-margin": "A tartalék a rendelkezésre álló teljesítmény és az igény különbsége.",
+    "phase-current-l1": "Add össze az L1 fázisra kötött áramkörök áramát.",
+    "phase-current-l2": "Add össze az L2 fázisra kötött áramkörök áramát.",
+    "phase-current-l3": "Add össze az L3 fázisra kötött áramkörök áramát.",
+    "most-loaded-phase": "Hasonlítsd össze a három fázis áramát, és válaszd a legnagyobbat.",
+    "phase-imbalance": "A legnagyobb és a legkisebb fázisáram különbsége."
   },
   "misconception": {
     "resistance-inverted": "Úgy tűnik, felcserélted a hosszt és a keresztmetszetet: R = ρ · L / S.",
@@ -644,7 +687,9 @@
       "power-dc": "Egyenáramú teljesítmény és energia",
       "load-demand": "Fogyasztói igény",
       "power-ac-single": "Egyfázisú váltakozó áramú teljesítmény",
-      "power-three-phase": "Háromfázisú teljesítmény"
+      "power-three-phase": "Háromfázisú teljesítmény",
+      "connection-power": "Csatlakozási teljesítmény",
+      "phase-balancing": "Fázisok terhelése"
     },
     "fieldName": {
       "slug": "Azonosító",
