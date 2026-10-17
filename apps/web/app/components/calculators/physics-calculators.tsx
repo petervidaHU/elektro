@@ -7,7 +7,6 @@ import {
   calculateLoadDemand,
   calculatePhaseLoad,
   formatPercent,
-  formatQuantity,
   powerDc,
   powerSinglePhase,
   powerThreePhase,
@@ -16,53 +15,8 @@ import {
   solveParallelBranches,
   solveSeriesCircuit,
   type CalculatorId,
-  type Locale,
 } from "@elektro/shared";
-import { attempt, NumField, ResultCard } from "./kit";
-
-interface Props {
-  locale: Locale;
-  /** Pre-filled inputs from a lesson example (validated by `readPrefill`). */
-  prefill: Record<string, string>;
-}
-
-/** A pre-filled number, or the default. */
-const pn = (prefill: Record<string, string>, key: string, fallback: number): number =>
-  prefill[key] === undefined ? fallback : Number(prefill[key].replace(",", "."));
-/** A pre-filled choice, or the default; the value was checked against the calculator's spec. */
-const pc = <T extends string>(prefill: Record<string, string>, key: string, fallback: T): T =>
-  (prefill[key] as T | undefined) ?? fallback;
-
-const num = (value: number | string) => (value === "" ? Number.NaN : Number(value));
-const optional = (value: number | string) => (value === "" || Number(value) === 0 ? undefined : Number(value));
-
-/** Quantity formatter bound to the unit labels and the locale. */
-function useQ(locale: Locale) {
-  const { t } = useTranslation();
-  return (value: number, unit: string, digits = 4) =>
-    formatQuantity(value, t(`unit.${unit}`), locale, { maximumSignificantDigits: digits });
-}
-
-function Choice<T extends string>({
-  label,
-  value,
-  onChange,
-  options,
-}: {
-  label: string;
-  value: T;
-  onChange: (value: T) => void;
-  options: { value: T; label: string }[];
-}) {
-  return (
-    <div>
-      <Text fw={500} mb={4}>
-        {label}
-      </Text>
-      <SegmentedControl fullWidth value={value} onChange={(next) => onChange(next as T)} data={options} />
-    </div>
-  );
-}
+import { attempt, Choice, NumField, optional, pc, pn, num, ResultCard, useQ, type Props } from "./kit";
 
 // ---- Ohm's law ---------------------------------------------------------------
 

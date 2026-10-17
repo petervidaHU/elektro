@@ -4,12 +4,15 @@ import { Link, useLoaderData, useSearchParams } from "react-router";
 import { hasPractice, isCalculatorId, readPrefill, type CalculatorId } from "@elektro/shared";
 import type { BreadcrumbHandle } from "../components/app-shell/breadcrumbs";
 import { loadTopicLessons, TheoryLink } from "../components/calculators/theory-link";
+import { P2_CALCULATORS } from "../components/calculators/p2-calculators";
 import { PHYSICS_CALCULATORS } from "../components/calculators/physics-calculators";
 import { ReportButton } from "../components/report/report-button";
 import { localePath } from "../i18n/locale";
 import { loadCalculator, type ListedCalculator } from "../lib/calculators";
 import { useLayoutData } from "../lib/use-layout-data";
 import type { Route } from "./+types/calculator";
+
+const PAGES = { ...PHYSICS_CALCULATORS, ...P2_CALCULATORS };
 
 /**
  * The physics calculators (plan §2.2, K7) share one route; the maths is in
@@ -19,7 +22,7 @@ import type { Route } from "./+types/calculator";
  */
 export async function loader({ request, params }: Route.LoaderArgs) {
   const id = String(params.calculatorId);
-  if (!isCalculatorId(id) || !PHYSICS_CALCULATORS[id]) {
+  if (!isCalculatorId(id) || !PAGES[id]) {
     throw new Response(null, { status: 404 });
   }
   const calculator = await loadCalculator(request, String(params.locale), id);
@@ -41,7 +44,7 @@ export default function CalculatorPage() {
   const { t } = useTranslation();
   const { locale } = useLayoutData();
   const { id, calculator, lessons } = useLoaderData<typeof loader>();
-  const render = PHYSICS_CALCULATORS[id]!;
+  const render = PAGES[id]!;
   const [searchParams] = useSearchParams();
   const prefill = readPrefill(id, searchParams);
 

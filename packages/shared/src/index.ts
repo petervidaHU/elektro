@@ -28,3 +28,5 @@ export * from "./reference/tables.js";
 export * from "./schemas/glossary.js";
 export * from "./calc/prefill.js";
 export * from "./reference/required.js";
+export * from "./calc/p2.js";
+export * from "./calc/p2-more.js";

@@ -17,6 +17,23 @@ export const CALCULATOR_IDS = [
   "power-three-phase",
   "connection-power",
   "phase-balancing",
+  // P2 physics (K10)
+  "ac-impedance",
+  "capacitors",
+  "inductors",
+  "voltage-source",
+  "transformer-ratio",
+  "charge-current",
+  "ac-values",
+  "kirchhoff",
+  "wheatstone-bridge",
+  "meter-range-extension",
+  "measurement-error",
+  "motor-basics",
+  "short-circuit-current",
+  "illuminance",
+  "pe-continuity-check",
+  "material-list",
 ] as const;
 
 export type CalculatorId = (typeof CALCULATOR_IDS)[number];
@@ -45,6 +62,22 @@ const DEFINITIONS: Record<CalculatorId, CalculatorDefinition> = {
   "power-three-phase": define("power-three-phase", "three-phase-systems"),
   "connection-power": define("connection-power", "service-connection-and-metering"),
   "phase-balancing": define("phase-balancing", "distribution-boards"),
+  "ac-impedance": define("ac-impedance", "ac-fundamentals"),
+  capacitors: define("capacitors", "electric-field-and-capacitors"),
+  inductors: define("inductors", "magnetism-and-induction"),
+  "voltage-source": define("voltage-source", "voltage-sources"),
+  "transformer-ratio": define("transformer-ratio", "transformers"),
+  "charge-current": define("charge-current", "dc-circuits"),
+  "ac-values": define("ac-values", "ac-fundamentals"),
+  kirchhoff: define("kirchhoff", "series-parallel-circuits"),
+  "wheatstone-bridge": define("wheatstone-bridge", "series-parallel-circuits"),
+  "meter-range-extension": define("meter-range-extension", "measuring-instruments"),
+  "measurement-error": define("measurement-error", "measuring-instruments"),
+  "motor-basics": define("motor-basics", "electric-motors"),
+  "short-circuit-current": define("short-circuit-current", "overcurrent-protection"),
+  illuminance: define("illuminance", "lighting-circuits"),
+  "pe-continuity-check": define("pe-continuity-check", "continuity-of-pe"),
+  "material-list": define("material-list", "installation-planning"),
 };
 
 export function isCalculatorId(value: unknown): value is CalculatorId {

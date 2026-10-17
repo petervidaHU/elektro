@@ -207,7 +207,7 @@ export default function VoltageDrop() {
           {t("calculators.voltageDrop.invalidInput")}
         </Alert>
       ) : (
-        <Card withBorder padding="lg" radius="md">
+        <Card withBorder padding="lg" radius="md" data-testid="calculator-result">
           <Stack gap="xs">
             <Text size="sm" c="dimmed">
               {t("calculators.voltageDrop.result")}

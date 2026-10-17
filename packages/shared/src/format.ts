@@ -51,3 +51,31 @@ export function formatDateTime(value: Date | string, locale: Locale): string {
     timeZone: LOCALE_TIME_ZONES[locale],
   }).format(typeof value === "string" ? new Date(value) : value);
 }
+
+const SI_PREFIXES = [
+  { exponent: -12, symbol: "p" },
+  { exponent: -9, symbol: "n" },
+  { exponent: -6, symbol: "µ" },
+  { exponent: -3, symbol: "m" },
+  { exponent: 0, symbol: "" },
+  { exponent: 3, symbol: "k" },
+  { exponent: 6, symbol: "M" },
+  { exponent: 9, symbol: "G" },
+] as const;
+
+/**
+ * A value with the SI prefix that keeps the number readable (`100 µF`,
+ * `2,5 mH`, `4,7 kΩ`), three significant digits. For quantities where the base
+ * unit is rarely a sensible size: capacitance, inductance, time constants.
+ */
+export function formatEngineering(value: number, unitSymbol: string, locale: Locale): string {
+  if (value === 0 || !Number.isFinite(value)) {
+    return formatQuantity(value, unitSymbol, locale);
+  }
+  const magnitude = Math.abs(value);
+  const prefix =
+    [...SI_PREFIXES].reverse().find((item) => magnitude >= 10 ** item.exponent * 0.9995) ?? SI_PREFIXES[0];
+  return formatQuantity(value / 10 ** prefix.exponent, `${prefix.symbol}${unitSymbol}`, locale, {
+    maximumSignificantDigits: 3,
+  });
+}

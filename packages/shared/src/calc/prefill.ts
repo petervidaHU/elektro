@@ -12,6 +12,7 @@ export type PrefillField =
   | { kind: "choice"; options: readonly string[] };
 
 const positive: PrefillField = { kind: "number", min: 0 };
+const signed: PrefillField = { kind: "number" };
 const factor: PrefillField = { kind: "number", min: 0, max: 1 };
 const choice = (...options: string[]): PrefillField => ({ kind: "choice", options });
 
@@ -49,6 +50,46 @@ export const PREFILL_FIELDS: Record<CalculatorId, Record<string, PrefillField>> 
   "power-three-phase": { known: choice("current", "power"), voltage: positive, current: positive, power: positive, powerFactor: factor },
   "connection-power": { system: choice("single-phase", "three-phase"), breaker: positive, demand: positive },
   "phase-balancing": { ...indexed("current", positive, 12), ...indexed("phase", choice("0", "1", "2"), 12) },
+  // P2 physics. Capacitance is entered in µF, inductance in mH, times in ms.
+  "ac-impedance": { resistance: positive, inductance: positive, capacitance: positive, frequency: positive, voltage: positive },
+  capacitors: { mode: choice("single", "series", "parallel"), ...indexed("c", positive, 3), voltage: positive, resistance: positive, time: positive },
+  inductors: {
+    mode: choice("single", "series", "parallel"),
+    ...indexed("l", positive, 3),
+    current: positive,
+    resistance: positive,
+    voltage: positive,
+    time: positive,
+  },
+  "voltage-source": { emf: positive, internalResistance: positive, loadResistance: positive },
+  "transformer-ratio": {
+    unknown: choice("secondaryVoltage", "primaryVoltage", "secondaryTurns", "primaryTurns"),
+    primaryVoltage: positive,
+    secondaryVoltage: positive,
+    primaryTurns: positive,
+    secondaryTurns: positive,
+    secondaryCurrent: positive,
+  },
+  "charge-current": { unknown: choice("charge", "current", "time"), charge: positive, current: positive, time: positive },
+  "ac-values": { given: choice("rms", "peak"), voltage: positive, frequency: positive },
+  kirchhoff: { emf1: signed, resistance1: positive, emf2: signed, resistance2: positive, resistance3: positive },
+  "wheatstone-bridge": { resistance1: positive, resistance2: positive, resistance3: positive, unknownResistance: positive, supply: positive },
+  "meter-range-extension": { kind: choice("ammeter", "voltmeter"), meterResistance: positive, meterCurrent: positive, target: positive },
+  "measurement-error": { reading: positive, percent: positive, digits: positive, resolution: positive },
+  "motor-basics": {
+    frequency: positive,
+    polePairs: positive,
+    rotorSpeed: positive,
+    ratedPower: positive,
+    voltage: positive,
+    efficiency: factor,
+    powerFactor: factor,
+    startingRatio: positive,
+  },
+  "short-circuit-current": { voltage: positive, impedance: positive, trip: positive },
+  illuminance: { flux: positive, area: positive, target: positive, luminaireFlux: positive, utilisation: factor },
+  "pe-continuity-check": { resistivity: positive, length: positive, crossSection: positive, measured: positive, allowedFactor: positive },
+  "material-list": { ...indexed("quantity", positive, 8), ...indexed("price", positive, 8), reserve: positive },
 };
 
 export type PrefillErrorReason = "unknown-field" | "invalid-value";

@@ -15,6 +15,7 @@ import { Link, useActionData, useLoaderData, useSearchParams } from "react-route
 import {
   DEFAULT_LOCALE,
   hasAtLeastRole,
+  hasPractice,
   isLocale,
   MODULES,
   moveItem,
@@ -33,6 +34,7 @@ import { apiFetch } from "../lib/api";
 import { actionFailure, type ManagedCalculators, type ManagedLesson } from "../lib/content-admin";
 import { jsonBody } from "../lib/content-admin-actions";
 import { getCurrentUser } from "../lib/session";
+import { listCalculators } from "../lib/calculators";
 import { getProgress } from "../lib/progress";
 import { useLayoutData } from "../lib/use-layout-data";
 import type { Route } from "./+types/syllabus";
@@ -61,8 +63,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const locale = isLocale(params.locale) ? params.locale : DEFAULT_LOCALE;
   const user = await getCurrentUser(request);
   const isStaff = user !== null && hasAtLeastRole(user.role, "teacher");
-  const [progress, intros, content] = await Promise.all([
+  const [progress, calculators, intros, content] = await Promise.all([
     getProgress(request, user !== null),
+    listCalculators(request, locale),
     apiFetch<{ intros: Partial<Record<string, { text: string }>> }>(request, `/api/topic-intros?locale=${locale}`)
       .then((data) => data.intros)
       .catch(() => ({}) as Partial<Record<string, { text: string }>>),
@@ -73,6 +76,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
   return {
     progress: Object.fromEntries(progress.map((row) => [row.topicId, row.masteryLevel])),
+    // Topics whose content comes later are still reachable when they already have a calculator.
+    withCalculator: [...new Set(calculators.map((calculator) => calculator.topicId))],
     intros: Object.fromEntries(Object.entries(intros).map(([topicId, intro]) => [topicId, intro?.text ?? ""])),
     content: content && {
       lessons: content[0],
@@ -146,7 +151,7 @@ const ALL_MODULES = "all";
 export default function Syllabus() {
   const { t } = useTranslation();
   const { locale } = useLayoutData();
-  const { progress, intros, content } = useLoaderData<typeof loader>();
+  const { progress, intros, withCalculator, content } = useLoaderData<typeof loader>();
   const failure = useActionData<typeof action>() ?? undefined;
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -230,6 +235,7 @@ export default function Syllabus() {
                 to={localePath(locale, `topics/${topic.id}`)}
                 mastery={progress[topic.id]}
                 intro={intros[topic.id]}
+                toolsOnly={topic.contentPhase > 1 && (withCalculator.includes(topic.id) || hasPractice(topic.id))}
               />
             ))}
           </SimpleGrid>
@@ -239,9 +245,9 @@ export default function Syllabus() {
   );
 }
 
-function TopicCard({ topic, to, mastery, intro }: { topic: Topic; to: string; mastery?: MasteryLevel; intro?: string }) {
+function TopicCard({ topic, to, mastery, intro, toolsOnly }: { topic: Topic; to: string; mastery?: MasteryLevel; intro?: string; toolsOnly: boolean }) {
   const { t } = useTranslation();
-  const available = topic.contentPhase === 1;
+  const available = topic.contentPhase === 1 || toolsOnly;
 
   const body = (
     <Stack gap={6}>
@@ -250,6 +256,11 @@ function TopicCard({ topic, to, mastery, intro }: { topic: Topic; to: string; ma
         {!available && (
           <Badge color="gray" variant="light" style={{ flexShrink: 0 }}>
             {t("syllabus.comingSoon")}
+          </Badge>
+        )}
+        {toolsOnly && (
+          <Badge color="teal" variant="light" style={{ flexShrink: 0 }}>
+            {t("syllabus.toolsOnly")}
           </Badge>
         )}
         {available && mastery && mastery !== "none" && <MasteryBadge level={mastery} />}

@@ -148,7 +148,158 @@
     "plannedHint": {
       "cable-selection": "A vizsga III. részének feladata: vezeték kiválasztása terhelhetőség és feszültségesés alapján. Hitelesített táblázatok kellenek hozzá."
     },
-    "plannedMissing": "Még {{count}} hitelesített táblázat hiányzik: megnyitás"
+    "plannedMissing": "Még {{count}} hitelesített táblázat hiányzik: megnyitás",
+    "combination": {
+      "mode": "Kapcsolás",
+      "single": "Egyetlen",
+      "series": "Soros",
+      "parallel": "Párhuzamos",
+      "thirdOptional": "Add meg az összes elem értékét; soros és párhuzamos kapcsolásnál három elem számít."
+    },
+    "acImpedance": {
+      "inductance": "Induktivitás (L, 0 = nincs)",
+      "capacitance": "Kapacitás (C, 0 = nincs)",
+      "frequency": "Frekvencia (f)",
+      "phaseAngle": "Fázisszög (φ)",
+      "characterOf": "Jelleg",
+      "inductive": "induktív (az áram késik)",
+      "capacitive": "kapacitív (az áram siet)",
+      "resistive": "ohmos",
+      "uR": "Feszültség az ellenálláson",
+      "uL": "Feszültség a tekercsen",
+      "uC": "Feszültség a kondenzátoron",
+      "xL": "Induktív reaktancia (X_L)",
+      "xC": "Kapacitív reaktancia (X_C)"
+    },
+    "capacitors": {
+      "capacitorN": "{{n}}. kondenzátor (C{{n}})",
+      "resistance": "Soros ellenállás az időállandóhoz (0 = nincs)",
+      "time": "Időpont a töltési görbéhez (0 = nincs)",
+      "charge": "Töltés (Q)",
+      "energy": "Tárolt energia (W)",
+      "tau": "Időállandó (τ)",
+      "charging": "Feszültség töltés közben",
+      "discharging": "Feszültség kisütés közben"
+    },
+    "inductors": {
+      "inductorN": "{{n}}. tekercs (L{{n}})",
+      "resistance": "Ellenállás az időállandóhoz (0 = nincs)",
+      "rising": "Áram a megadott időpontban"
+    },
+    "voltageSource": {
+      "emf": "Forrásfeszültség (E)",
+      "internal": "Belső ellenállás (Rᵦ)",
+      "load": "Terhelő ellenállás (0 = nincs)",
+      "loadPower": "A terhelés teljesítménye",
+      "shortCircuit": "Rövidzárási áram",
+      "matched": "Illesztett terhelés (R = Rᵦ)",
+      "maxPower": "Legnagyobb átvihető teljesítmény"
+    },
+    "transformer": {
+      "u1": "Primer feszültség (U₁)",
+      "u2": "Szekunder feszültség (U₂)",
+      "n1": "Primer menetszám (N₁)",
+      "n2": "Szekunder menetszám (N₂)",
+      "i1": "Primer áram (I₁)",
+      "i2": "Szekunder áram (I₂, nem kötelező)",
+      "ratio": "Áttétel (N₁ / N₂)",
+      "ideal": "Ideális (veszteségmentes) transzformátorral számolunk"
+    },
+    "charge": {
+      "charge": "Töltés (Q)",
+      "current": "Áram (I)",
+      "time": "Idő (t)"
+    },
+    "acValues": {
+      "given": "Mit ismersz?",
+      "rms": "Effektív érték (U)",
+      "peak": "Csúcsérték (Uₘ)",
+      "period": "Periódusidő (T)",
+      "omega": "Körfrekvencia (ω)"
+    },
+    "kirchhoff": {
+      "hint": "Két ágban egy-egy forrás és ellenállás, középen egy ellenállás. Negatív forrásfeszültség megfordított forrást jelent.",
+      "emfN": "{{n}}. forrás feszültsége (E{{n}})",
+      "currentN": "Az {{n}}. ág árama",
+      "nodeLaw": "Csomóponti törvény (I₁ + I₂ = I₃)"
+    },
+    "wheatstone": {
+      "hint": "A híd bal ágában R₁ felül és R₂ alul, a jobb ágban R₃ felül és Rₓ alul van.",
+      "actualRx": "Az Rₓ tényleges értéke a hídfeszültséghez (0 = nincs)",
+      "bridgeVoltage": "Hídfeszültség"
+    },
+    "meterRange": {
+      "kind": "Műszer",
+      "ammeter": "Árammérő (söntellenállás)",
+      "voltmeter": "Feszültségmérő (előtét)",
+      "meterResistance": "A műszer belső ellenállása",
+      "meterCurrent": "A műszer végkitérési árama",
+      "targetCurrent": "Új méréshatár (áram)",
+      "targetVoltage": "Új méréshatár (feszültség)",
+      "shunt": "Söntellenállás",
+      "seriesResistor": "Előtét-ellenállás"
+    },
+    "measurementError": {
+      "hint": "Digitális műszer pontossága: a leolvasás százaléka plusz néhány digit.",
+      "reading": "Leolvasott érték",
+      "percent": "Pontosság a leolvasás százalékában",
+      "digits": "Pontosság digitben",
+      "resolution": "Egy digit értéke",
+      "range": "A valódi érték tartománya",
+      "relative": "Relatív hiba"
+    },
+    "motor": {
+      "speedSection": "Fordulatszám és szlip",
+      "currentSection": "Névleges áram és indítás",
+      "polePairs": "Pólusszám-pár (p)",
+      "rotorSpeed": "A forgórész fordulatszáma (0 = nincs)",
+      "slip": "Szlip",
+      "ratedPower": "Névleges teljesítmény (tengelyen)",
+      "efficiency": "Hatásfok (η)",
+      "startingRatio": "Indítási áram a névleges többszöröse (0 = nincs, katalógusadat)",
+      "directStart": "Indítási áram közvetlen bekapcsolással",
+      "starDeltaStart": "Indítási áram csillag állásban"
+    },
+    "shortCircuit": {
+      "voltage": "Fázisfeszültség (U₀)",
+      "impedance": "Hurokimpedancia (Z_s)",
+      "trip": "A védőkészülék kioldó árama (0 = nincs)",
+      "tripHint": "A kioldó áramot a készülék adatlapja vagy a feladat adja meg; itt nem számoljuk ki fejből.",
+      "trips": "A zárlati áram eléri a kioldó áramot: a készülék kiold. A legnagyobb megengedett hurokimpedancia: {{max}}.",
+      "noTrip": "A zárlati áram nem éri el a kioldó áramot: a készülék nem biztos, hogy kiold. A legnagyobb megengedett hurokimpedancia: {{max}}."
+    },
+    "illuminance": {
+      "flux": "Fényáram (Φ)",
+      "area": "Terület (A)",
+      "target": "Kívánt megvilágítás (0 = nincs)",
+      "luminaireFlux": "Egy lámpatest fényárama",
+      "utilisation": "Hasznosítási tényező (1 = egyszerűsített)",
+      "needed": "Szükséges lámpatestek száma",
+      "note": "Egyszerűsített számítás. A kívánt megvilágítást a feladat vagy az előírás adja meg."
+    },
+    "peContinuity": {
+      "note": "A mérési eredményt a vezető számított ellenállásával vetjük össze. A fajlagos ellenállást mindig a feladat szerint add meg.",
+      "resistivity": "Fajlagos ellenállás (ρ)",
+      "length": "Vezetékhossz",
+      "crossSection": "Keresztmetszet",
+      "measured": "Mért ellenállás",
+      "allowed": "Megengedett többszörös (a feladat adja, 0 = nincs)",
+      "ratio": "Mért / számított",
+      "verdict": "Értékelés",
+      "within": "a megengedett határon belül",
+      "over": "a megengedett határ felett (gyenge kötés gyanúja)"
+    },
+    "materialList": {
+      "hint": "Az egységárakat a feladat vagy az árajánlat adja.",
+      "lineN": "{{n}}. tétel",
+      "quantity": "Mennyiség",
+      "price": "Egységár",
+      "lineTotal": "Tétel értéke",
+      "add": "Tétel hozzáadása",
+      "reserve": "Tartalék (nem kötelező)",
+      "total": "Összesen",
+      "totalWithReserve": "Összesen tartalékkal"
+    }
   },
   "simulator": {
     "title": "Mérés szimulátor",
@@ -268,7 +419,18 @@
     "var": "var",
     "kilowattHour": "kWh",
     "hour": "h",
-    "day": "nap"
+    "day": "nap",
+    "second": "s",
+    "hertz": "Hz",
+    "farad": "F",
+    "henry": "H",
+    "coulomb": "C",
+    "joule": "J",
+    "degree": "°",
+    "revolutionPerMinute": "1/min",
+    "lumen": "lm",
+    "lux": "lx",
+    "squareMetre": "m²"
   },
   "error": {
     "UNAUTHENTICATED": "Jelentkezz be a folytatáshoz.",
@@ -382,14 +544,58 @@
     "phase-current-l2": "Az L2 fázis árama",
     "phase-current-l3": "Az L3 fázis árama",
     "most-loaded-phase": "Legterheltebb fázis",
-    "phase-imbalance": "Fázisok közti eltérés (ΔI)"
+    "phase-imbalance": "Fázisok közti eltérés (ΔI)",
+    "inductive-reactance": "Induktív reaktancia (X_L)",
+    "capacitive-reactance": "Kapacitív reaktancia (X_C)",
+    "impedance": "Impedancia (Z)",
+    "phase-angle": "Fázisszög (φ)",
+    "power-factor": "Teljesítménytényező (cos φ)",
+    "capacitance": "Eredő kapacitás (C)",
+    "charge": "Töltés (Q)",
+    "time-constant": "Időállandó (τ)",
+    "charging-voltage": "Feszültség töltés közben",
+    "discharging-voltage": "Feszültség kisütés közben",
+    "inductance": "Eredő induktivitás (L)",
+    "rising-current": "Az áram a bekapcsolás után",
+    "terminal-voltage": "Kapocsfeszültség (U)",
+    "short-circuit-current": "Rövidzárási áram (I_k)",
+    "maximum-power": "Legnagyobb átvihető teljesítmény",
+    "secondary-voltage": "Szekunder feszültség (U₂)",
+    "primary-voltage": "Primer feszültség (U₁)",
+    "secondary-turns": "Szekunder menetszám (N₂)",
+    "primary-turns": "Primer menetszám (N₁)",
+    "primary-current": "Primer áram (I₁)",
+    "time": "Idő (t)",
+    "peak-value": "Csúcsérték (Uₘ)",
+    "frequency": "Frekvencia (f)",
+    "angular-frequency": "Körfrekvencia (ω)",
+    "node-voltage": "Csomóponti feszültség (U_ab)",
+    "current-1": "Az 1. ág árama",
+    "current-2": "A 2. ág árama",
+    "current-3": "A középső ág árama",
+    "unknown-resistance": "Az ismeretlen ellenállás (Rₓ)",
+    "bridge-voltage": "Hídfeszültség",
+    "shunt-resistor": "Söntellenállás (Rₚ)",
+    "series-resistor": "Előtét-ellenállás (Rₛ)",
+    "absolute-error": "Abszolút hiba",
+    "synchronous-speed": "Szinkron fordulatszám (nₛ)",
+    "slip": "Szlip (s)",
+    "rated-current": "Névleges áram (I)",
+    "star-delta-start-current": "Indítási áram csillag állásban",
+    "max-loop-impedance": "Legnagyobb megengedett hurokimpedancia",
+    "illuminance": "Megvilágítás (E)",
+    "luminaire-count": "Lámpatestek száma",
+    "expected-resistance": "Számított ellenállás",
+    "resistance-ratio": "Mért / számított",
+    "material-total": "Összesen"
   },
   "syllabus": {
     "title": "Tananyag",
     "intro": "A villanyszerelő képzés témakörei a képzési program szerint, modulokba rendezve.",
     "comingSoon": "Hamarosan",
     "safetyCritical": "Biztonságkritikus",
-    "exam": "Vizsga: {{parts}}"
+    "exam": "Vizsga: {{parts}}",
+    "toolsOnly": "Számológép"
   },
   "topicHub": {
     "lessons": "Leckék",
@@ -699,7 +905,23 @@
       "power-ac-single": "Egyfázisú váltakozó áramú teljesítmény",
       "power-three-phase": "Háromfázisú teljesítmény",
       "connection-power": "Csatlakozási teljesítmény",
-      "phase-balancing": "Fázisok terhelése"
+      "phase-balancing": "Fázisok terhelése",
+      "ac-impedance": "Váltakozó áramú impedancia",
+      "capacitors": "Kondenzátorok",
+      "inductors": "Tekercsek",
+      "voltage-source": "Valódi feszültségforrás",
+      "transformer-ratio": "Transzformátor áttétele",
+      "charge-current": "Töltés és áram",
+      "ac-values": "Váltakozó mennyiségek",
+      "kirchhoff": "Kirchhoff törvényei",
+      "wheatstone-bridge": "Wheatstone-híd",
+      "meter-range-extension": "Méréshatár-kiterjesztés",
+      "measurement-error": "Mérési hiba",
+      "motor-basics": "Motor alapadatai",
+      "short-circuit-current": "Zárlati áram",
+      "illuminance": "Megvilágítás",
+      "pe-continuity-check": "Védővezető folytonosságának értékelése",
+      "material-list": "Anyagjegyzék és költség"
     },
     "fieldName": {
       "slug": "Azonosító",
