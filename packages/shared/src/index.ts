@@ -22,3 +22,4 @@ export * from "./schemas/practice.js";
 export * from "./content/diff.js";
 export * from "./learning/index.js";
 export * from "./schemas/reports.js";
+export * from "./calc/physics.js";

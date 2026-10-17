@@ -183,7 +183,10 @@
     "metre": "m",
     "squareMillimetre": "mm²",
     "percent": "%",
-    "ohmSquareMillimetrePerMetre": "Ω·mm²/m"
+    "ohmSquareMillimetrePerMetre": "Ω·mm²/m",
+    "voltampere": "VA",
+    "var": "var",
+    "kilowattHour": "kWh"
   },
   "error": {
     "UNAUTHENTICATED": "Jelentkezz be a folytatáshoz.",
