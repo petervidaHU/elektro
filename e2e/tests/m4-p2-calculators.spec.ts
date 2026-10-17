@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { CALCULATOR_IDS } from "@elektro/shared";
+import { register, solveTask } from "../helpers";
 import hu from "../../apps/web/app/i18n/locales/hu/common.json" with { type: "json" };
 
 /**
@@ -34,4 +35,13 @@ test("M4: every calculator page computes with its default inputs", async ({ page
     await expect(page.getByTestId("calculator-result").first(), id).toBeVisible();
     await expect(page.getByText(hu.calculators.invalidInput), id).toHaveCount(0);
   }
+});
+
+test("M4: a student practises a P2 topic (electric motors) on the keypad", async ({ page }) => {
+  await register(page, "E2E Motor", `e2e-m4+${Date.now()}@example.com`, "e2e-password-123");
+  await page.goto("/hu/practice/electric-motors");
+  await page.getByRole("button", { name: hu.practice.start.start }).tap();
+  await expect(page).toHaveURL(/\/hu\/practice\/s\//);
+  await solveTask(page);
+  await expect(page.getByText(hu.practice.task.done)).toBeVisible();
 });

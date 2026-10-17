@@ -24,6 +24,18 @@ export const MISCONCEPTION_IDS = [
   "parallel-resistance-added",
   "current-not-squared",
   "root-three-missing",
+  "series-capacitance-summed",
+  "energy-half-missing",
+  "transformer-ratio-inverted",
+  "impedance-added",
+  "period-not-inverted",
+  "internal-resistance-ignored",
+  "shunt-full-range",
+  "digits-ignored",
+  "speed-per-second",
+  "efficiency-ignored",
+  "rounded-down",
+  "quantities-not-multiplied",
 ] as const;
 
 export type MisconceptionId = (typeof MISCONCEPTION_IDS)[number];

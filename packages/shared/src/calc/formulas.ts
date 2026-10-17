@@ -100,6 +100,9 @@ export const FORMULAS = {
   "pe-resistance-ratio": { expression: "k = R_mért / R" },
   "line-total": { expression: "Cₙ = nₙ · aₙ" },
   "material-total": { expression: "C = ΣCₙ" },
+  "maximum-true-value": { expression: "M_max = M + Δ" },
+  "rc-full-charge": { expression: "t ≈ 5 · τ" },
+  "needed-flux": { expression: "Φ = E · A" },
 } as const satisfies Record<string, Formula>;
 
 export type FormulaId = keyof typeof FORMULAS;

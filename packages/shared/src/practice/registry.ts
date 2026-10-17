@@ -1,11 +1,12 @@
 import type { TopicId } from "../syllabus/topics.js";
 import { INSTALLATION_TEMPLATES } from "./templates/installation.js";
+import { P2_TEMPLATES } from "./templates/p2.js";
 import { PHYSICS_TEMPLATES } from "./templates/physics.js";
 import { VOLTAGE_DROP_TEMPLATES } from "./templates/voltage-drop.js";
 import type { TaskTemplate } from "./types.js";
 
 /** Every practice template, by topic. Add a topic's templates here. */
-export const TEMPLATES: readonly TaskTemplate[] = [...VOLTAGE_DROP_TEMPLATES, ...PHYSICS_TEMPLATES, ...INSTALLATION_TEMPLATES];
+export const TEMPLATES: readonly TaskTemplate[] = [...VOLTAGE_DROP_TEMPLATES, ...PHYSICS_TEMPLATES, ...INSTALLATION_TEMPLATES, ...P2_TEMPLATES];
 
 export const TEMPLATES_BY_ID = new Map(TEMPLATES.map((template) => [template.id, template]));
 
