@@ -21,6 +21,12 @@ export function installErrorHandler(app: FastifyInstance): void {
     if (fastifyError.validation) {
       return reply.code(400).send({ code: ERROR_CODES.VALIDATION_FAILED });
     }
+    // Fastify's request errors (empty or malformed JSON body, unsupported
+    // media type, body too large) are the client's fault: keep their status.
+    const status = fastifyError.statusCode;
+    if (typeof status === "number" && status >= 400 && status < 500) {
+      return reply.code(status).send({ code: ERROR_CODES.VALIDATION_FAILED });
+    }
 
     request.log.error({ err: error }, "unhandled error");
     return reply.code(500).send({ code: ERROR_CODES.INTERNAL_ERROR });
