@@ -1,0 +1,12 @@
+[
+  { "key": "voltage-drop", "term": "Feszültségesés", "definition": "A vezetéken átfolyó áram hatására a vezeték ellenállásán eső feszültség. A fogyasztóra jutó feszültség ennyivel kisebb a betáplált feszültségnél." },
+  { "key": "cross-section", "term": "Keresztmetszet", "definition": "A vezető áramvezető anyagának merőleges metszete, mm²-ben megadva. Minél nagyobb, annál kisebb a vezető ellenállása, és annál nagyobb áram terhelheti melegedés nélkül." },
+  { "key": "mcb", "term": "Kismegszakító", "definition": "Kézzel visszakapcsolható védőkészülék, amely túlterhelés és zárlat esetén önműködően megszakítja az áramkört." },
+  { "key": "rcd", "term": "Áram-védőkapcsoló (ÁVK)", "definition": "Védőkészülék, amely az áramkör vezetőinek áramkülönbségét figyeli. Ha a hibaáram eléri a névleges értékét, gyorsan lekapcsolja az áramkört; az áramütés elleni védelem fontos eszköze." },
+  { "key": "shock-protection", "term": "Érintésvédelem", "definition": "Azoknak az intézkedéseknek az összessége, amelyek megvédik az embert a villamos berendezések okozta áramütéstől, hibátlan állapotban (alapvédelem) és hiba esetén (hibavédelem) is." },
+  { "key": "insulation-resistance", "term": "Szigetelési ellenállás", "definition": "Az aktív vezetők egymás közötti, illetve a vezetők és a föld közötti szigetelés ellenállása. A mérése megmutatja, hogy a szigetelés állapota megfelelő-e." },
+  { "key": "loop-impedance", "term": "Hurokimpedancia", "definition": "A hibahurok impedanciája: a tápforrásból a fázisvezetőn át a hibahelyre, majd a védővezetőn vissza vezető áramút eredő impedanciája. Ebből adódik a hibaáram nagysága, ami azt dönti el, hogy a védőkészülék kioldja-e." },
+  { "key": "protective-conductor", "term": "Védővezető (PE)", "definition": "A berendezés fém testét a földeléssel, illetve a tápforrás földelt pontjával összekötő vezető. Hiba esetén ezen folyik a hibaáram a védőkészülékig." },
+  { "key": "earth-resistance", "term": "Földelési ellenállás", "definition": "A földelő és a távoli föld közötti ellenállás. Minél kisebb, annál jobban vezeti a földbe a hibaáramot." },
+  { "key": "measurement-report", "term": "Jegyzőkönyv", "definition": "Az elvégzett mérések és ellenőrzések dokumentuma: mit mértek, mikor, milyen eszközzel, milyen értéket kaptak, és megfelelt-e. A villamos munka átadásának része." }
+]

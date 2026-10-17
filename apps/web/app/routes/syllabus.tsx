@@ -61,8 +61,11 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const locale = isLocale(params.locale) ? params.locale : DEFAULT_LOCALE;
   const user = await getCurrentUser(request);
   const isStaff = user !== null && hasAtLeastRole(user.role, "teacher");
-  const [progress, content] = await Promise.all([
+  const [progress, intros, content] = await Promise.all([
     getProgress(request, user !== null),
+    apiFetch<{ intros: Partial<Record<string, { text: string }>> }>(request, `/api/topic-intros?locale=${locale}`)
+      .then((data) => data.intros)
+      .catch(() => ({}) as Partial<Record<string, { text: string }>>),
     isStaff
       ? Promise.all([loadManagedLessons(request, locale), loadManagedCalculators(request, locale)])
       : null,
@@ -70,6 +73,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
   return {
     progress: Object.fromEntries(progress.map((row) => [row.topicId, row.masteryLevel])),
+    intros: Object.fromEntries(Object.entries(intros).map(([topicId, intro]) => [topicId, intro?.text ?? ""])),
     content: content && {
       lessons: content[0],
       ...content[1],
@@ -142,7 +146,7 @@ const ALL_MODULES = "all";
 export default function Syllabus() {
   const { t } = useTranslation();
   const { locale } = useLayoutData();
-  const { progress, content } = useLoaderData<typeof loader>();
+  const { progress, intros, content } = useLoaderData<typeof loader>();
   const failure = useActionData<typeof action>() ?? undefined;
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -165,6 +169,9 @@ export default function Syllabus() {
       <Stack gap={4}>
         <Title order={2}>{t("syllabus.title")}</Title>
         <Text c="dimmed">{t("syllabus.intro")}</Text>
+        <Text component={Link} to={localePath(locale, "glossary")} td="underline" size="sm">
+          {t("glossary.toGlossary")}
+        </Text>
       </Stack>
 
       {content && (
@@ -222,6 +229,7 @@ export default function Syllabus() {
                 topic={topic}
                 to={localePath(locale, `topics/${topic.id}`)}
                 mastery={progress[topic.id]}
+                intro={intros[topic.id]}
               />
             ))}
           </SimpleGrid>
@@ -231,7 +239,7 @@ export default function Syllabus() {
   );
 }
 
-function TopicCard({ topic, to, mastery }: { topic: Topic; to: string; mastery?: MasteryLevel }) {
+function TopicCard({ topic, to, mastery, intro }: { topic: Topic; to: string; mastery?: MasteryLevel; intro?: string }) {
   const { t } = useTranslation();
   const available = topic.contentPhase === 1;
 
@@ -247,6 +255,11 @@ function TopicCard({ topic, to, mastery }: { topic: Topic; to: string; mastery?:
         {available && mastery && mastery !== "none" && <MasteryBadge level={mastery} />}
       </Group>
       <TopicBadges topic={topic} />
+      {intro && (
+        <Text size="sm" c="dimmed" lineClamp={2}>
+          {intro}
+        </Text>
+      )}
     </Stack>
   );
 

@@ -25,3 +25,4 @@ export * from "./schemas/reports.js";
 export * from "./calc/physics.js";
 export * from "./calc/installation.js";
 export * from "./reference/tables.js";
+export * from "./schemas/glossary.js";

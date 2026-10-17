@@ -5,9 +5,12 @@ import { localeSchema, redactDeletedReviewer } from "@elektro/shared";
 import { db } from "../db/index.js";
 import {
   contentReviewEvents,
+  glossaryTerms,
+  glossaryTranslations,
   lessons,
   lessonTranslations,
   lessonVersions,
+  topicIntroTranslations,
 } from "../db/schema/content.js";
 import { notFound, parseBody } from "../lib/http-error.js";
 
@@ -58,10 +61,69 @@ export const reviewRoutes: FastifyPluginAsync = async (app) => {
               .map((row) => row.slug),
           );
 
+    // Glossary terms and topic intros wait for review the same way (plan §3.3).
+    const terms = await db()
+      .select({
+        key: glossaryTerms.key,
+        version: glossaryTranslations.version,
+        title: glossaryTranslations.term,
+        status: glossaryTranslations.status,
+        updatedAt: glossaryTranslations.updatedAt,
+      })
+      .from(glossaryTranslations)
+      .innerJoin(glossaryTerms, eq(glossaryTranslations.termId, glossaryTerms.id))
+      .where(eq(glossaryTranslations.locale, locale))
+      .orderBy(glossaryTerms.key, desc(glossaryTranslations.version));
+    const intros = await db()
+      .select({
+        topicId: topicIntroTranslations.topicId,
+        version: topicIntroTranslations.version,
+        status: topicIntroTranslations.status,
+        updatedAt: topicIntroTranslations.updatedAt,
+      })
+      .from(topicIntroTranslations)
+      .where(eq(topicIntroTranslations.locale, locale))
+      .orderBy(topicIntroTranslations.topicId, desc(topicIntroTranslations.version));
+
+    const newestOf = <T extends { version: number }>(rows: T[], idOf: (row: T) => string) => {
+      const map = new Map<string, T[]>();
+      for (const row of rows) map.set(idOf(row), [...(map.get(idOf(row)) ?? []), row]);
+      return [...map.values()].map((versions) => ({ newest: versions[0]!, hasLive: versions.some((v) => (v as { status?: string }).status === "approved") }));
+    };
+    const waiting = (status: string) => status === "ai_draft" || status === "in_review";
+
+    const lessonItems = queued.map(({ lessonId: _lessonId, ...row }) => ({
+      kind: "lesson" as const,
+      ...row,
+      hasLive: hasLive.has(row.slug),
+    }));
+    const termItems = newestOf(terms, (row) => row.key)
+      .filter(({ newest }) => waiting(newest.status))
+      .map(({ newest, hasLive: live }) => ({
+        kind: "glossary" as const,
+        slug: newest.key,
+        topicId: null,
+        version: newest.version,
+        title: newest.title,
+        status: newest.status,
+        updatedAt: newest.updatedAt,
+        hasLive: live,
+      }));
+    const introItems = newestOf(intros, (row) => row.topicId)
+      .filter(({ newest }) => waiting(newest.status))
+      .map(({ newest, hasLive: live }) => ({
+        kind: "intro" as const,
+        slug: newest.topicId,
+        topicId: newest.topicId,
+        version: newest.version,
+        title: null,
+        status: newest.status,
+        updatedAt: newest.updatedAt,
+        hasLive: live,
+      }));
+
     return {
-      items: queued
-        .map(({ lessonId: _lessonId, ...row }) => ({ ...row, hasLive: hasLive.has(row.slug) }))
-        .sort((a, b) => a.updatedAt.getTime() - b.updatedAt.getTime()),
+      items: [...lessonItems, ...termItems, ...introItems].sort((a, b) => a.updatedAt.getTime() - b.updatedAt.getTime()),
     };
   });
 

@@ -27,6 +27,7 @@ import {
   type TopicId,
 } from "@elektro/shared";
 import type { BreadcrumbHandle } from "../components/app-shell/breadcrumbs";
+import { GlossaryProvider, type GlossaryEntry } from "../components/lesson/glossary-terms";
 import { LessonBody } from "../components/lesson/lesson-body";
 import { ReportButton } from "../components/report/report-button";
 import { localePath } from "../i18n/locale";
@@ -75,7 +76,11 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const locale = String(params.locale);
   const loaded = await loadLesson(request, locale, String(params.slug));
   const [calculator] = await listCalculators(request, locale, loaded.lesson.topicId);
-  return { ...loaded, calculator: calculator ?? null, slug: String(params.slug) };
+  // Glossary terms for the `:term` references; the lesson reads fine without them.
+  const terms = await apiFetch<{ terms: GlossaryEntry[] }>(request, `/api/glossary?locale=${locale}`)
+    .then((data) => data.terms)
+    .catch(() => [] as GlossaryEntry[]);
+  return { ...loaded, calculator: calculator ?? null, slug: String(params.slug), terms };
 }
 
 /**
@@ -143,7 +148,7 @@ export const handle: BreadcrumbHandle = {
 export default function LessonPage() {
   const { t } = useTranslation();
   const { locale, user } = useLayoutData();
-  const { lesson, read, calculator, slug } = useLoaderData<typeof loader>();
+  const { lesson, read, calculator, slug, terms } = useLoaderData<typeof loader>();
   const tree = useMemo(() => parseLessonBody(lesson.body), [lesson.body]);
   const sections = useMemo(() => lessonSections(tree), [tree]);
   const current = useSectionTracking(sections.map((section) => section.id), user !== null);
@@ -192,7 +197,9 @@ export default function LessonPage() {
         </Button>
       )}
 
-      <LessonBody tree={tree} />
+      <GlossaryProvider terms={terms}>
+        <LessonBody tree={tree} />
+      </GlossaryProvider>
 
       <ReportButton targetKind="lesson" targetId={slug} targetVersion={lesson.version} />
 

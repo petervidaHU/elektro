@@ -121,6 +121,22 @@ export default async function globalSetup(config: FullConfig) {
 
   return async () => {
     await admin.delete(`/api/lessons/${slug}`);
+    // Glossary terms and the topic intro the S5/S6 test created.
+    const glossary = await admin.get("/api/glossary?locale=hu");
+    if (glossary.ok()) {
+      const { terms } = (await glossary.json()) as { terms: { key: string }[] };
+      for (const term of terms.filter((item) => item.key.startsWith("e2e-term-"))) {
+        await admin.delete(`/api/glossary/${term.key}`);
+      }
+    }
+    await admin.delete("/api/topic-intros/logic-basics");
+    const lessonsListed = await admin.get("/api/lessons?locale=hu&topicId=logic-basics");
+    if (lessonsListed.ok()) {
+      const { lessons } = (await lessonsListed.json()) as { lessons: { slug: string }[] };
+      for (const lesson of lessons.filter((item) => item.slug.startsWith("e2e-term-lesson-"))) {
+        await admin.delete(`/api/lessons/${lesson.slug}`);
+      }
+    }
     // Reference tables the K8 test created.
     const listed = await admin.get("/api/reference-tables");
     if (listed.ok()) {

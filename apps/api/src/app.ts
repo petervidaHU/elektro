@@ -11,6 +11,8 @@ import { authRoutes } from "./routes/auth.js";
 import { calcRoutes } from "./routes/calc.js";
 import { calculatorRoutes } from "./routes/calculators.js";
 import { contentRoutes } from "./routes/content.js";
+import { glossaryRoutes } from "./routes/glossary.js";
+import { topicIntroRoutes } from "./routes/topic-intros.js";
 import { healthRoutes } from "./routes/health.js";
 import { learningRoutes } from "./routes/learning.js";
 import { monitoringRoutes } from "./routes/monitoring.js";
@@ -102,6 +104,8 @@ export async function buildApp(): Promise<FastifyInstance> {
       await api.register(reportRoutes);
       await api.register(reviewRoutes);
       await api.register(referenceTableRoutes);
+      await api.register(glossaryRoutes);
+      await api.register(topicIntroRoutes);
     },
     { prefix: "/api" },
   );

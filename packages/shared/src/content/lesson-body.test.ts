@@ -110,3 +110,22 @@ describe("lessonGoals", () => {
     expect(lessonGoals(parseLessonBody("Szöveg."))).toEqual([]);
   });
 });
+
+describe("glossary term references", () => {
+  it("keeps :term[label]{id=key} as a term reference and accepts it", () => {
+    const body = "A :term[feszültségesés]{id=voltage-drop} fontos.";
+    expect(validateLessonBody(body).ok).toBe(true);
+    const tree = parseLessonBody(body);
+    const paragraph = tree.children[0] as { children: { type: string; name?: string }[] };
+    expect(paragraph.children.some((node) => node.type === "textDirective" && node.name === "term")).toBe(true);
+  });
+
+  it("rejects a term reference without a valid id", () => {
+    expect(validateLessonBody(":term[valami]").ok).toBe(false);
+    expect(validateLessonBody(":term[valami]{id=Bad Id}").ok).toBe(false);
+  });
+
+  it("still treats other inline colons as plain text", () => {
+    expect(validateLessonBody("Arány 1:2, idő 16:30 és :valami.").ok).toBe(true);
+  });
+});

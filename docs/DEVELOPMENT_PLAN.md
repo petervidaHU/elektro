@@ -239,7 +239,7 @@ which are rendered by the web app and validated by a shared zod schema on save:
 | `:::safety` | Safety callout, highlighted. Mandatory in 🛡 topics |
 | `:::mistake` | Common mistake + why it's wrong |
 | `:::exam` | "Így jelenik meg a vizsgán": which exam part the topic belongs to and what kind of task to expect |
-| `:::term{id=...}` | Inline reference to a glossary term (tap to see the definition) |
+| `:term[label]{id=key}` | Inline reference to a glossary term (tap to see the definition in a bottom sheet). It is an inline text directive, not a `:::` block, because it sits inside a sentence; an unknown key renders as plain text |
 | `:::next` | Rendered automatically: calculator / practice / simulator links for the topic |
 
 **Authoring workflow (v1):** lessons are written with Claude from the brief and
@@ -261,8 +261,8 @@ Additional content entities, each with the same versioning and approval as lesso
 | S2 | `lessons.position` column + migration; order the lesson list | api |
 | S3 | Markdown block renderer + zod validation of lesson bodies (unknown blocks are rejected on save) | shared, web, api |
 | S4 | `formula` block registry: formula ID → rendered expression + engine function | shared |
-| S5 | Glossary entity with approval workflow (reuse the lesson state machine) | api, web |
-| S6 | Topic intro texts (content entity, approval) | api, web |
+| S5 | Glossary entity with approval workflow (reuse the lesson state machine) | api, web. Done: `glossary_terms` + `glossary_translations` (migration `0012`), `/glossary`, `/teacher/glossary`, review screen `/teacher/review/glossary/:key`, seed `npm run db:seed:glossary` (10 `ai_draft` terms for the domain terms in CLAUDE.md) |
+| S6 | Topic intro texts (content entity, approval) | api, web. Done: `topic_intro_translations`, `/teacher/intros`, shown on the topic hub and the syllabus cards; no intro texts are authored yet |
 | S7 | Unit test that every `ptt` / `kkk` ref has the right format, and a generated mapping table (`npm run syllabus:report` → Markdown) for teacher review | shared |
 | S8 | **Approval audit trail** (Q19): approver snapshot on the translation (`approved_by_name/_email/_role` + `approved_at`, DB check that an `approved` row has all of them), append-only `content_review_events` log, `GET /lessons/:slug/reviews` (teacher+; deleted reviewers redacted) and `GET /admin/lessons/:slug/reviews` (admin-only, full record). Done for lessons; every later approvable entity reuses it (see §2.6) | shared, api |
 

@@ -3,6 +3,7 @@ import { Alert, Anchor, Card, Code, List, Stack, Text, Title } from "@mantine/co
 import { useTranslation } from "react-i18next";
 import type { Nodes, Root } from "mdast";
 import type {} from "mdast-util-directive";
+import { TermLink } from "./glossary-terms";
 import { FORMULAS, isFormulaId, lessonSections, type LessonContainerBlock } from "@elektro/shared";
 
 /**
@@ -150,6 +151,15 @@ function Inline({ nodes }: { nodes: Nodes[] }): ReactNode {
         return <Code key={index}>{node.value}</Code>;
       case "break":
         return <br key={index} />;
+      case "textDirective": {
+        // Only `:term[label]{id=key}` survives parsing (shared parseLessonBody).
+        const id = node.attributes?.["id"] ?? "";
+        return node.name === "term" ? (
+          <TermLink key={index} id={id}>
+            <Inline nodes={node.children} />
+          </TermLink>
+        ) : null;
+      }
       case "link": {
         // Only web, mail and in-app links; never `javascript:` or `data:` URLs.
         if (!SAFE_URL.test(node.url)) {

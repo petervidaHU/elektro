@@ -13,6 +13,8 @@ import { isFormulaId } from "../calc/formulas.js";
  *     :::goals / :::example / :::safety / :::mistake / :::exam   container blocks
  *     ::formula{id="voltage-drop"}                                 leaf block
  *
+ *     :term[label]{id=voltage-drop}                                inline glossary reference
+ *
  * A formula is rendered from the shared registry, so the text and the engine
  * can never disagree. Anything else written as a block is rejected on save.
  * The `next` links are added by the reader, never authored.
@@ -24,6 +26,7 @@ export type LessonContainerBlock = (typeof LESSON_CONTAINER_BLOCKS)[number];
 
 export type LessonBodyError =
   | { code: "empty" }
+  | { code: "invalid-term"; value: string }
   | { code: "unknown-block"; block: string }
   | { code: "unknown-formula"; block: "formula"; value: string };
 
@@ -45,9 +48,17 @@ export function parseLessonBody(markdown: string): Root {
   return tree;
 }
 
+/** Glossary term keys are slugs (schemas/glossary.ts). */
+const TERM_KEY = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+/** `:term[label]{id=key}` with a label and a slug key is a glossary reference. */
+function isTermReference(node: { name: string; attributes?: Record<string, string | null | undefined> | null; children: unknown[] }): boolean {
+  return node.name === "term" && node.children.length > 0 && TERM_KEY.test(node.attributes?.["id"] ?? "");
+}
+
 function restoreTextDirectives(parent: Parent, source: string): void {
   parent.children = parent.children.map((child) => {
-    if (child.type === "textDirective") {
+    if (child.type === "textDirective" && !isTermReference(child)) {
       const start = child.position?.start.offset;
       const end = child.position?.end.offset;
       const value =
@@ -67,8 +78,14 @@ export function validateLessonBody(markdown: string): { ok: boolean; errors: Les
   }
 
   const errors: LessonBodyError[] = [];
+  let termReferences = 0;
 
   visit(parseLessonBody(markdown), (node) => {
+    if (node.type === "textDirective") {
+      // Only valid term references survive parsing; anything else is plain text.
+      termReferences++;
+      return;
+    }
     if (node.type === "containerDirective") {
       if (!(LESSON_CONTAINER_BLOCKS as readonly string[]).includes(node.name)) {
         errors.push({ code: "unknown-block", block: node.name });
@@ -84,6 +101,12 @@ export function validateLessonBody(markdown: string): { ok: boolean; errors: Les
       }
     }
   });
+
+  // Every `:term[` the author wrote must have become a valid reference.
+  const written = (markdown.match(/:term\[/g) ?? []).length;
+  if (written !== termReferences) {
+    errors.push({ code: "invalid-term", value: "term" });
+  }
 
   return { ok: errors.length === 0, errors };
 }

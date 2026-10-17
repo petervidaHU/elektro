@@ -125,7 +125,7 @@ export const contentReviewEvents = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     /** `lesson` and `reference_table`; glossary, topic intros and task texts reuse this log. */
-    contentKind: text("content_kind", { enum: ["lesson", "reference_table"] }).notNull(),
+    contentKind: text("content_kind", { enum: ["lesson", "reference_table", "glossary_term", "topic_intro"] }).notNull(),
     /** Lesson slug at the time of the action. */
     contentSlug: text("content_slug").notNull(),
     /** The reviewed translation row (no FK: it may be deleted later). */
@@ -315,6 +315,86 @@ export const referenceTableVersions = pgTable(
     check(
       "reference_table_versions_verification_recorded",
       sql`${table.status} = 'unverified' OR (${table.verifiedAt} IS NOT NULL AND ${table.verifiedByName} IS NOT NULL AND ${table.verifiedByEmail} IS NOT NULL AND ${table.verifiedByRole} IS NOT NULL)`,
+    ),
+  ],
+);
+
+/**
+ * Glossary (fogalomtár, plan S5): a language-neutral term key plus per-locale
+ * translations, versioned and approved like lessons. A translation row is one
+ * (term, locale, version); editing an approved one creates the next version
+ * and the approved one stays live until the new one is approved.
+ */
+export const glossaryTerms = pgTable("glossary_terms", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  /** Slug used by `:term[...]{id=key}` in lesson bodies. */
+  key: text("key").notNull().unique(),
+  createdBy: text("created_by").references(() => user.id, { onDelete: "set null" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const glossaryTranslations = pgTable(
+  "glossary_translations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    termId: uuid("term_id")
+      .notNull()
+      .references(() => glossaryTerms.id, { onDelete: "cascade" }),
+    locale: text("locale", { enum: LOCALES }).notNull(),
+    version: integer("version").notNull(),
+    term: text("term").notNull(),
+    definition: text("definition").notNull(),
+    status: text("status", { enum: CONTENT_STATUSES }).notNull().default(INITIAL_CONTENT_STATUS),
+    reviewNote: text("review_note"),
+    approvedBy: text("approved_by").references(() => user.id, { onDelete: "set null" }),
+    approvedByName: text("approved_by_name"),
+    approvedByEmail: text("approved_by_email"),
+    approvedByRole: text("approved_by_role", { enum: ROLES }),
+    approvedAt: timestamp("approved_at", { withTimezone: true }),
+    createdBy: text("created_by").references(() => user.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique("glossary_translations_term_locale_version_uq").on(table.termId, table.locale, table.version),
+    index("glossary_translations_status_idx").on(table.status),
+    check(
+      "glossary_translations_approval_recorded",
+      sql`${table.status} <> 'approved' OR (${table.approvedAt} IS NOT NULL AND ${table.approvedByName} IS NOT NULL AND ${table.approvedByEmail} IS NOT NULL AND ${table.approvedByRole} IS NOT NULL)`,
+    ),
+  ],
+);
+
+/**
+ * Topic intro (plan S6): a short per-locale description of a topic, shown on
+ * the syllabus and the topic hub. The topic is code (`TOPIC_IDS`), so there is
+ * no parent row; each row is one (topic, locale, version).
+ */
+export const topicIntroTranslations = pgTable(
+  "topic_intro_translations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    topicId: text("topic_id", { enum: TOPIC_IDS }).notNull(),
+    locale: text("locale", { enum: LOCALES }).notNull(),
+    version: integer("version").notNull(),
+    text: text("text").notNull(),
+    status: text("status", { enum: CONTENT_STATUSES }).notNull().default(INITIAL_CONTENT_STATUS),
+    reviewNote: text("review_note"),
+    approvedBy: text("approved_by").references(() => user.id, { onDelete: "set null" }),
+    approvedByName: text("approved_by_name"),
+    approvedByEmail: text("approved_by_email"),
+    approvedByRole: text("approved_by_role", { enum: ROLES }),
+    approvedAt: timestamp("approved_at", { withTimezone: true }),
+    createdBy: text("created_by").references(() => user.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique("topic_intro_translations_topic_locale_version_uq").on(table.topicId, table.locale, table.version),
+    index("topic_intro_translations_status_idx").on(table.status),
+    check(
+      "topic_intro_translations_approval_recorded",
+      sql`${table.status} <> 'approved' OR (${table.approvedAt} IS NOT NULL AND ${table.approvedByName} IS NOT NULL AND ${table.approvedByEmail} IS NOT NULL AND ${table.approvedByRole} IS NOT NULL)`,
     ),
   ],
 );

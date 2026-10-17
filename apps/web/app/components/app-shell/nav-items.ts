@@ -42,7 +42,7 @@ const TEACHER: NavItem = {
   path: "teacher/students",
   labelKey: "nav.teacher",
   icon: "clipboard",
-  alsoActiveOn: ["teacher/review", "teacher/reports", "teacher/insights", "teacher/reference-tables"],
+  alsoActiveOn: ["teacher/review", "teacher/reports", "teacher/insights", "teacher/reference-tables", "teacher/glossary", "teacher/intros"],
 };
 const ACCOUNT: NavItem = { key: "account", path: "account", labelKey: "nav.account", icon: "user" };
 const LOGIN: NavItem = { key: "login", path: "login", labelKey: "nav.login", icon: "login" };

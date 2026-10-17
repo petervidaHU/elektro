@@ -807,7 +807,9 @@
       "review": "Ellenőrzés",
       "reports": "Hibajelentések",
       "insights": "Áttekintés",
-      "referenceTables": "Táblázatok"
+      "referenceTables": "Táblázatok",
+      "glossary": "Fogalomtár",
+      "intros": "Bevezetők"
     },
     "students": {
       "title": "Diákok",
@@ -851,6 +853,12 @@
         "approve": "Jóváhagyva.",
         "request_changes": "Javítást kértél.",
         "publish_directly": "Közzétéve."
+      },
+      "entry": "Tartalom",
+      "kind": {
+        "glossary": "Fogalom",
+        "intro": "Témakör-bevezető",
+        "lesson": "Lecke"
       }
     },
     "reports": {
@@ -921,5 +929,32 @@
       "removeRow": "{{n}}. sor törlése",
       "addRow": "Sor hozzáadása"
     }
+  },
+  "glossary": {
+    "title": "Fogalomtár",
+    "empty": "Még nincs jóváhagyott fogalom.",
+    "search": "Keresés a fogalmak között",
+    "index": "Betűrend",
+    "all": "Mind",
+    "noMatch": "Nincs találat.",
+    "toGlossary": "Fogalomtár",
+    "manage": {
+      "title": "Fogalomtár kezelése",
+      "new": "Új fogalom",
+      "edit": "Fogalom szerkesztése",
+      "key": "Azonosító",
+      "keyHint": "Kisbetűk, számok és kötőjel; a leckék ezzel hivatkoznak rá: :term[szöveg]{id=azonosito}.",
+      "term": "Fogalom",
+      "definition": "Meghatározás",
+      "liveStill": "Az élő változat a(z) {{version}}., amíg az újat nem hagyják jóvá."
+    }
+  },
+  "intros": {
+    "title": "Témakör-bevezetők",
+    "hint": "Rövid leírás a témakörről, a tananyag oldalon és a témakör oldalán jelenik meg.",
+    "none": "Nincs bevezető",
+    "edit": "Bevezető szerkesztése",
+    "text": "Bevezető szöveg",
+    "textHint": "Két-három mondat: miről szól a témakör és miért fontos."
   }
 }

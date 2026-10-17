@@ -10,10 +10,11 @@ import { useLayoutData } from "../lib/use-layout-data";
 import type { Route } from "./+types/teacher-review";
 
 interface QueueItem {
+  kind: "lesson" | "glossary" | "intro";
   slug: string;
-  topicId: TopicId;
+  topicId: TopicId | null;
   version: number;
-  title: string;
+  title: string | null;
   status: ContentStatus;
   updatedAt: string;
   hasLive: boolean;
@@ -43,9 +44,9 @@ export default function TeacherReview() {
       ) : (
         items.map((item) => (
           <Card
-            key={item.slug}
+            key={`${item.kind}-${item.slug}`}
             component={Link}
-            to={localePath(locale, `teacher/review/${item.slug}`)}
+            to={localePath(locale, item.kind === "lesson" ? `teacher/review/${item.slug}` : `teacher/review/${item.kind}/${item.slug}`)}
             withBorder
             padding="md"
             radius="md"
@@ -53,9 +54,9 @@ export default function TeacherReview() {
           >
             <Group justify="space-between" wrap="nowrap" align="flex-start">
               <Stack gap={2} style={{ minWidth: 0 }}>
-                <Text fw={600}>{item.title}</Text>
+                <Text fw={600}>{item.kind === "intro" ? t(`topic.${item.slug}`) : item.title}</Text>
                 <Text size="sm" c="dimmed">
-                  {t(`topic.${item.topicId}`)} · {t("review.version", { version: item.version })}
+                  {item.kind === "lesson" && item.topicId ? `${t(`topic.${item.topicId}`)} · ` : `${t(`teacher.review.kind.${item.kind}`)} · `}{t("review.version", { version: item.version })}
                 </Text>
                 <Text size="sm" c="dimmed">
                   {t("teacher.review.updated", { date: dateFormat.format(new Date(item.updatedAt)) })}

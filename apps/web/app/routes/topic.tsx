@@ -40,16 +40,21 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const user = await getCurrentUser(request);
   const query = new URLSearchParams({ locale: String(params.locale), topicId });
 
-  const [{ lessons }, progress, calculators] = await Promise.all([
+  const [{ lessons }, progress, calculators, intros] = await Promise.all([
     apiFetch<{ lessons: TopicLesson[] }>(request, `/api/lessons?${query.toString()}`),
     getProgress(request, user !== null),
     listCalculators(request, String(params.locale), topicId),
+    // The intro is optional: a failing lookup never breaks the hub.
+    apiFetch<{ intros: Partial<Record<TopicId, { text: string }>> }>(request, `/api/topic-intros?locale=${String(params.locale)}`)
+      .then((data) => data.intros)
+      .catch(() => ({}) as Partial<Record<TopicId, { text: string }>>),
   ]);
 
   return {
     topicId,
     lessons,
     calculators,
+    intro: intros[topicId]?.text ?? null,
     progress: progress.find((row) => row.topicId === topicId) ?? null,
   };
 }
@@ -64,7 +69,7 @@ export const handle: BreadcrumbHandle = {
 export default function TopicHub() {
   const { t } = useTranslation();
   const { locale, user } = useLayoutData();
-  const { topicId, lessons, progress, calculators } = useLoaderData<typeof loader>();
+  const { topicId, lessons, progress, calculators, intro } = useLoaderData<typeof loader>();
   const topic = getTopic(topicId);
   const practicePath = localePath(locale, `practice/${topicId}`);
 
@@ -76,6 +81,11 @@ export default function TopicHub() {
         </Text>
         <Title order={2}>{t(`topic.${topicId}`)}</Title>
         <TopicBadges topic={topic} />
+        {intro && (
+          <Text data-testid="topic-intro" style={{ lineHeight: 1.6 }}>
+            {intro}
+          </Text>
+        )}
       </Stack>
 
       {topic.contentPhase > 1 && <Alert variant="light">{t("topicHub.comingSoon")}</Alert>}
