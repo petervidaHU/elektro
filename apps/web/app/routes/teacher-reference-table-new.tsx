@@ -1,7 +1,7 @@
 import { Button, Stack, TextInput, Textarea, Title } from "@mantine/core";
 import { useTranslation } from "react-i18next";
-import { Form, redirect, useActionData, useNavigation } from "react-router";
-import { DEFAULT_LOCALE, isLocale } from "@elektro/shared";
+import { Form, redirect, useActionData, useLoaderData, useNavigation } from "react-router";
+import { DEFAULT_LOCALE, isLocale, REQUIRED_TABLES } from "@elektro/shared";
 import type { BreadcrumbHandle } from "../components/app-shell/breadcrumbs";
 import { FormError } from "../components/content/form-error";
 import { TableEditor } from "../components/reference/table-editor";
@@ -16,7 +16,9 @@ import type { Route } from "./+types/teacher-reference-table-new";
 export async function loader({ request, params }: Route.LoaderArgs) {
   const locale = isLocale(params.locale) ? params.locale : DEFAULT_LOCALE;
   await requireStaff(request, locale);
-  return null;
+  // "Create" on the missing-tables list suggests the key (and a title) of a required table.
+  const key = new URL(request.url).searchParams.get("key") ?? "";
+  return { suggestedKey: REQUIRED_TABLES.some((table) => table.key === key) ? key : "" };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
@@ -42,6 +44,7 @@ export const handle: BreadcrumbHandle = {
 
 export default function TeacherReferenceTableNew() {
   const { t } = useTranslation();
+  const { suggestedKey } = useLoaderData<typeof loader>();
   const failure = useActionData<typeof action>() ?? undefined;
   const navigation = useNavigation();
 
@@ -51,8 +54,8 @@ export default function TeacherReferenceTableNew() {
       <Form method="post">
         <Stack gap="md">
           <FormError failure={failure} />
-          <TextInput name="key" label={t("referenceTables.editor.key")} description={t("referenceTables.editor.keyHint")} required />
-          <TextInput name="title" label={t("referenceTables.editor.titleLabel")} required />
+          <TextInput name="key" label={t("referenceTables.editor.key")} description={t("referenceTables.editor.keyHint")} defaultValue={suggestedKey} required />
+          <TextInput name="title" label={t("referenceTables.editor.titleLabel")} defaultValue={suggestedKey ? t(`referenceTables.required.${suggestedKey}`) : ""} required />
           <Textarea name="source" label={t("referenceTables.editor.source")} description={t("referenceTables.editor.sourceHint")} autosize minRows={2} required />
           <TableEditor
             initial={{ columns: [{ id: "c1", label: "" }, { id: "c2", label: "" }], rows: [["", ""]] }}

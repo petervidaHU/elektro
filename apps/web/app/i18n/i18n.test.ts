@@ -13,7 +13,9 @@ import {
   CONTENT_ACTIONS,
   MASTERY_LEVELS,
   MISCONCEPTION_IDS,
+  PLANNED_CALCULATORS,
   REPORT_CATEGORIES,
+  REQUIRED_TABLES,
   TABLE_ACTIONS,
   TABLE_STATUSES,
   REPORT_TARGET_KINDS,
@@ -114,6 +116,16 @@ describe("hu translations", () => {
     }
     for (const action of CONTENT_ACTIONS) {
       expect(hu.teacher.review.done, `missing teacher.review.done.${action}`).toHaveProperty(action);
+    }
+  });
+
+  it("names every required table and every planned calculator", () => {
+    for (const table of REQUIRED_TABLES) {
+      expect(hu.referenceTables.required, `missing referenceTables.required.${table.key}`).toHaveProperty(table.key);
+    }
+    for (const planned of PLANNED_CALCULATORS) {
+      expect(hu.calculators.planned, `missing calculators.planned.${planned.id}`).toHaveProperty(planned.id);
+      expect(hu.calculators.plannedHint, `missing calculators.plannedHint.${planned.id}`).toHaveProperty(planned.id);
     }
   });
 

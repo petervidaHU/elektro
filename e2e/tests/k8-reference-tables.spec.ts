@@ -14,6 +14,15 @@ test("K8: unverified tables stay hidden from students until a teacher verifies t
   await logIn(page, E2E_TEACHER.email, E2E_TEACHER.password);
   await bottomBar(page).getByRole("link", { name: hu.nav.teacher }).tap();
   await page.getByRole("link", { name: hu.teacher.tabs.referenceTables }).tap();
+
+  // The list says which tables the cable-selection calculator still waits for.
+  await expect(page.getByTestId("missing-tables")).toContainText(hu.calculators.planned["cable-selection"]);
+  await expect(page.locator('[data-requirement="current-carrying-capacity"]')).toBeVisible();
+  await page.goto("/hu/calculators");
+  await expect(page.locator('[data-planned="cable-selection"]')).toContainText(hu.syllabus.comingSoon);
+  await expect(page.getByTestId("planned-missing")).toBeVisible();
+  await page.goto("/hu/teacher/reference-tables");
+
   await page.getByRole("link", { name: hu.referenceTables.new }).tap();
 
   await field(page, hu.referenceTables.editor.key).fill(key);

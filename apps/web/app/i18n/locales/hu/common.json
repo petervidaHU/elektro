@@ -141,7 +141,14 @@
       "note": "A javaslat a legnagyobb áramú áramkörtől kezdve mindig a legkevésbé terhelt fázisra teszi a következőt; kiindulópont, a végleges elosztást a kábelezés és a fogyasztók jellege is befolyásolja."
     },
     "theory": "Tanuld meg az elméletet: {{title}}",
-    "theoryTopic": "A témakör oldala"
+    "theoryTopic": "A témakör oldala",
+    "planned": {
+      "cable-selection": "Kábelkiválasztás"
+    },
+    "plannedHint": {
+      "cable-selection": "A vizsga III. részének feladata: vezeték kiválasztása terhelhetőség és feszültségesés alapján. Hitelesített táblázatok kellenek hozzá."
+    },
+    "plannedMissing": "Még {{count}} hitelesített táblázat hiányzik: megnyitás"
   },
   "simulator": {
     "title": "Mérés szimulátor",
@@ -931,6 +938,21 @@
       "cell": "{{row}}. sor, {{column}}",
       "removeRow": "{{n}}. sor törlése",
       "addRow": "Sor hozzáadása"
+    },
+    "required": {
+      "current-carrying-capacity": "Vezetékek terhelhetősége (szerelési módok, szigetelés, anyag szerint)",
+      "correction-factor-ambient-temperature": "Helyesbítő tényezők: környezeti hőmérséklet",
+      "correction-factor-grouping": "Helyesbítő tényezők: csoportosítás",
+      "permitted-voltage-drop": "Megengedett feszültségesés"
+    },
+    "missing": {
+      "title": "A(z) {{calculator}} számológép még nem érhető el",
+      "hint": "Amíg az alábbi táblázatok mindegyike nincs felvéve forrással és hitelesítve, a diákok csak a „Hamarosan” kártyát látják. Értékeket nem töltöttünk elő: a táblázatokat a szabványból vagy a tankönyvből kell felvinni.",
+      "missing": "Még nincs felvéve",
+      "unverified": "Fel van véve, de nincs ellenőrizve",
+      "verified": "Ellenőrizve",
+      "create": "Felvétel",
+      "open": "Megnyitás"
     }
   },
   "glossary": {
