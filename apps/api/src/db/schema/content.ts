@@ -2,6 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   check,
+  jsonb,
   index,
   integer,
   pgTable,
@@ -204,5 +205,58 @@ export const calculatorTranslations = pgTable(
   },
   (table) => [
     unique("calculator_translations_calculator_locale_uq").on(table.calculatorId, table.locale),
+  ],
+);
+
+/**
+ * Practice templates and their reviewable texts (plan §2.7, K12). The
+ * templates are code (`@elektro/shared`); these rows prepare the DB-backed,
+ * approvable texts. Unused at runtime in v1: the app still reads the i18n
+ * files, and `npm run db:sync:practice-texts` mirrors them here.
+ */
+export const practiceTemplates = pgTable("practice_templates", {
+  /** The template id, e.g. "voltage-drop.single-phase-basic". */
+  id: text("id").primaryKey(),
+  topicId: text("topic_id", { enum: TOPIC_IDS }).notNull(),
+  currentVersion: integer("current_version").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const practiceTaskTexts = pgTable(
+  "practice_task_texts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    templateId: text("template_id")
+      .notNull()
+      .references(() => practiceTemplates.id, { onDelete: "cascade" }),
+    templateVersion: integer("template_version").notNull(),
+    locale: text("locale", { enum: LOCALES }).notNull(),
+    /** Scenario text by scenario key (`practiceScenario.<key>`), with `{{placeholders}}`. */
+    scenarios: jsonb("scenarios").$type<Record<string, string>>().notNull(),
+    /** Step label by step id (`calcStep.<id>`). */
+    stepLabels: jsonb("step_labels").$type<Record<string, string>>().notNull(),
+    /** Hint text by step id (`practiceHint.<id>`). */
+    hints: jsonb("hints").$type<Record<string, string>>().notNull(),
+    status: text("status", { enum: CONTENT_STATUSES }).notNull().default(INITIAL_CONTENT_STATUS),
+    reviewNote: text("review_note"),
+    /** Approval record, same shape as on lessons (plan §2.6, Q19). */
+    approvedBy: text("approved_by").references(() => user.id, { onDelete: "set null" }),
+    approvedByName: text("approved_by_name"),
+    approvedByEmail: text("approved_by_email"),
+    approvedByRole: text("approved_by_role", { enum: ROLES }),
+    approvedAt: timestamp("approved_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique("practice_task_texts_template_version_locale_uq").on(
+      table.templateId,
+      table.templateVersion,
+      table.locale,
+    ),
+    check(
+      "practice_task_texts_approval_recorded",
+      sql`${table.status} <> 'approved' OR (${table.approvedAt} IS NOT NULL AND ${table.approvedByName} IS NOT NULL AND ${table.approvedByEmail} IS NOT NULL AND ${table.approvedByRole} IS NOT NULL)`,
+    ),
   ],
 );

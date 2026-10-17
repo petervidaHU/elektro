@@ -180,6 +180,28 @@ export const practiceRoutes: FastifyPluginAsync<PracticeRouteOptions> = async (a
     };
   });
 
+  /**
+   * Every task of a session as it was done, for the history replay (plan
+   * §3.3 `/history/practice/:id`): the owner and teachers may read it.
+   */
+  app.get("/practice/sessions/:id/replay", async (request, reply) => {
+    const session = await loadSession(request, "read");
+    const { locale } = parseBody(localeQuerySchema, request.query);
+    const attempts = await repo.listAttempts(session.id);
+    const sessionView = buildSessionView(session, attempts, locale);
+    reply.header("cache-control", "no-store");
+
+    return {
+      session: sessionView,
+      tasks: session.tasks
+        .map((planned, index) =>
+          buildTaskView(planned, index, attempts.find((attempt) => attempt.taskIndex === index), locale),
+        )
+        // Tasks the student never reached have nothing to replay.
+        .filter((task) => task.steps.some((step) => step.state.answers.length > 0 || step.state.hintsUsed > 0)),
+    };
+  });
+
   app.post("/practice/sessions/:id/answer", async (request) =>
     stepAction(request, practiceAnswerSchema, (task, steps, input) =>
       submitAnswer(task, steps, input.stepId, input.answer),

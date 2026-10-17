@@ -13,6 +13,7 @@ import {
   Title,
 } from "@mantine/core";
 import { useTranslation } from "react-i18next";
+import { ReportButton } from "../components/report/report-button";
 import { Link, useLoaderData, useParams } from "react-router";
 import { localePath } from "../i18n/locale";
 import { CalcSteps } from "../components/calc-steps";
@@ -244,6 +245,7 @@ export default function VoltageDrop() {
       <Button component={Link} to={localePath(locale, "practice/voltage-drop")} variant="light">
         {t("calculators.voltageDrop.practice")}
       </Button>
+      <ReportButton targetKind="calculator" targetId="voltage-drop" />
     </Stack>
   );
 }

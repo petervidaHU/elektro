@@ -3,7 +3,7 @@ import { createRng } from "./rng.js";
 import { allowedDeviation, compareAnswer, DEFAULT_TOLERANCES } from "./tolerance.js";
 import { buildTask, evaluateStep, expectedFor, hintFor, MAX_HINT_LEVEL } from "./checker.js";
 import { difficultyRamp, planSession, DEFAULT_SESSION_LENGTH, SESSION_LENGTHS } from "./session.js";
-import { computeMastery, isStruggling, taskOutcome, unaidedRate } from "./mastery.js";
+import { computeMastery, isStruggling, isStrugglingRate, taskOutcome, unaidedRate } from "./mastery.js";
 import type { StepState, TaskTemplate } from "./types.js";
 
 describe("createRng", () => {
@@ -264,5 +264,14 @@ describe("unaidedRate / isStruggling", () => {
     expect(isStruggling(tasks(["with_help", "with_help", "with_help", "unaided"]))).toBe(false);
     expect(isStruggling(tasks(["with_help", "with_help", "with_help", "with_help", "unaided"]))).toBe(true);
     expect(isStruggling(tasks(["with_help", "with_help", "unaided", "unaided", "with_help"]))).toBe(false);
+  });
+});
+
+describe("isStrugglingRate", () => {
+  it("applies the 40 % / 5 tasks rule to the cached figures", () => {
+    expect(isStrugglingRate(0.3, 6)).toBe(true);
+    expect(isStrugglingRate(0.3, 4)).toBe(false);
+    expect(isStrugglingRate(0.4, 10)).toBe(false);
+    expect(isStrugglingRate(null, 10)).toBe(false);
   });
 });

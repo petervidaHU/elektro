@@ -72,6 +72,8 @@ Key facts from the documents that shape this plan:
 | Q21 | Content management | **Decided 2026-10-17 (task U14).** The **syllabus page** has a **detailed list view** for teachers and admins (no standalone page; revised the same day): a Mantine `Table` per module with a header row per topic, listing every lesson and calculator in detail (type, status, newest and live version, approver, dates), with new / edit / ordering (up/down buttons, touch-friendly) and a module filter. **Teachers and admins** use it; deleting is **admin-only**. Calculators are **code** (engine + page + tests; formulas never come from the database): a **calculator registry** in the database lists them, with topic, order, published flag and per-locale title/description. "New calculator" adds one that is already implemented in code; "delete" only takes it off the list. Calculator texts are not part of the approval workflow (short UI texts, edited directly by teacher+) |
 | Q22 | Admin edits | **An admin's lesson edit goes live directly** (decided 2026-10-17): it is approved in the same save with the `publish_directly` action and recorded in the approval record like any approval (Q19). A teacher's edit is a draft (`ai_draft`) and goes through review |
 | Q23 | Deleting a lesson | **Archive, restorable** (decided 2026-10-17): an archived lesson is hidden from everyone but admins (lists, reading, progress), its versions, reading history and approval log stay, and an admin can restore it (it goes to the end of its topic). The hard `DELETE /api/lessons/:slug` stays for housekeeping and e2e cleanup |
+| Q24 | Teacher navigation | **Teachers and admins get a "Tanári" tab in place of "Szimulátor"** on the phone bar (decided with M2, to keep five tabs); the simulator stays reachable from the home page. The tab leads to students / review queue / problem reports / insights and carries the number of lessons waiting for review as a badge |
+| Q25 | K12 task-text rows | **The mirrored i18n texts are stored `approved` with a fixed marker** (M2, K12): approver snapshot name "Repository review (pull request)", e-mail `repository-review@elektro.invalid`, role `admin`, no `approved_by` account. They were reviewed in the pull request, and the next real review replaces the marker. The scenario is a map `scenarios` (key → text), because a template can have several scenario variants (e.g. single- and three-phase) |
 | Q18 | Extra calculators from the theory TOC review | **Added to the §2.2 catalogue** (2026-10-16). Highest value: `connection-power`, `phase-balancing` (P1), `material-list`, `short-circuit-current` (P2) |
 
 ---
@@ -548,7 +550,7 @@ transaction as each write, and an admin script can rebuild all of it.
   (`practice.<templateId>.*`). They are reviewed by a teacher in the PR.
 - **Prepared now:** the schema for DB-backed, approvable task texts, mirroring lessons:
   - `practice_templates`: `id` (= template id), `topic_id`, `current_version`
-  - `practice_task_texts`: `template_id`, `template_version`, `locale`, `scenario`,
+  - `practice_task_texts`: `template_id`, `template_version`, `locale`, `scenarios jsonb` (scenario key → text),
     `step_labels jsonb`, `hints jsonb`, `status` (same `CONTENT_STATUSES`),
     `review_note`, `approved_by`, `approved_by_name`, `approved_by_email`,
     `approved_by_role`, `approved_at` (approval record, §2.6 / Q19)
@@ -574,7 +576,7 @@ transaction as each write, and an admin script can rebuild all of it.
 | K9 | `conductor-resistance` + `cable-selection` (exam III), once the tables are verified |
 | K10 | P2 calculators (physics first, then table-dependent ones once verified) |
 | K11 | Calculator ↔ lesson links (`:::example` opens the calculator pre-filled; calculator shows "learn the theory" link) |
-| K12 | `practice_templates` / `practice_task_texts` tables + i18n → DB sync script (unused at runtime in v1) |
+| K12 | `practice_templates` / `practice_task_texts` tables + i18n → DB sync script (unused at runtime in v1). Done: `npm run db:sync:practice-texts` (Q25) |
 | K13 | P1 calculators from the TOC review: `connection-power`, `phase-balancing` + templates |
 
 ---
@@ -599,7 +601,7 @@ transaction as each write, and an admin script can rebuild all of it.
 
 | Phone (bottom tab bar) | Desktop (header) |
 | --- | --- |
-| Kezdőlap · Tananyag · Számolás · Szimulátor · Profil (teachers/admins manage content from the Tananyag tab, U14) | same + user menu; teacher/admin get an extra "Tanári" / "Admin" menu once those pages exist |
+| Kezdőlap · Tananyag · Számolás · Szimulátor · Profil (teachers/admins manage content from the Tananyag tab, U14; they get a "Tanári" tab in place of Szimulátor, Q24) | same + user menu |
 
 Guests see Kezdőlap · Tananyag · Számolás · Belépés.
 
@@ -729,14 +731,14 @@ All under `/:locale`. 🔓 = public, 👤 = student+, 🎓 = teacher+, 🛠 = ad
 | U2 | Register page (open, student) with privacy notice + login `returnTo`; guest gating on practice/simulator cards |
 | U3 | Syllabus page (modules, exam-part and 🛡 badges, "Hamarosan") + topic hub |
 | U4 | Lesson reader v2: block renderer, glossary sheet, completion, resume, summary page |
-| U5 | Dashboard (continue, recommended next, exam-readiness strip, recent history) |
+| U5 | Dashboard (continue, recommended next, exam-readiness strip, recent history). Done: `GET /api/dashboard`, `recommendNext` / `examReadiness` in `packages/shared` |
 | U6 | Practice screens (see K5) + session summary |
-| U7 | History feed (with privacy notice) + session replay |
+| U7 | History feed (with privacy notice) + session replay. Done: `/history`, `/history/practice/:id` (`GET /api/history`, `/api/practice/sessions/:id/replay`) |
 | U8 | Progress page + mastery function |
-| U9 | Teacher: students list, student detail (reuse U7/U8 components), insights |
-| U10 | Teacher: review screen with preview + diff; content editor; approval record + review history (S8) |
-| U11 | Cross-cutting: skeletons, empty states, toasts, error boundaries, offline banner |
-| U12 | Problem report stub: button + bottom sheet, `content_reports` table, POST endpoint, read-only teacher list |
+| U9 | Teacher: students list, student detail (reuse U7/U8 components), insights. Done: `/teacher/students[/:userId]`, `/teacher/insights` |
+| U10 | Teacher: review screen with preview + diff; content editor; approval record + review history (S8). Done: `/teacher/review[/:slug]` with queue badge, phone-width preview, line diff against the live version, approval record and review history; the editor is U14 |
+| U11 | Cross-cutting: skeletons, empty states, toasts, error boundaries, offline banner. Done: slow-navigation skeleton, `useToast`, an error boundary inside the app frame, offline banner (practice answer re-submit on a dropped connection is not built yet) |
+| U12 | Problem report stub: button + bottom sheet, `content_reports` table, POST endpoint, read-only teacher list. Done: on lessons, the voltage-drop calculator and practice tasks; `/teacher/reports` |
 | U13 | Teacher reference-table list/editor/verify (UI for K8) |
 | U14 | **Content management** (Q21–Q23): detailed list view on `/syllabus` (Mantine `Table` per module) with lessons + calculators, new / edit / order, archive/restore (admin), calculator registry; forms under `/teacher/content/...` return to the syllabus. Done |
 
@@ -755,7 +757,7 @@ adds Playwright for the acceptance tests.
 | **M1b** Voltage drop end to end | S3, S4, U3, U4, K3, K4, K5/U6, K6, `lesson_reads`, U8 (basic) | A student reads the voltage-drop lesson → uses the calculator (with ρ warning) → completes a session (with tolerance shown) → sees the summary and progress; a teacher approves the lesson. Deployed. |
 | **M2** Loop closed | S8, U14, U5, U7, U9, U10, U11, U12, K12 | Dashboard, history (with privacy notice), teacher monitoring, review and problem-report stub usable on phone |
 | **M3** Exam-relevant breadth | K7, K13, K8 + U13, K8a, K9, S5 glossary, S6 intros, K11; lessons for modules A, B (phase 1), E | All P1 physics calculators with practice; reference-table workflow live; `cable-selection` live once tables are verified; ~15 approved lessons |
-| **M4** Further calculators & content | K10, insights (U9), lessons for modules C, D, G (phase 1) | P2 calculators live; verification topics have lessons ready for the simulator |
+| **M4** Further calculators & content | K10, lessons for modules C, D, G (phase 1) | P2 calculators live; verification topics have lessons ready for the simulator |
 | **M5+** | Simulator (phase 4), AI drafting (phase 5: task texts move to DB), pilot (phase 6), content phase 2–3 topics | per roadmap |
 
 Every PR runs `npm run lint && npm run typecheck && npm test`. Tests are required for:

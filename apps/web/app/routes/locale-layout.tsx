@@ -1,11 +1,16 @@
 import { AppShell, Badge, Button, Container, Group, Text, Title } from "@mantine/core";
 import { useTranslation } from "react-i18next";
-import { Link, Outlet, useLoaderData, useLocation } from "react-router";
+import { useEffect, useState } from "react";
+import { Link, Outlet, useLoaderData, useLocation, useNavigation } from "react-router";
 import { isLocale } from "@elektro/shared";
 import { BottomNav } from "../components/app-shell/bottom-nav";
 import { Breadcrumbs } from "../components/app-shell/breadcrumbs";
 import { isNavItemActive, navItems } from "../components/app-shell/nav-items";
+import { OfflineBanner } from "../components/feedback/offline-banner";
+import { PageSkeleton } from "../components/feedback/page-skeleton";
+import { ToastProvider } from "../components/feedback/toast";
 import { localePath } from "../i18n/locale";
+import { apiFetch } from "../lib/api";
 import { getCurrentUser } from "../lib/session";
 import type { Route } from "./+types/locale-layout";
 
@@ -25,21 +30,60 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     throw new Response(null, { status: 404 });
   }
 
-  return { locale: params.locale, user: await getCurrentUser(request) };
+  const user = await getCurrentUser(request);
+  return { locale: params.locale, user, reviewCount: user && user.role !== "student" ? await reviewQueueCount(request, params.locale) : 0 };
+}
+
+/** Lessons waiting for review: the badge on the teacher tab (plan J8). */
+async function reviewQueueCount(request: Request, locale: string): Promise<number> {
+  try {
+    const { items } = await apiFetch<{ items: unknown[] }>(request, `/api/manage/review?locale=${locale}`);
+    return items.length;
+  } catch {
+    // The badge is a convenience: never fail a page because of it.
+    return 0;
+  }
 }
 
 export type LocaleLayoutData = Awaited<ReturnType<typeof loader>>;
 
 const BOTTOM_BAR_HEIGHT = 64;
 
+/** Only a navigation that takes longer than this shows the skeleton (no flicker). */
+const SKELETON_DELAY_MS = 200;
+
+/** True while a navigation to another page has been loading for a moment. */
+function useSlowNavigation(): boolean {
+  const navigation = useNavigation();
+  const { pathname } = useLocation();
+  const [slowKey, setSlowKey] = useState<string | null>(null);
+  // A form submit (e.g. a practice answer) stays on the page: no skeleton.
+  const key =
+    navigation.state === "loading" && navigation.formMethod === undefined && navigation.location.pathname !== pathname
+      ? navigation.location.key
+      : null;
+
+  useEffect(() => {
+    if (key === null) return;
+    const timer = setTimeout(() => setSlowKey(key), SKELETON_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [key]);
+
+  return key !== null && slowKey === key;
+}
+
+/** Only the teacher tab carries a count (lessons waiting for review). */
+const badgeFor = (key: string, reviewCount: number) => (key === "teacher" ? reviewCount : 0);
 
 export default function LocaleLayout() {
   const { t } = useTranslation();
-  const { locale, user } = useLoaderData<typeof loader>();
+  const { locale, user, reviewCount } = useLoaderData<typeof loader>();
   const { pathname } = useLocation();
   const items = navItems(user);
+  const slowNavigation = useSlowNavigation();
 
   return (
+    <ToastProvider>
     <AppShell
       header={{ height: 60 }}
       footer={{ height: { base: BOTTOM_BAR_HEIGHT, sm: 0 } }}
@@ -64,6 +108,11 @@ export default function LocaleLayout() {
                   variant={isNavItemActive(item, locale, pathname) ? "light" : "subtle"}
                 >
                   {t(item.labelKey)}
+                  {badgeFor(item.key, reviewCount) > 0 && (
+                    <Badge size="sm" circle color="red" ml={6} aria-label={t("teacher.reviewCount", { count: reviewCount })}>
+                      {reviewCount}
+                    </Badge>
+                  )}
                 </Button>
               ))}
             </Group>
@@ -82,14 +131,16 @@ export default function LocaleLayout() {
 
       <AppShell.Main>
         <Container size="lg" px={0}>
+          <OfflineBanner />
           <Breadcrumbs locale={locale} />
-          <Outlet />
+          {slowNavigation ? <PageSkeleton /> : <Outlet />}
         </Container>
       </AppShell.Main>
 
       <AppShell.Footer hiddenFrom="sm">
-        <BottomNav items={items} locale={locale} />
+        <BottomNav items={items} locale={locale} badges={{ teacher: reviewCount }} />
       </AppShell.Footer>
     </AppShell>
+    </ToastProvider>
   );
 }

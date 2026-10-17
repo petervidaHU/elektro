@@ -32,6 +32,7 @@ import {
 } from "@elektro/shared";
 import type { BreadcrumbHandle } from "../components/app-shell/breadcrumbs";
 import { NumericKeypad } from "../components/numeric-keypad/numeric-keypad";
+import { ReportButton } from "../components/report/report-button";
 import { localePath } from "../i18n/locale";
 import { ApiError, apiFetch } from "../lib/api";
 import { formatStepValue, formatTolerance, scenarioValues } from "../lib/practice-format";
@@ -195,6 +196,8 @@ export default function PracticeSession() {
           <StepCard key={step.id} step={step} taskIndex={task.index} locale={locale} />
         ))}
       </Stack>
+
+      <ReportButton targetKind="practice_task" targetId={task.templateId} targetVersion={task.templateVersion} />
 
       {done && (
         <Card withBorder padding="md" radius="md">

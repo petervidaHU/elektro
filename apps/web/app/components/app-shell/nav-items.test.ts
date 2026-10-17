@@ -12,16 +12,34 @@ describe("navItems", () => {
     ]);
   });
 
-  it("gives signed-in users the simulator and their profile instead of login", () => {
-    for (const role of ["student", "teacher", "admin"] as const) {
+  it("gives students the simulator and their profile instead of login", () => {
+    expect(navItems({ role: "student" }).map((item) => item.key)).toEqual([
+      "home",
+      "lessons",
+      "calculators",
+      "simulator",
+      "account",
+    ]);
+  });
+
+  it("gives teachers and admins their own area in place of the simulator", () => {
+    for (const role of ["teacher", "admin"] as const) {
       expect(navItems({ role }).map((item) => item.key)).toEqual([
         "home",
         "lessons",
         "calculators",
-        "simulator",
+        "teacher",
         "account",
       ]);
     }
+  });
+
+  it("keeps the teacher tab active on all teacher pages", () => {
+    const teacher = navItems({ role: "teacher" }).find((item) => item.key === "teacher")!;
+    for (const path of ["/hu/teacher/students", "/hu/teacher/students/u1", "/hu/teacher/review/x", "/hu/teacher/reports", "/hu/teacher/insights"]) {
+      expect(isNavItemActive(teacher, "hu", path), path).toBe(true);
+    }
+    expect(isNavItemActive(teacher, "hu", "/hu/teacher/content")).toBe(false);
   });
 
   it("matches the home tab exactly, so it is not active on every page", () => {

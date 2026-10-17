@@ -14,7 +14,8 @@
     "menu": "Menü",
     "bottomBar": "Alsó menü",
     "headerNav": "Felső menü",
-    "breadcrumbs": "Útvonal"
+    "breadcrumbs": "Útvonal",
+    "teacher": "Tanári"
   },
   "home": {
     "title": "Mit szeretnél gyakorolni?",
@@ -218,7 +219,32 @@
     "greeting": "Szia, {{name}}!",
     "subtitle": "Mit szeretnél ma gyakorolni?",
     "progressLink": "Haladásom",
-    "progressHint": "Nézd meg, hol tartasz az egyes témákban."
+    "progressHint": "Nézd meg, hol tartasz az egyes témákban.",
+    "continue": {
+      "title": "Folytasd ahol abbahagytad",
+      "practice": "Gyakorlás folytatása: {{topic}}",
+      "practiceProgress": "{{done}} / {{total}} feladat kész",
+      "lesson": "Lecke folytatása: {{title}}",
+      "nothing": "Nincs félbehagyott tevékenységed."
+    },
+    "recommended": {
+      "title": "Ajánlott következő",
+      "none": "Minden elérhető témát elsajátítottál.",
+      "reason": {
+        "start": "Itt érdemes elkezdeni.",
+        "next": "A következő téma a sorban.",
+        "mistakes": "Itt volt több hiba – érdemes újra gyakorolni."
+      }
+    },
+    "readiness": {
+      "title": "Vizsgafelkészültség",
+      "hint": "Tájékoztató: a vizsgarész témáinak hányadát gyakorlod vagy sajátítottad el.",
+      "covered": "{{covered}} / {{total}} téma"
+    },
+    "recent": {
+      "title": "Legutóbbi tevékenységek",
+      "all": "Összes előzmény"
+    }
   },
   "privacy": {
     "notice": "Az oktatók látják a tanulási előrehaladásodat és a gyakorlásaid előzményeit. Az adataidat a fiókod törléséig őrizzük meg."
@@ -398,7 +424,8 @@
     "toSyllabus": "Irány a tananyag",
     "lessons": "Leckék: {{done}} / {{total}}",
     "tasks": "Megoldott feladatok: {{count}}",
-    "unaided": "Segítség nélkül: {{rate}}"
+    "unaided": "Segítség nélkül: {{rate}}",
+    "toHistory": "Előzmények"
   },
   "given": {
     "current": "Áramerősség (I)",
@@ -527,6 +554,139 @@
       "live": "Élő változat / leírás",
       "updated": "Módosítva",
       "actions": "Műveletek"
+    }
+  },
+  "feedback": {
+    "loading": "Betöltés…",
+    "offline": "Nincs kapcsolat. A számológépek tovább működnek, a gyakorlás mentéséhez internet kell.",
+    "errorTitle": "Hiba történt",
+    "retry": "Újra"
+  },
+  "report": {
+    "button": "Hibát találtam",
+    "title": "Hibát találtam",
+    "category": "Mi a hiba?",
+    "note": "Megjegyzés (nem kötelező)",
+    "send": "Küldés",
+    "thanks": "Köszönjük, továbbítottuk.",
+    "categories": {
+      "wrong_value": "Hibás érték",
+      "unclear_text": "Érthetetlen szöveg",
+      "typo": "Elírás",
+      "other": "Egyéb"
+    },
+    "kinds": {
+      "lesson": "Lecke",
+      "calculator": "Számológép",
+      "practice_task": "Gyakorlófeladat"
+    }
+  },
+  "history": {
+    "title": "Előzmények",
+    "empty": "Még nincs előzményed.",
+    "startFirst": "Kezdd az első leckével",
+    "noMatch": "Nincs találat a szűrésre.",
+    "filterKind": "Típus szerinti szűrés",
+    "filterTopic": "Téma szerinti szűrés",
+    "allTopics": "Minden téma",
+    "kind": {
+      "all": "Mind",
+      "lesson": "Leckék",
+      "practice": "Gyakorlás"
+    },
+    "practice": "Gyakorlás: {{topic}}",
+    "practiceResult": "{{unaided}} / {{total}} feladat segítség nélkül",
+    "lessonTopic": "Lecke · {{topic}}",
+    "status": {
+      "lessonDone": "Elolvasva",
+      "lessonOpened": "Megnyitva",
+      "finished": "Befejezve",
+      "active": "Folyamatban",
+      "abandoned": "Megszakítva"
+    }
+  },
+  "replay": {
+    "title": "Gyakorlás visszajátszása",
+    "task": "{{n}}. feladat",
+    "empty": "Ebben a gyakorlásban még nincs megoldott lépés.",
+    "notReached": "Ide nem jutott el.",
+    "answer": "{{n}}. válasz: {{value}}",
+    "hintsUsed": "Kért tippek: {{count}}",
+    "verdict": {
+      "correct": "helyes",
+      "close": "majdnem",
+      "incorrect": "hibás"
+    },
+    "toSummary": "Összesítés",
+    "back": "Vissza"
+  },
+  "teacher": {
+    "sections": "Tanári részek",
+    "struggling": "Elakadt",
+    "reviewCount": "{{count}} ellenőrzésre váró lecke",
+    "tabs": {
+      "students": "Diákok",
+      "review": "Ellenőrzés",
+      "reports": "Hibajelentések",
+      "insights": "Áttekintés"
+    },
+    "students": {
+      "title": "Diákok",
+      "detail": "Diák",
+      "sort": "Rendezés",
+      "byActivity": "Utolsó tevékenység",
+      "byProgress": "Haladás",
+      "empty": "Még nincs diák.",
+      "progress": "Elsajátított témák: {{mastered}} · Gyakorolt: {{practising}}",
+      "lastActivity": "Utolsó tevékenység: {{date}}",
+      "noActivity": "Még nem volt tevékenysége."
+    },
+    "review": {
+      "title": "Ellenőrzésre váró tartalmak",
+      "empty": "Nincs ellenőrzésre váró lecke.",
+      "updated": "Módosítva: {{date}}",
+      "hasLive": "van élő változat",
+      "edit": "Szerkesztés",
+      "view": "Nézet",
+      "views": {
+        "preview": "Előnézet",
+        "diff": "Eltérések",
+        "history": "Előzmények"
+      },
+      "phoneWidth": "Telefonszélesség",
+      "diffAgainst": "Összevetés az élő, jóváhagyott {{version}}. változattal.",
+      "noLive": "Még nincs jóváhagyott változat, nincs mivel összevetni.",
+      "diffLine": {
+        "same": "változatlan",
+        "add": "hozzáadva",
+        "remove": "törölve"
+      },
+      "noActions": "Ezen az állapoton most nincs teendő.",
+      "noHistory": "Még nincs ellenőrzési előzmény.",
+      "notApprovedYet": "Ez a lecke még nincs jóváhagyva.",
+      "liveVersion": "Élő változat: {{version}}. változat, jóváhagyva",
+      "reviewer": "{{name}} ({{email}}), {{role}}",
+      "deletedReviewer": "törölt fiók ({{role}})",
+      "done": {
+        "submit_for_review": "Ellenőrzésre küldve.",
+        "approve": "Jóváhagyva.",
+        "request_changes": "Javítást kértél.",
+        "publish_directly": "Közzétéve."
+      }
+    },
+    "reports": {
+      "title": "Hibajelentések",
+      "empty": "Még nincs hibajelentés.",
+      "open": "Megnyitás",
+      "deletedReporter": "törölt fiók"
+    },
+    "insights": {
+      "title": "Áttekintés",
+      "hint": "{{count}} gyakorolt feladat alapján.",
+      "empty": "Még nincs gyakorlási adat.",
+      "hardestSteps": "Legnehezebb lépések",
+      "stepStats": "{{errors}} / {{attempts}} feladatban hibás próba",
+      "misconceptions": "Leggyakoribb tévképzetek"
     }
   }
 }

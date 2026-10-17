@@ -13,6 +13,8 @@ import {
   CONTENT_ACTIONS,
   MASTERY_LEVELS,
   MISCONCEPTION_IDS,
+  REPORT_CATEGORIES,
+  REPORT_TARGET_KINDS,
   TEMPLATES,
   buildTask,
   calculateVoltageDrop,
@@ -98,6 +100,18 @@ describe("hu translations", () => {
     }
     for (const action of CONTENT_ACTIONS) {
       expect(hu.review.action, `missing review.action.${action}`).toHaveProperty(action);
+    }
+  });
+
+  it("covers every report category and target kind, and every examinable exam part", () => {
+    for (const category of REPORT_CATEGORIES) {
+      expect(hu.report.categories, `missing report.categories.${category}`).toHaveProperty(category);
+    }
+    for (const kind of REPORT_TARGET_KINDS) {
+      expect(hu.report.kinds, `missing report.kinds.${kind}`).toHaveProperty(kind);
+    }
+    for (const action of CONTENT_ACTIONS) {
+      expect(hu.teacher.review.done, `missing teacher.review.done.${action}`).toHaveProperty(action);
     }
   });
 

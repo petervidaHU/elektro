@@ -8,6 +8,7 @@ export function useLayoutData(): LocaleLayoutData {
     useRouteLoaderData<LocaleLayoutData>("routes/locale-layout") ?? {
       locale: DEFAULT_LOCALE,
       user: null,
+      reviewCount: 0,
     }
   );
 }

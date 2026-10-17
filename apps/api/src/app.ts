@@ -12,6 +12,10 @@ import { calcRoutes } from "./routes/calc.js";
 import { calculatorRoutes } from "./routes/calculators.js";
 import { contentRoutes } from "./routes/content.js";
 import { healthRoutes } from "./routes/health.js";
+import { learningRoutes } from "./routes/learning.js";
+import { monitoringRoutes } from "./routes/monitoring.js";
+import { reportRoutes } from "./routes/reports.js";
+import { reviewRoutes } from "./routes/review.js";
 import { meRoutes } from "./routes/me.js";
 import { practiceRoutes } from "./routes/practice.js";
 import { progressRoutes } from "./routes/progress.js";
@@ -92,6 +96,10 @@ export async function buildApp(): Promise<FastifyInstance> {
         progress: drizzleProgress,
       });
       await api.register(progressRoutes);
+      await api.register(learningRoutes);
+      await api.register(monitoringRoutes);
+      await api.register(reportRoutes);
+      await api.register(reviewRoutes);
     },
     { prefix: "/api" },
   );

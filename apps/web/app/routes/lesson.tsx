@@ -28,6 +28,7 @@ import {
 } from "@elektro/shared";
 import type { BreadcrumbHandle } from "../components/app-shell/breadcrumbs";
 import { LessonBody } from "../components/lesson/lesson-body";
+import { ReportButton } from "../components/report/report-button";
 import { localePath } from "../i18n/locale";
 import { ApiError, apiFetch } from "../lib/api";
 import { listCalculators } from "../lib/calculators";
@@ -74,7 +75,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const locale = String(params.locale);
   const loaded = await loadLesson(request, locale, String(params.slug));
   const [calculator] = await listCalculators(request, locale, loaded.lesson.topicId);
-  return { ...loaded, calculator: calculator ?? null };
+  return { ...loaded, calculator: calculator ?? null, slug: String(params.slug) };
 }
 
 /**
@@ -142,7 +143,7 @@ export const handle: BreadcrumbHandle = {
 export default function LessonPage() {
   const { t } = useTranslation();
   const { locale, user } = useLayoutData();
-  const { lesson, read, calculator } = useLoaderData<typeof loader>();
+  const { lesson, read, calculator, slug } = useLoaderData<typeof loader>();
   const tree = useMemo(() => parseLessonBody(lesson.body), [lesson.body]);
   const sections = useMemo(() => lessonSections(tree), [tree]);
   const current = useSectionTracking(sections.map((section) => section.id), user !== null);
@@ -192,6 +193,8 @@ export default function LessonPage() {
       )}
 
       <LessonBody tree={tree} />
+
+      <ReportButton targetKind="lesson" targetId={slug} targetVersion={lesson.version} />
 
       <Card withBorder padding="md" radius="md" mt="lg">
         <Stack gap="sm">

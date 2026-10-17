@@ -1,8 +1,8 @@
-import { Button, Card, Group, Progress, Stack, Text, Title } from "@mantine/core";
+import { Button, Stack, Text, Title } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { Link, useLoaderData } from "react-router";
-import { compareTopics, DEFAULT_LOCALE, formatPercent, getTopic, isLocale } from "@elektro/shared";
-import { MasteryBadge } from "../components/topic/topic-badges";
+import { compareTopics, DEFAULT_LOCALE, isLocale } from "@elektro/shared";
+import { TopicProgressList } from "../components/progress/topic-progress-list";
 import { localePath } from "../i18n/locale";
 import { getProgress } from "../lib/progress";
 import { requireUser } from "../lib/session";
@@ -29,6 +29,9 @@ export default function ProgressPage() {
   return (
     <Stack gap="lg" maw={720}>
       <Title order={2}>{t("progressPage.title")}</Title>
+      <Button component={Link} to={localePath(locale, "history")} variant="light" maw={320}>
+        {t("progressPage.toHistory")}
+      </Button>
 
       {topics.length === 0 ? (
         <Stack gap="sm" align="flex-start">
@@ -38,44 +41,7 @@ export default function ProgressPage() {
           </Button>
         </Stack>
       ) : (
-        topics.map((row) => (
-          <Card
-            key={row.topicId}
-            component={Link}
-            to={localePath(locale, `topics/${row.topicId}`)}
-            withBorder
-            padding="md"
-            radius="md"
-            data-topic-id={row.topicId}
-          >
-            <Stack gap="xs">
-              <Group justify="space-between" wrap="nowrap" align="flex-start">
-                <Stack gap={0}>
-                  <Text size="xs" c="dimmed">
-                    {t(`module.${getTopic(row.topicId).module}`)}
-                  </Text>
-                  <Text fw={600}>{t(`topic.${row.topicId}`)}</Text>
-                </Stack>
-                <MasteryBadge level={row.masteryLevel} />
-              </Group>
-              {row.lessonsTotal > 0 && (
-                <Stack gap={2}>
-                  <Text size="sm">
-                    {t("progressPage.lessons", { done: row.lessonsCompleted, total: row.lessonsTotal })}
-                  </Text>
-                  <Progress value={(row.lessonsCompleted / row.lessonsTotal) * 100} size="xs" aria-hidden="true" />
-                </Stack>
-              )}
-              {row.tasksCompleted > 0 && (
-                <Text size="sm">
-                  {t("progressPage.tasks", { count: row.tasksCompleted })}
-                  {row.unaidedRate !== null &&
-                    ` · ${t("progressPage.unaided", { rate: formatPercent(row.unaidedRate * 100, locale, { maximumFractionDigits: 0 }) })}`}
-                </Text>
-              )}
-            </Stack>
-          </Card>
-        ))
+        <TopicProgressList rows={topics} locale={locale} />
       )}
     </Stack>
   );

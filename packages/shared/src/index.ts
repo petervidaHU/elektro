@@ -19,3 +19,6 @@ export * from "./schemas/manage.js";
 export * from "./schemas/calc.js";
 export * from "./practice/index.js";
 export * from "./schemas/practice.js";
+export * from "./content/diff.js";
+export * from "./learning/index.js";
+export * from "./schemas/reports.js";

@@ -49,6 +49,7 @@ npm run db:migrate     # apply migrations
 npm run db:seed        # creates the first admin user
 npm run content:check  # validates the lesson files in apps/api/content/lessons (see docs/THEORY_TOC.md)
 npm run db:seed:content # loads them as ai_draft; updates untouched drafts, never lessons in review/approved
+npm run db:sync:practice-texts # mirrors the practice i18n texts into practice_task_texts (K12; unused at runtime)
 ```
 Local development runs as a container (`Dockerfile.dev`, service `elektro`) in the composer repo's local stack at `https://elektro.fromthe.test:8443`, using the shared `postgres-server` (database `elektro`). See README.md. Compose/nginx config lives in the composer repo, not here.
 

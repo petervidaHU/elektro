@@ -86,6 +86,10 @@ export function unaidedRate(tasks: readonly CompletedTask[]): number | null {
 /** Teacher flag: below 40 % unaided over the last 10 tasks, with at least 5. */
 export function isStruggling(tasks: readonly CompletedTask[]): boolean {
   const recent = tasks.slice(-RATE_WINDOW);
-  const rate = unaidedRate(recent);
-  return recent.length >= STRUGGLING_MIN_TASKS && rate !== null && rate < STRUGGLING_RATE;
+  return isStrugglingRate(unaidedRate(recent), recent.length);
+}
+
+/** The same rule from the cached figures of `topic_progress`. */
+export function isStrugglingRate(rate: number | null, taskCount: number): boolean {
+  return Math.min(taskCount, RATE_WINDOW) >= STRUGGLING_MIN_TASKS && rate !== null && rate < STRUGGLING_RATE;
 }

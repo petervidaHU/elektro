@@ -3,7 +3,7 @@ import { localePath } from "../../i18n/locale";
 import type { IconName } from "../icons";
 
 export interface NavItem {
-  key: "home" | "lessons" | "calculators" | "simulator" | "account" | "login";
+  key: "home" | "lessons" | "calculators" | "simulator" | "teacher" | "account" | "login";
   /** Path below the locale prefix. */
   path: string;
   /** i18next key of the label. */
@@ -36,18 +36,30 @@ const SIMULATOR: NavItem = {
   labelKey: "nav.simulator",
   icon: "gauge",
 };
+/** Teachers and admins: students, review queue, reports, insights (plan §3.3). */
+const TEACHER: NavItem = {
+  key: "teacher",
+  path: "teacher/students",
+  labelKey: "nav.teacher",
+  icon: "clipboard",
+  alsoActiveOn: ["teacher/review", "teacher/reports", "teacher/insights"],
+};
 const ACCOUNT: NavItem = { key: "account", path: "account", labelKey: "nav.account", icon: "user" };
 const LOGIN: NavItem = { key: "login", path: "login", labelKey: "nav.login", icon: "login" };
 
 /**
  * The main navigation (docs/DEVELOPMENT_PLAN.md §3.2). Guests get the public
  * areas plus login; signed-in users get the simulator and their profile.
- * Teacher and admin menus join here once their pages exist.
+ * Teachers and admins swap the simulator tab for their own area (the
+ * simulator stays on the home page); the bar keeps five tabs on a phone.
  */
 export function navItems(user: { role: Role } | null): NavItem[] {
-  return user
+  if (!user) {
+    return [HOME, LESSONS, CALCULATORS, LOGIN];
+  }
+  return user.role === "student"
     ? [HOME, LESSONS, CALCULATORS, SIMULATOR, ACCOUNT]
-    : [HOME, LESSONS, CALCULATORS, LOGIN];
+    : [HOME, LESSONS, CALCULATORS, TEACHER, ACCOUNT];
 }
 
 /** Whether the tab is the current one: its own section or one it covers. */

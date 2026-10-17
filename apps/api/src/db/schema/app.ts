@@ -12,7 +12,11 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import {
+  LOCALES,
   MASTERY_LEVELS,
+  REPORT_CATEGORIES,
+  REPORT_STATUSES,
+  REPORT_TARGET_KINDS,
   TOPIC_IDS,
   type PlannedTask,
   type StepState,
@@ -146,4 +150,29 @@ export const lessonReads = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [unique("lesson_reads_user_lesson_uq").on(table.userId, table.lessonId)],
+);
+
+/**
+ * "Hibát találtam" (plan §3.4 J9): a reader's report on a lesson, calculator or
+ * practice task. A stub in v1 - teachers get a read-only list, no workflow.
+ * The reporter FK is `SET NULL` so a report outlives the account; the
+ * reporter's name is not copied.
+ */
+export const contentReports = pgTable(
+  "content_reports",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    reporterId: text("reporter_id").references(() => user.id, { onDelete: "set null" }),
+    targetKind: text("target_kind", { enum: REPORT_TARGET_KINDS }).notNull(),
+    /** Lesson slug, calculator id, or practice template id. */
+    targetId: text("target_id").notNull(),
+    /** The lesson or template version the reader saw. */
+    targetVersion: integer("target_version"),
+    locale: text("locale", { enum: LOCALES }).notNull(),
+    category: text("category", { enum: REPORT_CATEGORIES }).notNull(),
+    note: text("note"),
+    status: text("status", { enum: REPORT_STATUSES }).notNull().default("open"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("content_reports_created_idx").on(table.createdAt)],
 );
