@@ -174,6 +174,17 @@ verify against a new one):
 - European Resuscitation Council Guidelines 2021: Basic Life Support.
 - IEC/TS 60479-1 (az EMF-Portal összefoglalója alapján): az áram élettani hatásainak
   küszöbértékei.
+- MEE VÉT kézikönyv VII. fejezet, 307–355. o. (a 356–390. oldal szövege nem olvasható
+  ki): hálózati rendszerek betűjelei, N/PE/PEN, fő földelősín, EPH-követelmény,
+  `Z_s · I_a ≤ U₀`, II.17. táblázat.
+- en.wikipedia: Earthing system, Circuit breaker (B/C/D pillanatkioldás), Residual-current
+  device, IP code, Appliance classes, Measurement category, Multimeter, Current clamp,
+  Three-phase electric power, Electrical reactance, Electrical impedance, AC power.
+- de.wikipedia (a harmonizált DIN VDE 0100 / HD 60364 alapján): PEN-Leiter, Schutzleiter,
+  Potentialausgleich, Erder (Elektroinstallation), Fundamenterder, TT-System,
+  IT-System (Elektrotechnik), Schutzklasse (Elektrotechnik), Schutztrennung, Kleinspannung,
+  Schmelzsicherung, Fehlerstrom-Schutzschalter, Leitungsschutzschalter, Mantelleitung.
+- Nem olvasható automatikusan: electrical-installation.org, docplayer.hu, vde-verlag.de.
 
 ### A complete example
 
