@@ -192,6 +192,7 @@
     "INVALID_CREDENTIALS": "Hibás e-mail cím vagy jelszó.",
     "EMAIL_IN_USE": "Ezzel az e-mail címmel már létezik fiók.",
     "INVALID_STATUS_TRANSITION": "Ez az állapotváltás nem engedélyezett.",
+    "REVIEWER_IDENTITY_INCOMPLETE": "A jóváhagyáshoz a fiókodban meg kell adni a neved és az e-mail-címed.",
     "LOCALE_NOT_SUPPORTED": "Ez a nyelv nem támogatott.",
     "CALCULATION_INPUT_INVALID": "A megadott értékekkel nem végezhető el a számítás.",
     "RATE_LIMITED": "Túl sok kérés. Próbáld újra később.",

@@ -58,3 +58,19 @@ describe("POST /lessons/:slug/review", () => {
     }
   });
 });
+
+describe("GET /lessons/:slug/reviews", () => {
+  it("is for teachers and admins: the log holds reviewer names and emails", async () => {
+    for (const { headers, status } of [
+      { headers: {}, status: 401 },
+      { headers: as("s", "student"), status: 403 },
+    ]) {
+      const response = await app.inject({
+        method: "GET",
+        url: "/lessons/any/reviews",
+        headers,
+      });
+      expect(response.statusCode).toBe(status);
+    }
+  });
+});

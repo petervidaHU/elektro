@@ -1,5 +1,6 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
+  check,
   index,
   integer,
   pgTable,
@@ -8,7 +9,14 @@ import {
   unique,
   uuid,
 } from "drizzle-orm/pg-core";
-import { CONTENT_STATUSES, INITIAL_CONTENT_STATUS, LOCALES, TOPIC_IDS } from "@elektro/shared";
+import {
+  CONTENT_ACTIONS,
+  CONTENT_STATUSES,
+  INITIAL_CONTENT_STATUS,
+  LOCALES,
+  ROLES,
+  TOPIC_IDS,
+} from "@elektro/shared";
 import { user } from "./auth.js";
 
 /**
@@ -67,7 +75,15 @@ export const lessonTranslations = pgTable(
       .default(INITIAL_CONTENT_STATUS),
     /** Reviewer note that accompanies `changes_requested`. */
     reviewNote: text("review_note"),
+    /**
+     * The approver. `approved_by` links to the account while it exists; the
+     * `approved_by_*` columns are a snapshot taken at approval time and are
+     * never updated, so the record survives renaming or deleting the account.
+     */
     approvedBy: text("approved_by").references(() => user.id, { onDelete: "set null" }),
+    approvedByName: text("approved_by_name"),
+    approvedByEmail: text("approved_by_email"),
+    approvedByRole: text("approved_by_role", { enum: ROLES }),
     approvedAt: timestamp("approved_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
@@ -75,6 +91,50 @@ export const lessonTranslations = pgTable(
   (table) => [
     unique("lesson_translations_version_locale_uq").on(table.lessonVersionId, table.locale),
     index("lesson_translations_status_idx").on(table.status),
+    // An approval is only valid with its full record: who (snapshot) and when.
+    check(
+      "lesson_translations_approval_recorded",
+      sql`${table.status} <> 'approved' OR (${table.approvedAt} IS NOT NULL AND ${table.approvedByName} IS NOT NULL AND ${table.approvedByEmail} IS NOT NULL AND ${table.approvedByRole} IS NOT NULL)`,
+    ),
+  ],
+);
+
+/**
+ * Append-only log of every review action on content (submit, approve, request
+ * changes): who (snapshot of id, name, email, role), when, on which content
+ * version and locale, and the note. Rows are never updated or deleted (a
+ * database trigger enforces it); only `actor_id` is set to null when the
+ * account is deleted. There is deliberately no foreign key to the content row,
+ * so the log also outlives a deleted lesson.
+ */
+export const contentReviewEvents = pgTable(
+  "content_review_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /** `lesson` for now; glossary, topic intros and task texts reuse this log. */
+    contentKind: text("content_kind", { enum: ["lesson"] }).notNull(),
+    /** Lesson slug at the time of the action. */
+    contentSlug: text("content_slug").notNull(),
+    /** The reviewed translation row (no FK: it may be deleted later). */
+    translationId: uuid("translation_id").notNull(),
+    version: integer("version").notNull(),
+    locale: text("locale", { enum: LOCALES }).notNull(),
+    action: text("action", { enum: CONTENT_ACTIONS }).notNull(),
+    fromStatus: text("from_status", { enum: CONTENT_STATUSES }).notNull(),
+    toStatus: text("to_status", { enum: CONTENT_STATUSES }).notNull(),
+    actorId: text("actor_id").references(() => user.id, { onDelete: "set null" }),
+    actorName: text("actor_name").notNull(),
+    actorEmail: text("actor_email").notNull(),
+    actorRole: text("actor_role", { enum: ROLES }).notNull(),
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("content_review_events_content_idx").on(
+      table.contentKind,
+      table.contentSlug,
+      table.createdAt,
+    ),
   ],
 );
 

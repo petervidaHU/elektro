@@ -62,12 +62,13 @@ Key facts from the documents that shape this plan:
 | Q8 | Problem reports | **Stub in v1**: button + stored report + read-only teacher list (§3.4 J9) |
 | Q9 | Machines/control topics | Topic IDs added, content later |
 | Q10 | Simulator card for guests | Shown locked with "Jelentkezz be" |
-| Q11 | Privacy | Short notice on registration and on the History page; data kept until the account is deleted |
+| Q11 | Privacy | Short notice on registration and on the History page; data kept until the account is deleted. **Exception:** the name, email and role of a reviewer stay in the approval record after their account is deleted (Q19), because approvals of safety-critical content must stay traceable |
 | Q12 | Curriculum documents | Supplied; mapping done in §1.2 |
 | Q13 | Newer PTT? | No. **The 2020 PTT is the latest**; use it |
 | Q15 | Who verifies reference tables | **Teachers** (any user with role `teacher` or higher) |
 | Q16 | Pre-filled candidate reference values | **Yes.** Claude pre-fills candidate values with citations, stored as `unverified`, and a teacher verifies them (§2.3) |
 | Q17 | Exam-style (multiple-choice) answer mode | **Not in v1** |
+| Q19 | Approval record | **Every approval is documented precisely** (2026-10-17, task S8): who (only `teacher` or higher; user id + a **snapshot** of name, email and role taken at approval time) and when (database timestamp). The snapshot is never updated, so it survives renaming, demotion or deletion of the account. Every review action (submit, approve, request changes) also goes to an append-only review log. Teacher+ can read the log; students and guests never see reviewer emails. Applies to lessons now, and to every later approvable entity: glossary (S5), topic intros (S6), task texts (§2.7), reference-table verification (§2.3) |
 | Q18 | Extra calculators from the theory TOC review | **Added to the §2.2 catalogue** (2026-10-16). Highest value: `connection-power`, `phase-balancing` (P1), `material-list`, `short-circuit-current` (P2) |
 
 ---
@@ -257,6 +258,7 @@ Additional content entities, each with the same versioning and approval as lesso
 | S5 | Glossary entity with approval workflow (reuse the lesson state machine) | api, web |
 | S6 | Topic intro texts (content entity, approval) | api, web |
 | S7 | Unit test that every `ptt` / `kkk` ref has the right format, and a generated mapping table (`npm run syllabus:report` → Markdown) for teacher review | shared |
+| S8 | **Approval audit trail** (Q19): approver snapshot on the translation (`approved_by_name/_email/_role` + `approved_at`, DB check that an `approved` row has all of them), append-only `content_review_events` log, `GET /lessons/:slug/reviews` (teacher+). Done for lessons; every later approvable entity reuses it (see §2.6) | shared, api |
 
 ---
 
@@ -358,7 +360,8 @@ The approach:
    - `rows jsonb`;
    - `source` (standard or textbook, edition, table/page);
    - `status`: `unverified` → `verified` → `superseded`;
-   - `verifiedBy`, `verifiedAt` and `version`.
+   - `verifiedBy`, `verifiedAt` and `version`, with the same verifier snapshot
+     (name, email, role) and review-log entry as lesson approvals (Q19, §2.6).
 
    Changing a verified table creates a new version, just like lessons.
 2. **The engine stays explicit.** Calculators receive table values as inputs, which
@@ -496,7 +499,24 @@ topic_progress        replace the three booleans with: lesson_status, simulator_
 reference_tables      see 2.3 (+ reference_table_versions)
 content_reports       see 3.4 J9
 practice_task_texts   see 2.7
+lesson_translations   (exists) + approved_by_name, approved_by_email, approved_by_role   (S8)
+content_review_events append-only: content_kind, content_slug, translation_id, version,  (S8)
+                      locale, action, from_status, to_status, actor_id (FK, set null),
+                      actor_name, actor_email, actor_role, note, created_at
 ```
+
+**Approval record (S8, Q19).** An approval is stored as `approved_by` (FK to the
+user, `ON DELETE SET NULL`) plus a snapshot of the approver's name, email and role
+and `approved_at` (database `now()`). The snapshot is written once, in the same
+transaction as the status change, and never updated; a check constraint rejects an
+`approved` row without it. Every review action also adds one row to
+`content_review_events`. A trigger makes that table append-only: the only allowed
+change is the FK clearing `actor_id` when an account is deleted. The log has no FK
+to the content row, so it outlives a deleted lesson too. Only `teacher` or higher
+can review (`snapshotReviewer` in `packages/shared`; admins rank above teachers and
+may approve, and their role is recorded). New approvable entities (glossary,
+topic intros, task texts, reference tables) get the same snapshot columns and write
+to the same log with their own `content_kind`.
 
 `topic_progress` stays a **denormalised cache** that can be recomputed from
 `lesson_reads` + `practice_attempts` (+ simulator results). It is updated in the same
@@ -510,7 +530,8 @@ transaction as each write, and an admin script can rebuild all of it.
   - `practice_templates`: `id` (= template id), `topic_id`, `current_version`
   - `practice_task_texts`: `template_id`, `template_version`, `locale`, `scenario`,
     `step_labels jsonb`, `hints jsonb`, `status` (same `CONTENT_STATUSES`),
-    `review_note`, `approved_by`, `approved_at`
+    `review_note`, `approved_by`, `approved_by_name`, `approved_by_email`,
+    `approved_by_role`, `approved_at` (approval record, §2.6 / Q19)
 - A seed script syncs i18n texts into the table as `approved` (they were reviewed in
   the PR). From phase 5 (AI generation), the loader reads the DB and new texts start
   as `ai_draft`.
@@ -645,7 +666,7 @@ All under `/:locale`. 🔓 = public, 👤 = student+, 🎓 = teacher+, 🛠 = ad
 
 **J8 – Teacher content review & reference data**
 1. Review queue with a count badge in the nav.
-2. Review screen: rendered as the student sees it (phone-width toggle) + diff against the live approved version → approve / request changes (note required).
+2. Review screen: rendered as the student sees it (phone-width toggle) + diff against the live approved version → approve / request changes (note required). It shows the **approval record**: who approved the live version (name, email, role) and when, plus the review history from `GET /lessons/:slug/reviews` (a reviewer whose account was deleted is shown from the snapshot, marked as deleted).
 3. Reference tables: open an `unverified` table → compare with the cited source → "Ellenőriztem" (records who and when) → dependent calculators and tasks go live.
 
 **J9 – Content problem report (stub in v1)**
@@ -691,7 +712,7 @@ All under `/:locale`. 🔓 = public, 👤 = student+, 🎓 = teacher+, 🛠 = ad
 | U7 | History feed (with privacy notice) + session replay |
 | U8 | Progress page + mastery function |
 | U9 | Teacher: students list, student detail (reuse U7/U8 components), insights |
-| U10 | Teacher: review screen with preview + diff; content editor |
+| U10 | Teacher: review screen with preview + diff; content editor; approval record + review history (S8) |
 | U11 | Cross-cutting: skeletons, empty states, toasts, error boundaries, offline banner |
 | U12 | Problem report stub: button + bottom sheet, `content_reports` table, POST endpoint, read-only teacher list |
 | U13 | Teacher reference-table list/editor/verify (UI for K8) |
@@ -709,7 +730,7 @@ adds Playwright for the acceptance tests.
 | --- | --- | --- |
 | **M1a** Foundations for learning | S1, S2, K1, K2, U1, U2 | New nav works on phone; topics have modules, metadata and the PTT/KKK refs; open registration works |
 | **M1b** Voltage drop end to end | S3, S4, U3, U4, K3, K4, K5/U6, K6, `lesson_reads`, U8 (basic) | A student reads the voltage-drop lesson → uses the calculator (with ρ warning) → completes a session (with tolerance shown) → sees the summary and progress; a teacher approves the lesson. Deployed. |
-| **M2** Loop closed | U5, U7, U9, U10, U11, U12, K12 | Dashboard, history (with privacy notice), teacher monitoring, review and problem-report stub usable on phone |
+| **M2** Loop closed | S8, U5, U7, U9, U10, U11, U12, K12 | Dashboard, history (with privacy notice), teacher monitoring, review and problem-report stub usable on phone |
 | **M3** Exam-relevant breadth | K7, K13, K8 + U13, K8a, K9, S5 glossary, S6 intros, K11; lessons for modules A, B (phase 1), E | All P1 physics calculators with practice; reference-table workflow live; `cable-selection` live once tables are verified; ~15 approved lessons |
 | **M4** Further calculators & content | K10, insights (U9), lessons for modules C, D, G (phase 1) | P2 calculators live; verification topics have lessons ready for the simulator |
 | **M5+** | Simulator (phase 4), AI drafting (phase 5: task texts move to DB), pilot (phase 6), content phase 2–3 topics | per roadmap |
@@ -718,7 +739,9 @@ Every PR runs `npm run lint && npm run typecheck && npm test`. Tests are require
 - the calculation engine;
 - authorization: a teacher can read any student's history, a student only their own,
   a guest gets 401 on practice, only teacher+ can verify reference tables;
-- approval transitions, including the reference-table verification state machine.
+- approval transitions, including the reference-table verification state machine;
+- the approval record: only teacher+ can approve, and the approver snapshot and
+  review-log entry are written with every transition (S8).
 
 ---
 

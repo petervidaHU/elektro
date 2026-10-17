@@ -3,6 +3,7 @@ import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import {
   applyContentAction,
+  approvalFields,
   compareTopics,
   contentActionSchema,
   createLessonSchema,
@@ -10,13 +11,20 @@ import {
   INITIAL_CONTENT_STATUS,
   isVisibleToStudent,
   localeSchema,
+  reviewEventFields,
+  snapshotReviewer,
   topicIdSchema,
   upsertLessonTranslationSchema,
   type Locale,
 } from "@elektro/shared";
 import { db } from "../db/index.js";
 import { lessonReads } from "../db/schema/app.js";
-import { lessons, lessonTranslations, lessonVersions } from "../db/schema/content.js";
+import {
+  contentReviewEvents,
+  lessons,
+  lessonTranslations,
+  lessonVersions,
+} from "../db/schema/content.js";
 import { recomputeTopicProgress } from "../lib/progress.js";
 import { forbidden, HttpError, notFound, parseBody } from "../lib/http-error.js";
 import { allowUnapprovedDrafts } from "../lib/settings.js";
@@ -27,6 +35,8 @@ const listQuerySchema = z.object({
 });
 
 const readQuerySchema = z.object({ locale: localeSchema });
+
+const reviewsQuerySchema = z.object({ locale: localeSchema.optional() });
 
 const slugParamsSchema = z.object({ slug: z.string().min(1) });
 
@@ -330,6 +340,9 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
             status: INITIAL_CONTENT_STATUS,
             reviewNote: null,
             approvedBy: null,
+            approvedByName: null,
+            approvedByEmail: null,
+            approvedByRole: null,
             approvedAt: null,
             updatedAt: new Date(),
           },
@@ -352,11 +365,22 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
   /**
    * Drives the approval state machine. The transition rules and the role check
    * live in `packages/shared`, so the API and the UI agree on them.
+   *
+   * Every action is documented: the approver snapshot (id, name, email, role)
+   * and `approved_at` go on the translation, and one row goes to the
+   * append-only `content_review_events` log, in the same transaction.
    */
   app.post("/lessons/:slug/review", async (request) => {
     const reviewer = app.requireRole(request, "teacher");
     const { slug } = parseBody(z.object({ slug: z.string().min(1) }), request.params);
     const input = parseBody(contentActionSchema, request.body);
+
+    const signed = snapshotReviewer(reviewer);
+    if (!signed.ok) {
+      throw signed.reason === "forbidden"
+        ? forbidden()
+        : new HttpError(409, ERROR_CODES.REVIEWER_IDENTITY_INCOMPLETE);
+    }
 
     return db().transaction(async (tx) => {
       const [current] = await tx
@@ -392,7 +416,7 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
         .set({
           status: transition.status,
           reviewNote: input.note ?? null,
-          approvedBy: transition.recordsApproval ? reviewer.id : null,
+          ...approvalFields(transition, signed.snapshot),
           approvedAt: transition.recordsApproval ? sql`now()` : null,
           updatedAt: new Date(),
         })
@@ -401,10 +425,69 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
           id: lessonTranslations.id,
           status: lessonTranslations.status,
           approvedBy: lessonTranslations.approvedBy,
+          approvedByName: lessonTranslations.approvedByName,
+          approvedByEmail: lessonTranslations.approvedByEmail,
+          approvedByRole: lessonTranslations.approvedByRole,
           approvedAt: lessonTranslations.approvedAt,
         });
 
+      // `now()` is the transaction start, so the log and approved_at agree.
+      await tx.insert(contentReviewEvents).values({
+        contentKind: "lesson",
+        contentSlug: slug,
+        translationId: current.id,
+        version: current.version,
+        locale: input.locale,
+        ...reviewEventFields({
+          action: input.action,
+          fromStatus: current.status,
+          transition,
+          reviewer: signed.snapshot,
+          note: input.note,
+        }),
+        createdAt: sql`now()`,
+      });
+
       return { translation: updated, version: current.version };
     });
+  });
+
+  /**
+   * The approval record of a lesson: every review action, newest first, with
+   * the reviewer snapshot. Teacher+ only, because it holds names and emails.
+   * The log also covers deleted reviewer accounts (`actorId` is then null).
+   */
+  app.get("/lessons/:slug/reviews", async (request, reply) => {
+    app.requireRole(request, "teacher");
+    const { slug } = parseBody(slugParamsSchema, request.params);
+    const query = parseQuery(reviewsQuerySchema, request.query);
+
+    const reviews = await db()
+      .select({
+        id: contentReviewEvents.id,
+        version: contentReviewEvents.version,
+        locale: contentReviewEvents.locale,
+        action: contentReviewEvents.action,
+        fromStatus: contentReviewEvents.fromStatus,
+        toStatus: contentReviewEvents.toStatus,
+        actorId: contentReviewEvents.actorId,
+        actorName: contentReviewEvents.actorName,
+        actorEmail: contentReviewEvents.actorEmail,
+        actorRole: contentReviewEvents.actorRole,
+        note: contentReviewEvents.note,
+        createdAt: contentReviewEvents.createdAt,
+      })
+      .from(contentReviewEvents)
+      .where(
+        and(
+          eq(contentReviewEvents.contentKind, "lesson"),
+          eq(contentReviewEvents.contentSlug, slug),
+          query.locale ? eq(contentReviewEvents.locale, query.locale) : undefined,
+        ),
+      )
+      .orderBy(desc(contentReviewEvents.createdAt));
+
+    reply.header("cache-control", "no-store");
+    return { reviews };
   });
 };

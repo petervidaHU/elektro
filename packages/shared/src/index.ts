@@ -5,6 +5,7 @@ export * from "./syllabus/topics.js";
 export * from "./format.js";
 export * from "./parse.js";
 export * from "./content/status.js";
+export * from "./content/review-record.js";
 export * from "./content/lesson-body.js";
 export * from "./reference/conductors.js";
 export * from "./calc/types.js";

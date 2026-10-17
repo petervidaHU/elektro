@@ -37,7 +37,8 @@ src/lib/settings.ts        admin settings with their defaults
 src/plugins/auth.ts        session resolution + requireUser / requireRole
 src/routes/                health, topics, calc, content, admin, auth
 src/scripts/               migrate.ts, seed.ts
-drizzle/                   generated migrations (never edited by hand)
+drizzle/                   generated migrations (never edited by hand; data backfills
+                           and triggers go in `drizzle-kit generate --custom` files)
 content/lessons/           lesson drafts as files (docs/THEORY_TOC.md); content:check, db:seed:content
 ```
 
@@ -52,9 +53,15 @@ content/lessons/           lesson drafts as files (docs/THEORY_TOC.md); content:
 - **Validate every input** with the shared zod schemas via `parseBody`.
 - **Content approval goes through the shared state machine.**
   `applyContentAction(status, action, role)` decides transitions; the route only
-  persists the result, stamping `approvedBy` + `approvedAt` when
-  `recordsApproval` is true. Editing an approved translation creates a new
-  version instead of mutating it.
+  persists the result. Editing an approved translation creates a new version
+  instead of mutating it.
+- **Every review action is documented** (plan §2.6, Q19). In the same
+  transaction as the status change: `snapshotReviewer` freezes the reviewer
+  (teacher+ only), `approvalFields` writes `approved_by` + the name/email/role
+  snapshot (with `approved_at = now()`), and `reviewEventFields` adds a row to
+  `content_review_events`. Never update the snapshot, and never update or delete
+  log rows (a trigger rejects it). User FKs on audit data are `ON DELETE SET
+  NULL`, never `CASCADE`. New approvable entities reuse all of this.
 - **Student visibility is a setting**, not a constant: `allowUnapprovedDrafts()`.
 - **Database access only through Drizzle**, and only from this app. Change
   `src/db/schema/*`, then `npm run db:generate` and commit the migration.

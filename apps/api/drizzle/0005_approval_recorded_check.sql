@@ -1,0 +1,1 @@
+ALTER TABLE "lesson_translations" ADD CONSTRAINT "lesson_translations_approval_recorded" CHECK ("lesson_translations"."status" <> 'approved' OR ("lesson_translations"."approved_at" IS NOT NULL AND "lesson_translations"."approved_by_name" IS NOT NULL AND "lesson_translations"."approved_by_email" IS NOT NULL AND "lesson_translations"."approved_by_role" IS NOT NULL));

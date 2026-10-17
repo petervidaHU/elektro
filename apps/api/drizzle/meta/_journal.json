@@ -22,6 +22,27 @@
       "when": 1792146596471,
       "tag": "0002_practice_and_reading",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792221927860,
+      "tag": "0003_approval_snapshot",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792221928807,
+      "tag": "0004_approval_backfill",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792221952189,
+      "tag": "0005_approval_recorded_check",
+      "breakpoints": true
     }
   ]
 }
