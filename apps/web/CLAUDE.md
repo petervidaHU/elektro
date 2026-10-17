@@ -30,6 +30,8 @@ app/entry.client.tsx  hydration entry
 app/i18n/             i18next setup, locale helpers, hu resources
 app/routes/           route modules
 app/lib/api.ts        typed calls to /api from loaders and actions
+app/lib/calculators.ts the calculator registry (list, page loader); never hard-code calculators
+app/components/content/ forms of the content-management pages (/teacher/content)
 app/theme.ts          touch-first Mantine theme (MIN_TOUCH_TARGET)
 ```
 
@@ -62,6 +64,9 @@ app/theme.ts          touch-first Mantine theme (MIN_TOUCH_TARGET)
 - **The signed-in user** is loaded once by `routes/locale-layout`; read it with
   `useLayoutData()`. Login-only pages call `requireUser(request, locale)` in their
   loader, which sends guests to `/login?returnTo=...` (validated by `safeReturnTo`).
+- **Teacher/admin pages** call `requireStaff(request, locale)` in their loader.
+  Destructive actions use `ConfirmButton` (two taps). Authoring forms may need
+  typing; the touch-only rule applies to learning interactions.
 - **The UI is not a security boundary.** Hiding a control is a convenience; the
   API re-checks the role on every request.
 

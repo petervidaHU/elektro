@@ -1,5 +1,5 @@
 import { redirect } from "react-router";
-import type { Locale, Role } from "@elektro/shared";
+import { hasAtLeastRole, type Locale, type Role } from "@elektro/shared";
 import { apiFetch } from "./api";
 import { loginPath } from "./return-to";
 
@@ -28,6 +28,18 @@ export async function requireUser(request: Request, locale: Locale): Promise<Cur
   if (!user) {
     const url = new URL(request.url);
     throw redirect(loginPath(locale, `${url.pathname}${url.search}`));
+  }
+  return user;
+}
+
+/**
+ * For loaders of teacher/admin pages: guests go to login, students get a 403
+ * page. Again only a convenience - the API checks the role itself.
+ */
+export async function requireStaff(request: Request, locale: Locale): Promise<CurrentUser> {
+  const user = await requireUser(request, locale);
+  if (!hasAtLeastRole(user.role, "teacher")) {
+    throw new Response(null, { status: 403 });
   }
   return user;
 }

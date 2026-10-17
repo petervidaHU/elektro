@@ -30,7 +30,7 @@ import type { BreadcrumbHandle } from "../components/app-shell/breadcrumbs";
 import { LessonBody } from "../components/lesson/lesson-body";
 import { localePath } from "../i18n/locale";
 import { ApiError, apiFetch } from "../lib/api";
-import { TOPIC_CALCULATORS } from "../lib/topic-tools";
+import { listCalculators } from "../lib/calculators";
 import { useLayoutData } from "../lib/use-layout-data";
 import type { Route } from "./+types/lesson";
 
@@ -71,7 +71,10 @@ export async function loadLesson(request: Request, locale: string, slug: string)
 }
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  return loadLesson(request, String(params.locale), String(params.slug));
+  const locale = String(params.locale);
+  const loaded = await loadLesson(request, locale, String(params.slug));
+  const [calculator] = await listCalculators(request, locale, loaded.lesson.topicId);
+  return { ...loaded, calculator: calculator ?? null };
 }
 
 /**
@@ -139,13 +142,12 @@ export const handle: BreadcrumbHandle = {
 export default function LessonPage() {
   const { t } = useTranslation();
   const { locale, user } = useLayoutData();
-  const { lesson, read } = useLoaderData<typeof loader>();
+  const { lesson, read, calculator } = useLoaderData<typeof loader>();
   const tree = useMemo(() => parseLessonBody(lesson.body), [lesson.body]);
   const sections = useMemo(() => lessonSections(tree), [tree]);
   const current = useSectionTracking(sections.map((section) => section.id), user !== null);
   const progress = sections.length === 0 ? 0 : ((current + 1) / sections.length) * 100;
   const resumeSection = read && !read.completedAt ? sections.find((s) => s.id === read.lastSection) : undefined;
-  const calculator = TOPIC_CALCULATORS[lesson.topicId];
 
   return (
     <Stack gap="md" maw={760}>

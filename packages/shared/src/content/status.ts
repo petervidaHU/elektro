@@ -20,7 +20,12 @@ export type ContentStatus = (typeof CONTENT_STATUSES)[number];
 
 export const INITIAL_CONTENT_STATUS: ContentStatus = "ai_draft";
 
-export const CONTENT_ACTIONS = ["submit_for_review", "approve", "request_changes"] as const;
+export const CONTENT_ACTIONS = [
+  "submit_for_review",
+  "approve",
+  "request_changes",
+  "publish_directly",
+] as const;
 
 export type ContentAction = (typeof CONTENT_ACTIONS)[number];
 
@@ -51,6 +56,16 @@ const TRANSITIONS: Record<ContentAction, TransitionRule> = {
     to: "changes_requested",
     requiredRole: "teacher",
     recordsApproval: false,
+  },
+  /**
+   * An admin's own edit goes live without a separate review (plan Q22). It is
+   * still an approval: recorded with the admin as approver and in the log.
+   */
+  publish_directly: {
+    from: ["ai_draft", "in_review", "changes_requested"],
+    to: "approved",
+    requiredRole: "admin",
+    recordsApproval: true,
   },
 };
 

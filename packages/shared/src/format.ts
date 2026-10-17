@@ -1,4 +1,4 @@
-import { INTL_LOCALES, type Locale } from "./locales.js";
+import { INTL_LOCALES, LOCALE_TIME_ZONES, type Locale } from "./locales.js";
 
 /**
  * Display formatting. Values are SI internally and only formatted at the edge,
@@ -41,4 +41,13 @@ export function formatPercent(
     maximumFractionDigits: 2,
     ...options,
   }).format(value / 100);
+}
+
+/** Date and time of a timestamp, e.g. `2026. okt. 17. 9:49`. */
+export function formatDateTime(value: Date | string, locale: Locale): string {
+  return new Intl.DateTimeFormat(INTL_LOCALES[locale], {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: LOCALE_TIME_ZONES[locale],
+  }).format(typeof value === "string" ? new Date(value) : value);
 }

@@ -16,7 +16,7 @@ import { apiFetch } from "../lib/api";
 import { getProgress } from "../lib/progress";
 import { loginPath } from "../lib/return-to";
 import { getCurrentUser } from "../lib/session";
-import { TOPIC_CALCULATORS } from "../lib/topic-tools";
+import { listCalculators } from "../lib/calculators";
 import { useLayoutData } from "../lib/use-layout-data";
 import type { Route } from "./+types/topic";
 
@@ -40,14 +40,16 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const user = await getCurrentUser(request);
   const query = new URLSearchParams({ locale: String(params.locale), topicId });
 
-  const [{ lessons }, progress] = await Promise.all([
+  const [{ lessons }, progress, calculators] = await Promise.all([
     apiFetch<{ lessons: TopicLesson[] }>(request, `/api/lessons?${query.toString()}`),
     getProgress(request, user !== null),
+    listCalculators(request, String(params.locale), topicId),
   ]);
 
   return {
     topicId,
     lessons,
+    calculators,
     progress: progress.find((row) => row.topicId === topicId) ?? null,
   };
 }
@@ -62,9 +64,8 @@ export const handle: BreadcrumbHandle = {
 export default function TopicHub() {
   const { t } = useTranslation();
   const { locale, user } = useLayoutData();
-  const { topicId, lessons, progress } = useLoaderData<typeof loader>();
+  const { topicId, lessons, progress, calculators } = useLoaderData<typeof loader>();
   const topic = getTopic(topicId);
-  const calculator = TOPIC_CALCULATORS[topicId];
   const practicePath = localePath(locale, `practice/${topicId}`);
 
   return (
@@ -129,13 +130,14 @@ export default function TopicHub() {
       </Stack>
 
       <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
-        {calculator && (
+        {calculators.map((calculator) => (
           <ToolCard
+            key={calculator.id}
             to={localePath(locale, calculator.path)}
-            title={t("topicHub.calculator")}
+            title={calculator.title ?? t("topicHub.calculator")}
             description={t("topicHub.calculatorDescription")}
           />
-        )}
+        ))}
         {hasPractice(topicId) && (
           <ToolCard
             to={user ? practicePath : loginPath(locale, practicePath)}

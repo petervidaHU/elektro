@@ -13,10 +13,12 @@ import {
   Title,
 } from "@mantine/core";
 import { useTranslation } from "react-i18next";
-import { Link, useParams } from "react-router";
+import { Link, useLoaderData, useParams } from "react-router";
 import { localePath } from "../i18n/locale";
 import { CalcSteps } from "../components/calc-steps";
 import type { BreadcrumbHandle } from "../components/app-shell/breadcrumbs";
+import { loadCalculator, type ListedCalculator } from "../lib/calculators";
+import type { Route } from "./+types/voltage-drop";
 import {
   calculateVoltageDrop,
   CalculationInputError,
@@ -42,15 +44,24 @@ import {
  * numeric fields have steppers, so the whole calculation can be done with
  * touch alone.
  */
+/** Listed and published in the calculator registry, or 404 (plan Q21). */
+export async function loader({ request, params }: Route.LoaderArgs) {
+  return { calculator: await loadCalculator(request, String(params.locale), "voltage-drop") };
+}
+
 export const handle: BreadcrumbHandle = {
-  breadcrumbs: () => [
-    { labelKey: "nav.calculators", path: "calculators" },
-    { labelKey: "calculators.voltageDrop.title" },
-  ],
+  breadcrumbs: (data) => {
+    const calculator = (data as { calculator?: ListedCalculator } | undefined)?.calculator;
+    return [
+      { labelKey: "nav.calculators", path: "calculators" },
+      calculator?.title ? { label: calculator.title } : { labelKey: "calculators.voltageDrop.title" },
+    ];
+  },
 };
 
 export default function VoltageDrop() {
   const { t } = useTranslation();
+  const { calculator } = useLoaderData<typeof loader>();
   const params = useParams();
   const locale = isLocale(params.locale) ? params.locale : DEFAULT_LOCALE;
 
@@ -86,7 +97,7 @@ export default function VoltageDrop() {
 
   return (
     <Stack gap="lg" maw={640}>
-      <Title order={2}>{t("calculators.voltageDrop.title")}</Title>
+      <Title order={2}>{calculator.title ?? t("calculators.voltageDrop.title")}</Title>
 
       <Stack gap="md">
         <div>

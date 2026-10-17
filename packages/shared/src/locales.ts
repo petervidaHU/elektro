@@ -16,6 +16,14 @@ export const INTL_LOCALES: Record<Locale, string> = {
   hu: "hu-HU",
 };
 
+/**
+ * Time zone used to show timestamps per locale. Fixed (not the viewer's), so
+ * the server render and the browser agree on the text.
+ */
+export const LOCALE_TIME_ZONES: Record<Locale, string> = {
+  hu: "Europe/Budapest",
+};
+
 export function isLocale(value: unknown): value is Locale {
   return typeof value === "string" && (LOCALES as readonly string[]).includes(value);
 }

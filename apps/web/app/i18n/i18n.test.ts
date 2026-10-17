@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  CALCULATOR_IDS,
   CONTENT_STATUSES,
   ERROR_CODES,
   EXAM_PARTS,
@@ -79,6 +80,12 @@ describe("hu translations", () => {
   it("covers every API error code", () => {
     for (const code of Object.values(ERROR_CODES)) {
       expect(hu.error, `missing error.${code}`).toHaveProperty(code);
+    }
+  });
+
+  it("names every calculator implemented in code (content page)", () => {
+    for (const id of CALCULATOR_IDS) {
+      expect(hu.contentAdmin.calculatorIds, `missing contentAdmin.calculatorIds.${id}`).toHaveProperty(id);
     }
   });
 

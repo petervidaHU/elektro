@@ -1,9 +1,9 @@
-import type { Locale, Role } from "@elektro/shared";
+import { hasAtLeastRole, type Locale, type Role } from "@elektro/shared";
 import { localePath } from "../../i18n/locale";
 import type { IconName } from "../icons";
 
 export interface NavItem {
-  key: "home" | "lessons" | "calculators" | "simulator" | "account" | "login";
+  key: "home" | "lessons" | "calculators" | "simulator" | "account" | "login" | "content";
   /** Path below the locale prefix. */
   path: string;
   /** i18next key of the label. */
@@ -38,6 +38,12 @@ const SIMULATOR: NavItem = {
 };
 const ACCOUNT: NavItem = { key: "account", path: "account", labelKey: "nav.account", icon: "user" };
 const LOGIN: NavItem = { key: "login", path: "login", labelKey: "nav.login", icon: "login" };
+const CONTENT: NavItem = {
+  key: "content",
+  path: "teacher/content",
+  labelKey: "nav.content",
+  icon: "edit",
+};
 
 /**
  * The main navigation (docs/DEVELOPMENT_PLAN.md §3.2). Guests get the public
@@ -48,6 +54,14 @@ export function navItems(user: { role: Role } | null): NavItem[] {
   return user
     ? [HOME, LESSONS, CALCULATORS, SIMULATOR, ACCOUNT]
     : [HOME, LESSONS, CALCULATORS, LOGIN];
+}
+
+/**
+ * The extra teacher/admin menu (plan §3.2). Desktop header only: the phone tab
+ * bar keeps its five tabs, and the profile page links there instead.
+ */
+export function staffNavItems(user: { role: Role } | null): NavItem[] {
+  return user && hasAtLeastRole(user.role, "teacher") ? [CONTENT] : [];
 }
 
 /** Whether the tab is the current one: its own section or one it covers. */

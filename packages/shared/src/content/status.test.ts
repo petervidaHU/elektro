@@ -107,12 +107,42 @@ describe("isVisibleToStudent", () => {
 describe("availableContentActions", () => {
   it("offers a teacher submit for a draft, approve or request changes in review", () => {
     expect(availableContentActions("ai_draft", "teacher")).toEqual(["submit_for_review"]);
-    expect(availableContentActions("changes_requested", "admin")).toEqual(["submit_for_review"]);
+    expect(availableContentActions("changes_requested", "teacher")).toEqual(["submit_for_review"]);
+    expect(availableContentActions("changes_requested", "admin")).toEqual([
+      "submit_for_review",
+      "publish_directly",
+    ]);
     expect(availableContentActions("in_review", "teacher")).toEqual(["approve", "request_changes"]);
   });
 
   it("offers nothing for an approved version or to a student", () => {
     expect(availableContentActions("approved", "admin")).toEqual([]);
     expect(availableContentActions("in_review", "student")).toEqual([]);
+  });
+});
+
+describe("publish_directly (admin edits go live, plan Q22)", () => {
+  it("lets an admin approve a draft, a review or a rejected draft in one step", () => {
+    for (const from of ["ai_draft", "in_review", "changes_requested"] as const) {
+      expect(applyContentAction(from, "publish_directly", "admin")).toEqual({
+        ok: true,
+        status: "approved",
+        recordsApproval: true,
+      });
+    }
+  });
+
+  it("is admin-only: teachers go through the review", () => {
+    expect(applyContentAction("ai_draft", "publish_directly", "teacher")).toEqual({
+      ok: false,
+      reason: "forbidden",
+    });
+  });
+
+  it("cannot touch an approved version (a new version is needed)", () => {
+    expect(applyContentAction("approved", "publish_directly", "admin")).toEqual({
+      ok: false,
+      reason: "invalid_transition",
+    });
   });
 });

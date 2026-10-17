@@ -26,5 +26,10 @@ export default [
     route("register", "routes/register.tsx"),
     route("logout", "routes/logout.tsx"),
     route("account", "routes/account.tsx"),
+    route("teacher/content", "routes/teacher-content.tsx"),
+    route("teacher/content/lessons/new", "routes/teacher-lesson-new.tsx"),
+    route("teacher/content/lessons/:slug", "routes/teacher-lesson-edit.tsx"),
+    route("teacher/content/calculators/new", "routes/teacher-calculator-new.tsx"),
+    route("teacher/content/calculators/:id", "routes/teacher-calculator-edit.tsx"),
   ]),
 ] satisfies RouteConfig;

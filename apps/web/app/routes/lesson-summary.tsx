@@ -6,7 +6,7 @@ import { hasPractice, lessonGoals, parseLessonBody } from "@elektro/shared";
 import type { BreadcrumbHandle } from "../components/app-shell/breadcrumbs";
 import { localePath } from "../i18n/locale";
 import { apiFetch } from "../lib/api";
-import { TOPIC_CALCULATORS } from "../lib/topic-tools";
+import { listCalculators } from "../lib/calculators";
 import { useLayoutData } from "../lib/use-layout-data";
 import { loadLesson, type LessonData } from "./lesson";
 import type { Route } from "./+types/lesson-summary";
@@ -20,12 +20,17 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const slug = String(params.slug);
   const { lesson, read } = await loadLesson(request, locale, slug);
   const query = new URLSearchParams({ locale, topicId: lesson.topicId });
-  const { lessons } = await apiFetch<{ lessons: { slug: string; title: string }[] }>(
-    request,
-    `/api/lessons?${query.toString()}`,
-  );
+  const [{ lessons }, calculators] = await Promise.all([
+    apiFetch<{ lessons: { slug: string; title: string }[] }>(request, `/api/lessons?${query.toString()}`),
+    listCalculators(request, locale, lesson.topicId),
+  ]);
   const index = lessons.findIndex((item) => item.slug === slug);
-  return { lesson, read, nextLesson: index >= 0 ? (lessons[index + 1] ?? null) : null };
+  return {
+    lesson,
+    read,
+    calculator: calculators[0] ?? null,
+    nextLesson: index >= 0 ? (lessons[index + 1] ?? null) : null,
+  };
 }
 
 export const handle: BreadcrumbHandle = {
@@ -42,9 +47,8 @@ export const handle: BreadcrumbHandle = {
 export default function LessonSummary() {
   const { t } = useTranslation();
   const { locale } = useLayoutData();
-  const { lesson, read, nextLesson } = useLoaderData<typeof loader>();
+  const { lesson, read, calculator, nextLesson } = useLoaderData<typeof loader>();
   const goals = useMemo(() => lessonGoals(parseLessonBody(lesson.body)), [lesson.body]);
-  const calculator = TOPIC_CALCULATORS[lesson.topicId];
 
   return (
     <Stack gap="lg" maw={640}>

@@ -5,7 +5,8 @@ import { request, type APIRequestContext, type FullConfig } from "@playwright/te
  * Prepares the data the acceptance tests need, through the app's own API as
  * the seeded admin:
  * - an e2e teacher with a known password,
- * - a fresh lesson in review (`e2e-…`), which the M1b test approves.
+ * - a fresh lesson in review (`e2e-…`), which the M1b test approves. The e2e
+ *   teacher writes it: an admin's save would go live directly (plan Q22).
  * The returned teardown deletes the lesson again.
  *
  * Admin credentials: E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD, falling back to the
@@ -87,25 +88,33 @@ export default async function globalSetup(config: FullConfig) {
     await ok(created, "create teacher");
   }
 
-  // A fresh lesson in review for the M1b test.
+  // A fresh lesson in review for the M1b test, written by the teacher.
+  const teacher = await request.newContext({ baseURL, ignoreHTTPSErrors: true });
+  await ok(
+    await teacher.post("/api/auth/sign-in/email", {
+      data: { email: E2E_TEACHER.email, password: E2E_TEACHER.password },
+    }),
+    "teacher sign-in",
+  );
   const slug = `e2e-${Date.now()}`;
   const title = `E2E lecke ${slug}`;
   await ok(
-    await admin.post("/api/lessons", { data: { topicId: "voltage-drop", slug, position: 900 } }),
+    await teacher.post("/api/lessons", { data: { topicId: "voltage-drop", slug, position: 900 } }),
     "create lesson",
   );
   await ok(
-    await admin.put(`/api/lessons/${slug}/translations`, {
+    await teacher.put(`/api/lessons/${slug}/translations`, {
       data: { locale: "hu", title, summary: "E2E gyakorló lecke.", body: LESSON_BODY },
     }),
     "lesson translation",
   );
   await ok(
-    await admin.post(`/api/lessons/${slug}/review`, {
+    await teacher.post(`/api/lessons/${slug}/review`, {
       data: { action: "submit_for_review", locale: "hu" },
     }),
     "submit for review",
   );
+  await teacher.dispose();
 
   process.env.E2E_LESSON_SLUG = slug;
   process.env.E2E_LESSON_TITLE = title;

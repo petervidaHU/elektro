@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync, FastifyRequest } from "fastify";
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import {
   applyContentAction,
@@ -8,18 +8,25 @@ import {
   contentActionSchema,
   createLessonSchema,
   ERROR_CODES,
+  hasAtLeastRole,
   INITIAL_CONTENT_STATUS,
+  isReorderOf,
   isVisibleToStudent,
   localeSchema,
   redactDeletedReviewer,
+  reorderLessonsSchema,
   reviewEventFields,
   snapshotReviewer,
   topicIdSchema,
+  updateLessonSchema,
   upsertLessonTranslationSchema,
+  type ContentAction,
+  type ContentStatus,
   type Locale,
+  type TopicId,
 } from "@elektro/shared";
 import { db } from "../db/index.js";
-import { lessonReads } from "../db/schema/app.js";
+import { lessonReads, topicProgress } from "../db/schema/app.js";
 import {
   contentReviewEvents,
   lessons,
@@ -29,6 +36,96 @@ import {
 import { recomputeTopicProgress } from "../lib/progress.js";
 import { forbidden, HttpError, notFound, parseBody } from "../lib/http-error.js";
 import { allowUnapprovedDrafts } from "../lib/settings.js";
+import type { AuthenticatedUser } from "../plugins/auth.js";
+
+/**
+ * Archiving or moving a lesson changes how many lessons a topic has, so the
+ * cached progress of everyone with progress on that topic is recomputed.
+ */
+async function recomputeTopicForAll(topicId: TopicId) {
+  const rows = await db()
+    .select({ userId: topicProgress.userId })
+    .from(topicProgress)
+    .where(eq(topicProgress.topicId, topicId));
+  for (const { userId } of rows) {
+    await recomputeTopicProgress(userId, topicId);
+  }
+}
+
+type Tx = Parameters<Parameters<ReturnType<typeof db>["transaction"]>[0]>[0];
+
+/**
+ * Applies a review action to one translation and documents it (plan §2.6,
+ * Q19): the approver snapshot on the row and a row in the append-only log, in
+ * the caller's transaction. Used by the review route and by an admin's direct
+ * publish on save (Q22), so both leave the same record.
+ */
+async function applyReview(
+  tx: Tx,
+  target: {
+    slug: string;
+    translationId: string;
+    version: number;
+    locale: Locale;
+    status: ContentStatus;
+  },
+  action: ContentAction,
+  reviewer: AuthenticatedUser,
+  note?: string,
+) {
+  const signed = snapshotReviewer(reviewer);
+  if (!signed.ok) {
+    throw signed.reason === "forbidden"
+      ? forbidden()
+      : new HttpError(409, ERROR_CODES.REVIEWER_IDENTITY_INCOMPLETE);
+  }
+
+  const transition = applyContentAction(target.status, action, reviewer.role);
+  if (!transition.ok) {
+    throw transition.reason === "forbidden"
+      ? forbidden()
+      : new HttpError(409, ERROR_CODES.INVALID_STATUS_TRANSITION);
+  }
+
+  const [updated] = await tx
+    .update(lessonTranslations)
+    .set({
+      status: transition.status,
+      reviewNote: note ?? null,
+      ...approvalFields(transition, signed.snapshot),
+      approvedAt: transition.recordsApproval ? sql`now()` : null,
+      updatedAt: new Date(),
+    })
+    .where(eq(lessonTranslations.id, target.translationId))
+    .returning({
+      id: lessonTranslations.id,
+      status: lessonTranslations.status,
+      approvedBy: lessonTranslations.approvedBy,
+      approvedByName: lessonTranslations.approvedByName,
+      approvedByEmail: lessonTranslations.approvedByEmail,
+      approvedByRole: lessonTranslations.approvedByRole,
+      approvedAt: lessonTranslations.approvedAt,
+    });
+
+  // `now()` is the transaction start, so the log and approved_at agree.
+  await tx.insert(contentReviewEvents).values({
+    contentKind: "lesson",
+    contentSlug: target.slug,
+    translationId: target.translationId,
+    version: target.version,
+    locale: target.locale,
+    ...reviewEventFields({
+      action,
+      fromStatus: target.status,
+      transition,
+      reviewer: signed.snapshot,
+      note,
+    }),
+    createdAt: sql`now()`,
+  });
+
+  return updated;
+}
 
 const listQuerySchema = z.object({
   locale: localeSchema,
@@ -85,6 +182,7 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
         and(
           eq(lessonTranslations.locale, query.locale),
           query.topicId ? eq(lessons.topicId, query.topicId) : undefined,
+          isNull(lessons.archivedAt),
         ),
       )
       .orderBy(lessons.slug, desc(lessonVersions.version));
@@ -155,7 +253,14 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
       .from(lessonTranslations)
       .innerJoin(lessonVersions, eq(lessonTranslations.lessonVersionId, lessonVersions.id))
       .innerJoin(lessons, eq(lessonVersions.lessonId, lessons.id))
-      .where(and(eq(lessons.slug, slug), eq(lessonTranslations.locale, locale)))
+      .where(
+        and(
+          eq(lessons.slug, slug),
+          eq(lessonTranslations.locale, locale),
+          // Archived lessons are hidden from everyone but admins (plan Q23).
+          user?.role === "admin" ? undefined : isNull(lessons.archivedAt),
+        ),
+      )
       .orderBy(desc(lessonVersions.version));
 
     const lesson = rows.find((row) => isVisibleToStudent(row.status, draftsVisible));
@@ -359,6 +464,22 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
         .set({ updatedAt: new Date() })
         .where(eq(lessons.id, lesson.id));
 
+      if (!saved) {
+        throw new HttpError(500, ERROR_CODES.INTERNAL_ERROR);
+      }
+
+      // An admin's edit goes live directly (plan Q22), still with a full
+      // approval record. A teacher's edit is a draft for review.
+      if (hasAtLeastRole(editor.role, "admin")) {
+        const published = await applyReview(
+          tx,
+          { slug, translationId: saved.id, version, locale: input.locale, status: saved.status },
+          "publish_directly",
+          editor,
+        );
+        return { translation: { ...saved, status: published?.status ?? saved.status }, version };
+      }
+
       return { translation: saved, version };
     });
   });
@@ -375,13 +496,6 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
     const reviewer = app.requireRole(request, "teacher");
     const { slug } = parseBody(z.object({ slug: z.string().min(1) }), request.params);
     const input = parseBody(contentActionSchema, request.body);
-
-    const signed = snapshotReviewer(reviewer);
-    if (!signed.ok) {
-      throw signed.reason === "forbidden"
-        ? forbidden()
-        : new HttpError(409, ERROR_CODES.REVIEWER_IDENTITY_INCOMPLETE);
-    }
 
     return db().transaction(async (tx) => {
       const [current] = await tx
@@ -404,50 +518,19 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
         throw notFound();
       }
 
-      const transition = applyContentAction(current.status, input.action, reviewer.role);
-
-      if (!transition.ok) {
-        throw transition.reason === "forbidden"
-          ? forbidden()
-          : new HttpError(409, ERROR_CODES.INVALID_STATUS_TRANSITION);
-      }
-
-      const [updated] = await tx
-        .update(lessonTranslations)
-        .set({
-          status: transition.status,
-          reviewNote: input.note ?? null,
-          ...approvalFields(transition, signed.snapshot),
-          approvedAt: transition.recordsApproval ? sql`now()` : null,
-          updatedAt: new Date(),
-        })
-        .where(eq(lessonTranslations.id, current.id))
-        .returning({
-          id: lessonTranslations.id,
-          status: lessonTranslations.status,
-          approvedBy: lessonTranslations.approvedBy,
-          approvedByName: lessonTranslations.approvedByName,
-          approvedByEmail: lessonTranslations.approvedByEmail,
-          approvedByRole: lessonTranslations.approvedByRole,
-          approvedAt: lessonTranslations.approvedAt,
-        });
-
-      // `now()` is the transaction start, so the log and approved_at agree.
-      await tx.insert(contentReviewEvents).values({
-        contentKind: "lesson",
-        contentSlug: slug,
-        translationId: current.id,
-        version: current.version,
-        locale: input.locale,
-        ...reviewEventFields({
-          action: input.action,
-          fromStatus: current.status,
-          transition,
-          reviewer: signed.snapshot,
-          note: input.note,
-        }),
-        createdAt: sql`now()`,
-      });
+      const updated = await applyReview(
+        tx,
+        {
+          slug,
+          translationId: current.id,
+          version: current.version,
+          locale: input.locale,
+          status: current.status,
+        },
+        input.action,
+        reviewer,
+        input.note,
+      );
 
       return { translation: updated, version: current.version };
     });
@@ -512,5 +595,191 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
     return {
       reviews: reviews.map((review) => ({ ...review, actorDeleted: review.actorId === null })),
     };
+  });
+
+  /**
+   * The detailed lesson list of the content-management page (plan §3.3
+   * `/teacher/content`): per lesson the newest version in `locale` and the
+   * live (approved) one with its approval record. Admins also get archived
+   * lessons. A deleted approver is shown without name (plan Q11).
+   */
+  app.get("/manage/lessons", async (request, reply) => {
+    const user = app.requireRole(request, "teacher");
+    const query = parseQuery(readQuerySchema, request.query);
+    const isAdmin = hasAtLeastRole(user.role, "admin");
+
+    const lessonRows = await db()
+      .select({
+        lessonId: lessons.id,
+        slug: lessons.slug,
+        topicId: lessons.topicId,
+        position: lessons.position,
+        archivedAt: lessons.archivedAt,
+        updatedAt: lessons.updatedAt,
+      })
+      .from(lessons)
+      .where(isAdmin ? undefined : isNull(lessons.archivedAt));
+
+    const translationRows =
+      lessonRows.length === 0
+        ? []
+        : await db()
+            .select({
+              lessonId: lessonVersions.lessonId,
+              version: lessonVersions.version,
+              title: lessonTranslations.title,
+              status: lessonTranslations.status,
+              updatedAt: lessonTranslations.updatedAt,
+              approvedBy: lessonTranslations.approvedBy,
+              approvedByName: lessonTranslations.approvedByName,
+              approvedByRole: lessonTranslations.approvedByRole,
+              approvedAt: lessonTranslations.approvedAt,
+            })
+            .from(lessonTranslations)
+            .innerJoin(lessonVersions, eq(lessonTranslations.lessonVersionId, lessonVersions.id))
+            .where(
+              and(
+                eq(lessonTranslations.locale, query.locale),
+                inArray(
+                  lessonVersions.lessonId,
+                  lessonRows.map((row) => row.lessonId),
+                ),
+              ),
+            )
+            .orderBy(desc(lessonVersions.version));
+
+    const result = lessonRows.map((lesson) => {
+      const versions = translationRows.filter((row) => row.lessonId === lesson.lessonId);
+      const latest = versions[0];
+      const live = versions.find((row) => row.status === "approved");
+      return {
+        ...lesson,
+        latest: latest
+          ? {
+              version: latest.version,
+              title: latest.title,
+              status: latest.status,
+              updatedAt: latest.updatedAt,
+            }
+          : null,
+        live: live
+          ? {
+              version: live.version,
+              title: live.title,
+              approvedAt: live.approvedAt,
+              approvedByRole: live.approvedByRole,
+              approvedByDeleted: live.approvedBy === null,
+              approvedByName: live.approvedBy === null ? null : live.approvedByName,
+            }
+          : null,
+      };
+    });
+
+    result.sort(
+      (a, b) =>
+        compareTopics(a.topicId, b.topicId) ||
+        a.position - b.position ||
+        a.slug.localeCompare(b.slug),
+    );
+
+    reply.header("cache-control", "no-store");
+    return { lessons: result };
+  });
+
+  /** Moves a lesson to another topic, at the end of that topic. */
+  app.patch("/lessons/:slug", async (request) => {
+    app.requireRole(request, "teacher");
+    const { slug } = parseBody(slugParamsSchema, request.params);
+    const input = parseBody(updateLessonSchema, request.body);
+
+    const [lesson] = await db()
+      .select({ id: lessons.id, topicId: lessons.topicId })
+      .from(lessons)
+      .where(eq(lessons.slug, slug))
+      .limit(1);
+
+    if (!lesson) {
+      throw notFound();
+    }
+    if (lesson.topicId === input.topicId) {
+      return { lesson: { slug, topicId: lesson.topicId } };
+    }
+
+    await db()
+      .update(lessons)
+      .set({
+        topicId: input.topicId,
+        position: sql`(SELECT COALESCE(MAX(l.position) + 1, 0) FROM ${lessons} AS l WHERE l.topic_id = ${input.topicId})`,
+        updatedAt: new Date(),
+      })
+      .where(eq(lessons.id, lesson.id));
+
+    await recomputeTopicForAll(lesson.topicId);
+    await recomputeTopicForAll(input.topicId);
+    return { lesson: { slug, topicId: input.topicId } };
+  });
+
+  /** The full new order of the (not archived) lessons of one topic. */
+  app.put("/lessons/order", async (request) => {
+    app.requireRole(request, "teacher");
+    const input = parseBody(reorderLessonsSchema, request.body);
+
+    await db().transaction(async (tx) => {
+      const rows = await tx
+        .select({ slug: lessons.slug })
+        .from(lessons)
+        .where(and(eq(lessons.topicId, input.topicId), isNull(lessons.archivedAt)))
+        .orderBy(asc(lessons.position));
+
+      if (!isReorderOf(rows.map((row) => row.slug), input.slugs)) {
+        throw new HttpError(409, ERROR_CODES.VALIDATION_FAILED, { slugs: ["stale_order"] });
+      }
+      for (const [position, slug] of input.slugs.entries()) {
+        await tx.update(lessons).set({ position }).where(eq(lessons.slug, slug));
+      }
+    });
+
+    return { topicId: input.topicId, slugs: input.slugs };
+  });
+
+  /** "Delete" from the content page: archive (plan Q23). Admin-only. */
+  app.post("/lessons/:slug/archive", async (request) => {
+    const admin = app.requireRole(request, "admin");
+    const { slug } = parseBody(slugParamsSchema, request.params);
+
+    const [archived] = await db()
+      .update(lessons)
+      .set({ archivedAt: sql`COALESCE(${lessons.archivedAt}, now())`, archivedBy: admin.id })
+      .where(eq(lessons.slug, slug))
+      .returning({ topicId: lessons.topicId, archivedAt: lessons.archivedAt });
+
+    if (!archived) {
+      throw notFound();
+    }
+    await recomputeTopicForAll(archived.topicId);
+    return { lesson: { slug, archivedAt: archived.archivedAt } };
+  });
+
+  /** Brings an archived lesson back, at the end of its topic. Admin-only. */
+  app.post("/lessons/:slug/restore", async (request) => {
+    app.requireRole(request, "admin");
+    const { slug } = parseBody(slugParamsSchema, request.params);
+
+    const [restored] = await db()
+      .update(lessons)
+      .set({
+        archivedAt: null,
+        archivedBy: null,
+        position: sql`(SELECT COALESCE(MAX(l.position) + 1, 0) FROM ${lessons} AS l WHERE l.topic_id = ${lessons.topicId} AND l.archived_at IS NULL)`,
+        updatedAt: new Date(),
+      })
+      .where(eq(lessons.slug, slug))
+      .returning({ topicId: lessons.topicId });
+
+    if (!restored) {
+      throw notFound();
+    }
+    await recomputeTopicForAll(restored.topicId);
+    return { lesson: { slug, archivedAt: null } };
   });
 };

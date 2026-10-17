@@ -9,6 +9,7 @@ import { installErrorHandler } from "./lib/error-handler.js";
 import { adminRoutes } from "./routes/admin.js";
 import { authRoutes } from "./routes/auth.js";
 import { calcRoutes } from "./routes/calc.js";
+import { calculatorRoutes } from "./routes/calculators.js";
 import { contentRoutes } from "./routes/content.js";
 import { healthRoutes } from "./routes/health.js";
 import { meRoutes } from "./routes/me.js";
@@ -83,6 +84,7 @@ export async function buildApp(): Promise<FastifyInstance> {
       await api.register(meRoutes);
       await api.register(topicRoutes);
       await api.register(calcRoutes);
+      await api.register(calculatorRoutes);
       await api.register(contentRoutes);
       await api.register(adminRoutes);
       await api.register(practiceRoutes, {

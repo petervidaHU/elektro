@@ -35,7 +35,7 @@ src/lib/http-error.ts      coded HTTP errors + zod body parsing
 src/lib/react-router.ts    mounts the SSR handler as the not-found handler
 src/lib/settings.ts        admin settings with their defaults
 src/plugins/auth.ts        session resolution + requireUser / requireRole
-src/routes/                health, topics, calc, content, admin, auth
+src/routes/                health, topics, calc, calculators (registry), content, admin, auth
 src/scripts/               migrate.ts, seed.ts
 drizzle/                   generated migrations (never edited by hand; data backfills
                            and triggers go in `drizzle-kit generate --custom` files)
@@ -64,6 +64,11 @@ content/lessons/           lesson drafts as files (docs/THEORY_TOC.md); content:
   NULL`, never `CASCADE`. Routes the UI uses return deleted reviewers through
   `redactDeletedReviewer` (no name/email); only admin routes return the full
   snapshot. New approvable entities reuse all of this.
+- **Admin saves publish directly** (plan Q22) through the same `applyReview`
+  helper as the review route, so they leave the same approval record.
+- **Archived lessons** (`archived_at`, plan Q23) are excluded from every
+  student-facing query and from progress; only admins can read them. Archiving,
+  restoring or moving a lesson recomputes that topic's cached progress.
 - **Student visibility is a setting**, not a constant: `allowUnapprovedDrafts()`.
 - **Database access only through Drizzle**, and only from this app. Change
   `src/db/schema/*`, then `npm run db:generate` and commit the migration.

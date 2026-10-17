@@ -14,7 +14,8 @@
     "menu": "Menü",
     "bottomBar": "Alsó menü",
     "headerNav": "Felső menü",
-    "breadcrumbs": "Útvonal"
+    "breadcrumbs": "Útvonal",
+    "content": "Tartalom"
   },
   "home": {
     "title": "Mit szeretnél gyakorolni?",
@@ -322,7 +323,8 @@
     "action": {
       "submit_for_review": "Ellenőrzésre küldés",
       "approve": "Jóváhagyás",
-      "request_changes": "Javítás kérése"
+      "request_changes": "Javítás kérése",
+      "publish_directly": "Közzététel azonnal"
     }
   },
   "practice": {
@@ -439,5 +441,87 @@
     "wrong-reference-voltage": "Rossz feszültséghez viszonyítottál: egyfázisú körben 230 V-hoz, háromfázisúban a 400 V-os vonali feszültséghez.",
     "limit-percent-used-as-volts": "A megengedett feszültségesést voltban kell behelyettesíteni (ΔUₘₐₓ), nem százalékban.",
     "chose-below-minimum": "Ez kisebb a szükségesnél. A szabványos sorból a legalább akkorát válaszd, mint a szükséges legkisebb keresztmetszet."
+  },
+  "contentAdmin": {
+    "title": "Tartalomkezelés",
+    "tab": {
+      "lessons": "Leckék",
+      "calculators": "Kalkulátorok"
+    },
+    "saved": "Mentve.",
+    "cancel": "Mégse",
+    "open": "Megnyitás",
+    "edit": "Szerkesztés",
+    "save": "Mentés",
+    "saveDraft": "Mentés vázlatként",
+    "savePublish": "Mentés és közzététel",
+    "moveUp": "Feljebb",
+    "moveDown": "Lejjebb",
+    "deletedAccount": "törölt fiók",
+    "updatedAt": "Módosítva: {{date}}",
+    "invalidFields": "Hibás mezők: {{fields}}",
+    "field": {
+      "topic": "Témakör",
+      "slug": "Azonosító (URL)",
+      "slugHint": "Kisbetűk, számok és kötőjel, ékezet nélkül, pl. feszultsegeses-alapjai. Később nem módosítható.",
+      "title": "Cím",
+      "summary": "Rövid összefoglaló",
+      "body": "Tartalom (Markdown)",
+      "bodyHint": "A lecke blokkjai a tananyag-formátum szerint (## címsorok, :::képlet stb.). Ismeretlen blokkot a rendszer nem fogad el.",
+      "description": "Leírás",
+      "calculator": "Kalkulátor",
+      "calculatorHint": "Csak a programban már elkészült kalkulátorok vehetők fel; a képletek nem szerkeszthetők itt.",
+      "published": "Látható a tanulóknak",
+      "publishedHint": "Kikapcsolva csak oktatók és adminisztrátorok látják (előnézet)."
+    },
+    "lesson": {
+      "count_one": "{{count}} lecke",
+      "count_other": "{{count}} lecke",
+      "new": "Új lecke",
+      "edit": "Lecke szerkesztése",
+      "editing": "{{slug}} · jelenleg a(z) {{version}}. változat",
+      "editingNew": "{{slug}} · ezen a nyelven még nincs szövege",
+      "empty": "Még nincs lecke.",
+      "archived": "Archivált",
+      "archivedAt": "Archiválva: {{date}}",
+      "latest": "Legújabb: {{version}}. változat · {{date}}",
+      "noTranslation": "Ezen a nyelven még nincs szövege.",
+      "live": "Élő: {{version}}. változat · jóváhagyta: {{approver}} ({{role}}) · {{date}}",
+      "notLive": "Nincs jóváhagyott változat, a tanulók nem látják.",
+      "archive": "Törlés",
+      "archiveConfirm": "Igen, archiválom",
+      "restore": "Visszaállítás",
+      "savesDraft": "A mentés új vázlatot hoz létre; a tanulók a jóváhagyásig a korábbi jóváhagyott változatot látják.",
+      "publishesDirectly": "Adminisztrátorként a mentés azonnal élesedik, és a jóváhagyási naplóban a te nevedre kerül."
+    },
+    "calculator": {
+      "count_one": "{{count}} kalkulátor",
+      "count_other": "{{count}} kalkulátor",
+      "new": "Új kalkulátor",
+      "edit": "Kalkulátor szerkesztése",
+      "empty": "Nincs listázott kalkulátor.",
+      "allListed": "Minden elkészült kalkulátor szerepel a listában.",
+      "published": "Látható",
+      "hidden": "Rejtett",
+      "noText": "Ezen a nyelven nincs címe, ezért a tanulók nem látják.",
+      "remove": "Törlés",
+      "removeConfirm": "Igen, leveszem a listáról"
+    },
+    "calculatorIds": {
+      "voltage-drop": "Feszültségesés"
+    },
+    "fieldName": {
+      "slug": "Azonosító",
+      "topicId": "Témakör",
+      "title": "Cím",
+      "summary": "Rövid összefoglaló",
+      "body": "Tartalom",
+      "description": "Leírás",
+      "id": "Kalkulátor",
+      "published": "Láthatóság",
+      "slugs": "Sorrend",
+      "ids": "Sorrend",
+      "_": "Űrlap"
+    }
   }
 }

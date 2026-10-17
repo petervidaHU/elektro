@@ -91,3 +91,36 @@ describe("GET /admin/lessons/:slug/reviews", () => {
     }
   });
 });
+
+describe("content management of lessons", () => {
+  const teacherRoutes = [
+    { method: "GET", url: "/manage/lessons?locale=hu" },
+    { method: "PATCH", url: "/lessons/any", payload: { topicId: "ohms-law" } },
+    { method: "PUT", url: "/lessons/order", payload: { topicId: "ohms-law", slugs: ["a"] } },
+  ] as const;
+
+  it("lists, edits and orders lessons for teachers and admins only", async () => {
+    for (const route of teacherRoutes) {
+      for (const { headers, status } of [
+        { headers: {}, status: 401 },
+        { headers: as("s", "student"), status: 403 },
+      ]) {
+        const response = await app.inject({ ...route, headers });
+        expect(response.statusCode, `${route.method} ${route.url}`).toBe(status);
+      }
+    }
+  });
+
+  it("archives and restores lessons for admins only", async () => {
+    for (const url of ["/lessons/any/archive", "/lessons/any/restore"]) {
+      for (const { headers, status } of [
+        { headers: {}, status: 401 },
+        { headers: as("s", "student"), status: 403 },
+        { headers: as("t", "teacher"), status: 403 },
+      ]) {
+        const response = await app.inject({ method: "POST", url, headers });
+        expect(response.statusCode, url).toBe(status);
+      }
+    }
+  });
+});

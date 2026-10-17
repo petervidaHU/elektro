@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import {
   computeMastery,
   hasPractice,
@@ -44,7 +44,8 @@ export async function recomputeTopicProgress(userId: string, topicId: TopicId): 
     .from(lessonTranslations)
     .innerJoin(lessonVersions, eq(lessonTranslations.lessonVersionId, lessonVersions.id))
     .innerJoin(lessons, eq(lessonVersions.lessonId, lessons.id))
-    .where(eq(lessons.topicId, topicId));
+    // Archived lessons no longer count (plan Q23).
+    .where(and(eq(lessons.topicId, topicId), isNull(lessons.archivedAt)));
   const visible = new Set(
     translations
       .filter((row) => isVisibleToStudent(row.status, draftsVisible))

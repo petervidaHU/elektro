@@ -69,6 +69,9 @@ Key facts from the documents that shape this plan:
 | Q16 | Pre-filled candidate reference values | **Yes.** Claude pre-fills candidate values with citations, stored as `unverified`, and a teacher verifies them (§2.3) |
 | Q17 | Exam-style (multiple-choice) answer mode | **Not in v1** |
 | Q19 | Approval record | **Every approval is documented precisely** (2026-10-17, task S8): who (only `teacher` or higher; user id + a **snapshot** of name, email and role taken at approval time) and when (database timestamp). The snapshot is never updated, so it survives renaming, demotion or deletion of the account. Every review action (submit, approve, request changes) also goes to an append-only review log. **Admins may approve too** (they rank above teachers; confirmed 2026-10-17), and the record shows the role. Teacher+ can read the log; students and guests never see reviewer emails. Once a reviewer's account is deleted, their name and email are hidden from the app and only admins can retrieve them (Q11). Applies to lessons now, and to every later approvable entity: glossary (S5), topic intros (S6), task texts (§2.7), reference-table verification (§2.3) |
+| Q21 | Content management page | **Decided 2026-10-17 (task U14).** `/teacher/content` lists every lesson and calculator in detail (status, newest and live version, approver, dates), with new / edit / ordering (up/down buttons, touch-friendly). **Teachers and admins** use it; deleting is **admin-only**. Calculators are **code** (engine + page + tests; formulas never come from the database): a **calculator registry** in the database lists them, with topic, order, published flag and per-locale title/description. "New calculator" adds one that is already implemented in code; "delete" only takes it off the list. Calculator texts are not part of the approval workflow (short UI texts, edited directly by teacher+) |
+| Q22 | Admin edits | **An admin's lesson edit goes live directly** (decided 2026-10-17): it is approved in the same save with the `publish_directly` action and recorded in the approval record like any approval (Q19). A teacher's edit is a draft (`ai_draft`) and goes through review |
+| Q23 | Deleting a lesson | **Archive, restorable** (decided 2026-10-17): an archived lesson is hidden from everyone but admins (lists, reading, progress), its versions, reading history and approval log stay, and an admin can restore it (it goes to the end of its topic). The hard `DELETE /api/lessons/:slug` stays for housekeeping and e2e cleanup |
 | Q18 | Extra calculators from the theory TOC review | **Added to the §2.2 catalogue** (2026-10-16). Highest value: `connection-power`, `phase-balancing` (P1), `material-list`, `short-circuit-current` (P2) |
 
 ---
@@ -343,7 +346,16 @@ Every row needs:
 - an engine function + zod schema;
 - unit tests, including the textbook's worked examples once they are supplied;
 - a calculator page + i18n keys;
-- practice templates.
+- practice templates;
+- an entry in `CALCULATOR_IDS` (`packages/shared/src/calc/catalogue.ts`) and a name
+  in `contentAdmin.calculatorIds`, after which teachers can list it in the app.
+
+**Calculator registry (Q21, U14).** Which calculators students see, under which
+topic, in which order and with which title/description is data
+(`calculators` + `calculator_translations`), managed on `/teacher/content`. The
+calculator list, the topic hubs and the lesson pages read it from
+`GET /api/calculators`; a calculator page answers 404 while its calculator is not
+listed or not published (teachers and admins can preview it).
 
 ### 2.3 Reference data process (resolves Q3)
 
@@ -500,6 +512,10 @@ reference_tables      see 2.3 (+ reference_table_versions)
 content_reports       see 3.4 J9
 practice_task_texts   see 2.7
 lesson_translations   (exists) + approved_by_name, approved_by_email, approved_by_role   (S8)
+lessons               (exists) + archived_at, archived_by (FK, set null)                  (U14, Q23)
+calculators           id (= CALCULATOR_IDS), topic_id, position, published, updated_by,  (U14, Q21)
+                      created_at, updated_at
+calculator_translations calculator_id (FK, cascade), locale, title, description          (U14)
 content_review_events append-only: content_kind, content_slug, translation_id, version,  (S8)
                       locale, action, from_status, to_status, actor_id (FK, set null),
                       actor_name, actor_email, actor_role, note, created_at
@@ -583,7 +599,7 @@ transaction as each write, and an admin script can rebuild all of it.
 
 | Phone (bottom tab bar) | Desktop (header) |
 | --- | --- |
-| Kezdőlap · Tananyag · Számolás · Szimulátor · Profil | same + user menu; teacher/admin get an extra "Tanári" / "Admin" menu |
+| Kezdőlap · Tananyag · Számolás · Szimulátor · Profil (teacher/admin: "Tartalom" is linked from Profil) | same + user menu; teacher/admin get an extra "Tanári" / "Admin" menu (now: "Tartalom" → `/teacher/content`) |
 
 Guests see Kezdőlap · Tananyag · Számolás · Belépés.
 
@@ -613,7 +629,9 @@ All under `/:locale`. 🔓 = public, 👤 = student+, 🎓 = teacher+, 🛠 = ad
 | `/teacher/students/:userId` | Student detail: same views as `/progress` + `/history` for that student | 🎓 |
 | `/teacher/review` | Review queue (lessons, glossary, intros in `ai_draft` / `in_review`) | 🎓 |
 | `/teacher/review/:id` | Review screen: rendered preview (phone-width toggle), diff to the live version, approve / request changes with note | 🎓 |
-| `/teacher/content` | Content editor (lessons, glossary, topic intros) | 🎓 |
+| `/teacher/content` | **Content management** (U14, Q21): tabs for lessons (grouped by topic: status, newest and live version, approver, dates) and calculators (topic, published, texts); new / edit / up-down ordering; archive + restore lessons and remove calculators are 🛠 only. Later also glossary and topic intros | 🎓 |
+| `/teacher/content/lessons/new`, `/teacher/content/lessons/:slug` | Lesson form: topic, title, summary, Markdown body (slug only when new). Teacher save = draft, admin save = live (Q22) | 🎓 |
+| `/teacher/content/calculators/new`, `/teacher/content/calculators/:id` | Calculator registry form: calculator (from code, when new), topic, title, description, published | 🎓 |
 | `/teacher/reference-tables` | Reference tables: list with status, editor, verify action (§2.3) | 🎓 |
 | `/teacher/reports` | Problem reports (stub: read-only list) | 🎓 |
 | `/teacher/insights` | Aggregate: hardest steps, most common misconceptions per topic | 🎓 |
@@ -720,6 +738,7 @@ All under `/:locale`. 🔓 = public, 👤 = student+, 🎓 = teacher+, 🛠 = ad
 | U11 | Cross-cutting: skeletons, empty states, toasts, error boundaries, offline banner |
 | U12 | Problem report stub: button + bottom sheet, `content_reports` table, POST endpoint, read-only teacher list |
 | U13 | Teacher reference-table list/editor/verify (UI for K8) |
+| U14 | **Content management** (Q21–Q23): `/teacher/content` with lessons + calculators, new / edit / order, archive/restore (admin), calculator registry; header item "Tartalom" (desktop) and a link on the profile page (phone). Done |
 
 ---
 
@@ -734,7 +753,7 @@ adds Playwright for the acceptance tests.
 | --- | --- | --- |
 | **M1a** Foundations for learning | S1, S2, K1, K2, U1, U2 | New nav works on phone; topics have modules, metadata and the PTT/KKK refs; open registration works |
 | **M1b** Voltage drop end to end | S3, S4, U3, U4, K3, K4, K5/U6, K6, `lesson_reads`, U8 (basic) | A student reads the voltage-drop lesson → uses the calculator (with ρ warning) → completes a session (with tolerance shown) → sees the summary and progress; a teacher approves the lesson. Deployed. |
-| **M2** Loop closed | S8, U5, U7, U9, U10, U11, U12, K12 | Dashboard, history (with privacy notice), teacher monitoring, review and problem-report stub usable on phone |
+| **M2** Loop closed | S8, U14, U5, U7, U9, U10, U11, U12, K12 | Dashboard, history (with privacy notice), teacher monitoring, review and problem-report stub usable on phone |
 | **M3** Exam-relevant breadth | K7, K13, K8 + U13, K8a, K9, S5 glossary, S6 intros, K11; lessons for modules A, B (phase 1), E | All P1 physics calculators with practice; reference-table workflow live; `cable-selection` live once tables are verified; ~15 approved lessons |
 | **M4** Further calculators & content | K10, insights (U9), lessons for modules C, D, G (phase 1) | P2 calculators live; verification topics have lessons ready for the simulator |
 | **M5+** | Simulator (phase 4), AI drafting (phase 5: task texts move to DB), pilot (phase 6), content phase 2–3 topics | per roadmap |

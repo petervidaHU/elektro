@@ -1,5 +1,6 @@
 import { relations, sql } from "drizzle-orm";
 import {
+  boolean,
   check,
   index,
   integer,
@@ -10,6 +11,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import {
+  CALCULATOR_IDS,
   CONTENT_ACTIONS,
   CONTENT_STATUSES,
   INITIAL_CONTENT_STATUS,
@@ -33,6 +35,12 @@ export const lessons = pgTable(
     slug: text("slug").notNull().unique(),
     /** Order of the lesson within its topic (ascending); topics follow the syllabus. */
     position: integer("position").notNull().default(0),
+    /**
+     * "Delete" archives a lesson (plan Q23): hidden from everyone but admins,
+     * restorable, reading progress and the approval log stay.
+     */
+    archivedAt: timestamp("archived_at", { withTimezone: true }),
+    archivedBy: text("archived_by").references(() => user.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -160,3 +168,41 @@ export const lessonTranslationsRelations = relations(lessonTranslations, ({ one 
     references: [user.id],
   }),
 }));
+
+/**
+ * The calculator registry (plan §2.2, Q21). The calculators themselves (engine,
+ * page) are code - `CALCULATOR_IDS` in `@elektro/shared`. A row here lists one
+ * of them: topic, order, whether students see it, and per-locale texts.
+ * Removing a row only takes the calculator off the list.
+ */
+export const calculators = pgTable(
+  "calculators",
+  {
+    id: text("id", { enum: CALCULATOR_IDS }).primaryKey(),
+    topicId: text("topic_id", { enum: TOPIC_IDS }).notNull(),
+    position: integer("position").notNull().default(0),
+    published: boolean("published").notNull().default(false),
+    updatedBy: text("updated_by").references(() => user.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("calculators_position_idx").on(table.position)],
+);
+
+/** Title and description of a calculator in one locale. */
+export const calculatorTranslations = pgTable(
+  "calculator_translations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    calculatorId: text("calculator_id", { enum: CALCULATOR_IDS })
+      .notNull()
+      .references(() => calculators.id, { onDelete: "cascade" }),
+    locale: text("locale", { enum: LOCALES }).notNull(),
+    title: text("title").notNull(),
+    description: text("description").notNull().default(""),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique("calculator_translations_calculator_locale_uq").on(table.calculatorId, table.locale),
+  ],
+);
