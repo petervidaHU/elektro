@@ -74,3 +74,20 @@ describe("GET /lessons/:slug/reviews", () => {
     }
   });
 });
+
+describe("GET /admin/lessons/:slug/reviews", () => {
+  it("is admin-only: it reveals deleted reviewers' names and emails", async () => {
+    for (const { headers, status } of [
+      { headers: {}, status: 401 },
+      { headers: as("s", "student"), status: 403 },
+      { headers: as("t", "teacher"), status: 403 },
+    ]) {
+      const response = await app.inject({
+        method: "GET",
+        url: "/admin/lessons/any/reviews",
+        headers,
+      });
+      expect(response.statusCode).toBe(status);
+    }
+  });
+});

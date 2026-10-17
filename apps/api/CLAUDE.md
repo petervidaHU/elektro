@@ -61,7 +61,9 @@ content/lessons/           lesson drafts as files (docs/THEORY_TOC.md); content:
   snapshot (with `approved_at = now()`), and `reviewEventFields` adds a row to
   `content_review_events`. Never update the snapshot, and never update or delete
   log rows (a trigger rejects it). User FKs on audit data are `ON DELETE SET
-  NULL`, never `CASCADE`. New approvable entities reuse all of this.
+  NULL`, never `CASCADE`. Routes the UI uses return deleted reviewers through
+  `redactDeletedReviewer` (no name/email); only admin routes return the full
+  snapshot. New approvable entities reuse all of this.
 - **Student visibility is a setting**, not a constant: `allowUnapprovedDrafts()`.
 - **Database access only through Drizzle**, and only from this app. Change
   `src/db/schema/*`, then `npm run db:generate` and commit the migration.

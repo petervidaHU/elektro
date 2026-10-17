@@ -11,6 +11,7 @@ import {
   INITIAL_CONTENT_STATUS,
   isVisibleToStudent,
   localeSchema,
+  redactDeletedReviewer,
   reviewEventFields,
   snapshotReviewer,
   topicIdSchema,
@@ -452,17 +453,9 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
     });
   });
 
-  /**
-   * The approval record of a lesson: every review action, newest first, with
-   * the reviewer snapshot. Teacher+ only, because it holds names and emails.
-   * The log also covers deleted reviewer accounts (`actorId` is then null).
-   */
-  app.get("/lessons/:slug/reviews", async (request, reply) => {
-    app.requireRole(request, "teacher");
-    const { slug } = parseBody(slugParamsSchema, request.params);
-    const query = parseQuery(reviewsQuerySchema, request.query);
-
-    const reviews = await db()
+  /** Every review action on a lesson, newest first, with the full reviewer snapshot. */
+  async function lessonReviews(slug: string, locale: Locale | undefined) {
+    return db()
       .select({
         id: contentReviewEvents.id,
         version: contentReviewEvents.version,
@@ -482,12 +475,42 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
         and(
           eq(contentReviewEvents.contentKind, "lesson"),
           eq(contentReviewEvents.contentSlug, slug),
-          query.locale ? eq(contentReviewEvents.locale, query.locale) : undefined,
+          locale ? eq(contentReviewEvents.locale, locale) : undefined,
         ),
       )
       .orderBy(desc(contentReviewEvents.createdAt));
+  }
+
+  /**
+   * The approval record of a lesson, as the app shows it (teacher+). A
+   * reviewer whose account was deleted appears as `actorDeleted` without name
+   * and email; those are only returned by the admin route below (plan Q11).
+   */
+  app.get("/lessons/:slug/reviews", async (request, reply) => {
+    app.requireRole(request, "teacher");
+    const { slug } = parseBody(slugParamsSchema, request.params);
+    const query = parseQuery(reviewsQuerySchema, request.query);
+
+    const reviews = await lessonReviews(slug, query.locale);
 
     reply.header("cache-control", "no-store");
-    return { reviews };
+    return { reviews: reviews.map(redactDeletedReviewer) };
+  });
+
+  /**
+   * The full approval record, including the name and email of deleted
+   * reviewers. Admin-only and not used by the UI: it exists for audits.
+   */
+  app.get("/admin/lessons/:slug/reviews", async (request, reply) => {
+    app.requireRole(request, "admin");
+    const { slug } = parseBody(slugParamsSchema, request.params);
+    const query = parseQuery(reviewsQuerySchema, request.query);
+
+    const reviews = await lessonReviews(slug, query.locale);
+
+    reply.header("cache-control", "no-store");
+    return {
+      reviews: reviews.map((review) => ({ ...review, actorDeleted: review.actorId === null })),
+    };
   });
 };

@@ -102,3 +102,24 @@ export function reviewEventFields(input: {
     note: input.note ?? null,
   };
 }
+
+/**
+ * What the app shows of a review record. Once the reviewer's account is
+ * deleted (`actorId` is null), their name and email stay in the database but
+ * are hidden: only the admin route returns them (plan Q11, Q19). The role is
+ * kept, so the record still shows that a teacher (or admin) reviewed it.
+ */
+export function redactDeletedReviewer<
+  T extends { actorId: string | null; actorName: string; actorEmail: string },
+>(
+  event: T,
+): Omit<T, "actorName" | "actorEmail"> & {
+  actorName: string | null;
+  actorEmail: string | null;
+  actorDeleted: boolean;
+} {
+  if (event.actorId !== null) {
+    return { ...event, actorDeleted: false };
+  }
+  return { ...event, actorName: null, actorEmail: null, actorDeleted: true };
+}

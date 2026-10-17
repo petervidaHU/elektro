@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { applyContentAction } from "./status.js";
 import {
   approvalFields,
+  redactDeletedReviewer,
   reviewEventFields,
   snapshotReviewer,
   type Reviewer,
@@ -125,5 +126,30 @@ describe("reviewEventFields", () => {
     });
     expect(event.note).toBeNull();
     expect(event.toStatus).toBe("approved");
+  });
+});
+
+describe("redactDeletedReviewer", () => {
+  const event = {
+    id: "e1",
+    actorId: "u-teacher" as string | null,
+    actorName: "Kovács Anna",
+    actorEmail: "anna.kovacs@example.com",
+    actorRole: "teacher" as const,
+  };
+
+  it("leaves a reviewer whose account still exists untouched", () => {
+    expect(redactDeletedReviewer(event)).toEqual({ ...event, actorDeleted: false });
+  });
+
+  it("hides the name and email of a deleted reviewer, keeping the role", () => {
+    expect(redactDeletedReviewer({ ...event, actorId: null })).toEqual({
+      id: "e1",
+      actorId: null,
+      actorName: null,
+      actorEmail: null,
+      actorRole: "teacher",
+      actorDeleted: true,
+    });
   });
 });

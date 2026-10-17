@@ -62,13 +62,13 @@ Key facts from the documents that shape this plan:
 | Q8 | Problem reports | **Stub in v1**: button + stored report + read-only teacher list (§3.4 J9) |
 | Q9 | Machines/control topics | Topic IDs added, content later |
 | Q10 | Simulator card for guests | Shown locked with "Jelentkezz be" |
-| Q11 | Privacy | Short notice on registration and on the History page; data kept until the account is deleted. **Exception:** the name, email and role of a reviewer stay in the approval record after their account is deleted (Q19), because approvals of safety-critical content must stay traceable |
+| Q11 | Privacy | Short notice on registration and on the History page; data kept until the account is deleted. **Exception (decided 2026-10-17):** the name, email and role of a reviewer stay in the approval record after their account is deleted (Q19), because approvals of safety-critical content must stay traceable. They are **hidden**: never shown in the UI, and only admins can retrieve them (admin-only API). The GDPR basis and retention are still open (Q20) |
 | Q12 | Curriculum documents | Supplied; mapping done in §1.2 |
 | Q13 | Newer PTT? | No. **The 2020 PTT is the latest**; use it |
 | Q15 | Who verifies reference tables | **Teachers** (any user with role `teacher` or higher) |
 | Q16 | Pre-filled candidate reference values | **Yes.** Claude pre-fills candidate values with citations, stored as `unverified`, and a teacher verifies them (§2.3) |
 | Q17 | Exam-style (multiple-choice) answer mode | **Not in v1** |
-| Q19 | Approval record | **Every approval is documented precisely** (2026-10-17, task S8): who (only `teacher` or higher; user id + a **snapshot** of name, email and role taken at approval time) and when (database timestamp). The snapshot is never updated, so it survives renaming, demotion or deletion of the account. Every review action (submit, approve, request changes) also goes to an append-only review log. Teacher+ can read the log; students and guests never see reviewer emails. Applies to lessons now, and to every later approvable entity: glossary (S5), topic intros (S6), task texts (§2.7), reference-table verification (§2.3) |
+| Q19 | Approval record | **Every approval is documented precisely** (2026-10-17, task S8): who (only `teacher` or higher; user id + a **snapshot** of name, email and role taken at approval time) and when (database timestamp). The snapshot is never updated, so it survives renaming, demotion or deletion of the account. Every review action (submit, approve, request changes) also goes to an append-only review log. **Admins may approve too** (they rank above teachers; confirmed 2026-10-17), and the record shows the role. Teacher+ can read the log; students and guests never see reviewer emails. Once a reviewer's account is deleted, their name and email are hidden from the app and only admins can retrieve them (Q11). Applies to lessons now, and to every later approvable entity: glossary (S5), topic intros (S6), task texts (§2.7), reference-table verification (§2.3) |
 | Q18 | Extra calculators from the theory TOC review | **Added to the §2.2 catalogue** (2026-10-16). Highest value: `connection-power`, `phase-balancing` (P1), `material-list`, `short-circuit-current` (P2) |
 
 ---
@@ -258,7 +258,7 @@ Additional content entities, each with the same versioning and approval as lesso
 | S5 | Glossary entity with approval workflow (reuse the lesson state machine) | api, web |
 | S6 | Topic intro texts (content entity, approval) | api, web |
 | S7 | Unit test that every `ptt` / `kkk` ref has the right format, and a generated mapping table (`npm run syllabus:report` → Markdown) for teacher review | shared |
-| S8 | **Approval audit trail** (Q19): approver snapshot on the translation (`approved_by_name/_email/_role` + `approved_at`, DB check that an `approved` row has all of them), append-only `content_review_events` log, `GET /lessons/:slug/reviews` (teacher+). Done for lessons; every later approvable entity reuses it (see §2.6) | shared, api |
+| S8 | **Approval audit trail** (Q19): approver snapshot on the translation (`approved_by_name/_email/_role` + `approved_at`, DB check that an `approved` row has all of them), append-only `content_review_events` log, `GET /lessons/:slug/reviews` (teacher+; deleted reviewers redacted) and `GET /admin/lessons/:slug/reviews` (admin-only, full record). Done for lessons; every later approvable entity reuses it (see §2.6) | shared, api |
 
 ---
 
@@ -514,7 +514,11 @@ transaction as the status change, and never updated; a check constraint rejects 
 change is the FK clearing `actor_id` when an account is deleted. The log has no FK
 to the content row, so it outlives a deleted lesson too. Only `teacher` or higher
 can review (`snapshotReviewer` in `packages/shared`; admins rank above teachers and
-may approve, and their role is recorded). New approvable entities (glossary,
+may approve, and their role is recorded). **Deleted reviewers:** the snapshot stays,
+but `GET /lessons/:slug/reviews` (teacher+, used by the UI) returns them as
+`actorDeleted: true` without name and email (`redactDeletedReviewer`). Only the
+admin-only `GET /admin/lessons/:slug/reviews` returns the full record; no UI uses it.
+New approvable entities (glossary,
 topic intros, task texts, reference tables) get the same snapshot columns and write
 to the same log with their own `content_kind`.
 
@@ -666,7 +670,7 @@ All under `/:locale`. 🔓 = public, 👤 = student+, 🎓 = teacher+, 🛠 = ad
 
 **J8 – Teacher content review & reference data**
 1. Review queue with a count badge in the nav.
-2. Review screen: rendered as the student sees it (phone-width toggle) + diff against the live approved version → approve / request changes (note required). It shows the **approval record**: who approved the live version (name, email, role) and when, plus the review history from `GET /lessons/:slug/reviews` (a reviewer whose account was deleted is shown from the snapshot, marked as deleted).
+2. Review screen: rendered as the student sees it (phone-width toggle) + diff against the live approved version → approve / request changes (note required). It shows the **approval record**: who approved the live version (name, email, role) and when, plus the review history from `GET /lessons/:slug/reviews` (a reviewer whose account was deleted is shown only as "törölt fiók" with their role; never with name or email).
 3. Reference tables: open an `unverified` table → compare with the cited source → "Ellenőriztem" (records who and when) → dependent calculators and tasks go live.
 
 **J9 – Content problem report (stub in v1)**
@@ -749,9 +753,10 @@ Every PR runs `npm run lint && npm run typecheck && npm test`. Tests are require
 
 | # | Question | Default until answered |
 | - | --- | --- |
-Neither question blocks work: each has a default that is built until it is answered.
+None of these questions blocks work: each has a default that is built until it is answered.
 
 | # | Question | Default until answered |
 | - | --- | --- |
 | Q2 | **Resistivity convention**: operating-temperature (current) or 20 °C values? | Operating temperature + UI warning; ρ printed in every task |
+| Q20 | **GDPR basis for the approval record**: legal basis, retention period and wording in the privacy notice for keeping deleted reviewers' name and email (Q11 exception). The owner will elaborate. | Keep the snapshot; hide it from the UI; admin-only retrieval; no automatic erasure |
 | Q14 | **Textbook**: which textbook does the course use? It decides material constants, worked examples for tests, and which reference tables to verify first. Still unknown. | Teachers verify the tables against the standards directly; engine tests use the standard-based values |
