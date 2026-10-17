@@ -121,6 +121,14 @@ export default async function globalSetup(config: FullConfig) {
 
   return async () => {
     await admin.delete(`/api/lessons/${slug}`);
+    // Reference tables the K8 test created.
+    const listed = await admin.get("/api/reference-tables");
+    if (listed.ok()) {
+      const { tables } = (await listed.json()) as { tables: { key: string }[] };
+      for (const table of tables.filter((item) => item.key.startsWith("e2e-table-"))) {
+        await admin.delete(`/api/reference-tables/${table.key}`);
+      }
+    }
     await admin.dispose();
   };
 }

@@ -702,7 +702,13 @@
       "published": "Láthatóság",
       "slugs": "Sorrend",
       "ids": "Sorrend",
-      "_": "Űrlap"
+      "_": "Űrlap",
+      "key": "Azonosító",
+      "source": "Forrás",
+      "content": "Táblázat",
+      "columns": "Oszlopok",
+      "rows": "Sorok",
+      "compared": "Összevetés"
     },
     "view": {
       "label": "Nézet",
@@ -800,7 +806,8 @@
       "students": "Diákok",
       "review": "Ellenőrzés",
       "reports": "Hibajelentések",
-      "insights": "Áttekintés"
+      "insights": "Áttekintés",
+      "referenceTables": "Táblázatok"
     },
     "students": {
       "title": "Diákok",
@@ -859,6 +866,60 @@
       "hardestSteps": "Legnehezebb lépések",
       "stepStats": "{{errors}} / {{attempts}} feladatban hibás próba",
       "misconceptions": "Leggyakoribb tévképzetek"
+    }
+  },
+  "referenceTables": {
+    "title": "Hivatkozási táblázatok",
+    "intro": "Szabványokból és tankönyvekből átvett értékek. Csak az ellenőrzött táblázat jut el a diákokhoz.",
+    "new": "Új táblázat",
+    "empty": "Még nincs táblázat.",
+    "source": "Forrás: {{source}}",
+    "status": {
+      "unverified": "Nem ellenőrzött",
+      "verified": "Ellenőrzött",
+      "superseded": "Lecserélt"
+    },
+    "liveStill": "Az élő, ellenőrzött változat a(z) {{version}}. marad, amíg az újat nem ellenőrzik.",
+    "unverifiedBanner": "Nem ellenőrzött adat: a diákok ezt nem látják. Vesd össze a megadott forrással, mielőtt ellenőrzöd.",
+    "verifiedRecord": "Ellenőrizte:",
+    "done": {
+      "saved": "Elmentve.",
+      "verified": "Ellenőrizve, a táblázat élesben van."
+    },
+    "verify": {
+      "title": "Ellenőrzés",
+      "hint": "Vesd össze minden értéket a megadott forrással. Az ellenőrzés rögzíti a nevedet és az időpontot.",
+      "compared": "Összevetettem az értékeket a megadott forrással.",
+      "note": "Megjegyzés (nem kötelező)",
+      "button": "Ellenőriztem"
+    },
+    "edit": {
+      "title": "Szerkesztés",
+      "save": "Mentés",
+      "newVersionHint": "Az ellenőrzött táblázat szerkesztése új, nem ellenőrzött változatot hoz létre; az ellenőrzött változat addig él, amíg az újat nem ellenőrzik.",
+      "inPlaceHint": "Ez a változat még nincs ellenőrizve, ezért helyben módosul."
+    },
+    "history": "Előzmények",
+    "action": {
+      "create": "Létrehozva",
+      "verify": "Ellenőrizve",
+      "supersede": "Lecserélve"
+    },
+    "editor": {
+      "key": "Azonosító",
+      "keyHint": "Kisbetűk, számok és kötőjel, például iz-pvc-copper-method-a1.",
+      "titleLabel": "Cím",
+      "source": "Forrás",
+      "sourceHint": "A szabvány vagy tankönyv, kiadás, táblázat vagy oldal. Kötelező.",
+      "create": "Létrehozás",
+      "columnLabel": "{{n}}. oszlop neve",
+      "unit": "Mértékegység",
+      "removeColumn": "{{n}}. oszlop törlése",
+      "addColumn": "Oszlop hozzáadása",
+      "rows": "Sorok",
+      "cell": "{{row}}. sor, {{column}}",
+      "removeRow": "{{n}}. sor törlése",
+      "addRow": "Sor hozzáadása"
     }
   }
 }

@@ -11,9 +11,13 @@ import {
   unique,
   uuid,
 } from "drizzle-orm/pg-core";
+import type {
+  CONTENT_ACTIONS} from "@elektro/shared";
 import {
   CALCULATOR_IDS,
-  CONTENT_ACTIONS,
+  TABLE_STATUSES,
+  type ReferenceTableContent,
+  type TableAction,
   CONTENT_STATUSES,
   INITIAL_CONTENT_STATUS,
   LOCALES,
@@ -120,17 +124,22 @@ export const contentReviewEvents = pgTable(
   "content_review_events",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    /** `lesson` for now; glossary, topic intros and task texts reuse this log. */
-    contentKind: text("content_kind", { enum: ["lesson"] }).notNull(),
+    /** `lesson` and `reference_table`; glossary, topic intros and task texts reuse this log. */
+    contentKind: text("content_kind", { enum: ["lesson", "reference_table"] }).notNull(),
     /** Lesson slug at the time of the action. */
     contentSlug: text("content_slug").notNull(),
     /** The reviewed translation row (no FK: it may be deleted later). */
     translationId: uuid("translation_id").notNull(),
     version: integer("version").notNull(),
     locale: text("locale", { enum: LOCALES }).notNull(),
-    action: text("action", { enum: CONTENT_ACTIONS }).notNull(),
-    fromStatus: text("from_status", { enum: CONTENT_STATUSES }).notNull(),
-    toStatus: text("to_status", { enum: CONTENT_STATUSES }).notNull(),
+    /** Lesson review actions, or the table actions `verify` / `supersede` / `create`. */
+    action: text("action").$type<(typeof CONTENT_ACTIONS)[number] | TableAction | "create">().notNull(),
+    fromStatus: text("from_status")
+      .$type<(typeof CONTENT_STATUSES)[number] | (typeof TABLE_STATUSES)[number]>()
+      .notNull(),
+    toStatus: text("to_status")
+      .$type<(typeof CONTENT_STATUSES)[number] | (typeof TABLE_STATUSES)[number]>()
+      .notNull(),
     actorId: text("actor_id").references(() => user.id, { onDelete: "set null" }),
     actorName: text("actor_name").notNull(),
     actorEmail: text("actor_email").notNull(),
@@ -257,6 +266,55 @@ export const practiceTaskTexts = pgTable(
     check(
       "practice_task_texts_approval_recorded",
       sql`${table.status} <> 'approved' OR (${table.approvedAt} IS NOT NULL AND ${table.approvedByName} IS NOT NULL AND ${table.approvedByEmail} IS NOT NULL AND ${table.approvedByRole} IS NOT NULL)`,
+    ),
+  ],
+);
+
+/**
+ * Reference tables (plan §2.3, K8): standards and textbook values as data with
+ * a source and a verification status. A table is the language-neutral row
+ * (`key`); each edit of a verified table is a new version. Only `verified`
+ * versions reach students. Verification is documented like an approval (Q19):
+ * a snapshot of the verifier plus a row in `content_review_events`.
+ */
+export const referenceTables = pgTable("reference_tables", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  key: text("key").notNull().unique(),
+  createdBy: text("created_by").references(() => user.id, { onDelete: "set null" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const referenceTableVersions = pgTable(
+  "reference_table_versions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tableId: uuid("table_id")
+      .notNull()
+      .references(() => referenceTables.id, { onDelete: "cascade" }),
+    version: integer("version").notNull(),
+    title: text("title").notNull(),
+    /** Standard or textbook, edition, table or page: shown under every excerpt. */
+    source: text("source").notNull(),
+    columns: jsonb("columns").$type<ReferenceTableContent["columns"]>().notNull(),
+    rows: jsonb("rows").$type<ReferenceTableContent["rows"]>().notNull(),
+    status: text("status", { enum: TABLE_STATUSES }).notNull().default("unverified"),
+    createdBy: text("created_by").references(() => user.id, { onDelete: "set null" }),
+    /** The verifier: `verified_by` while the account exists, the snapshot forever. */
+    verifiedBy: text("verified_by").references(() => user.id, { onDelete: "set null" }),
+    verifiedByName: text("verified_by_name"),
+    verifiedByEmail: text("verified_by_email"),
+    verifiedByRole: text("verified_by_role", { enum: ROLES }),
+    verifiedAt: timestamp("verified_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique("reference_table_versions_table_version_uq").on(table.tableId, table.version),
+    index("reference_table_versions_status_idx").on(table.status),
+    // Verified and superseded versions keep their full verifier record.
+    check(
+      "reference_table_versions_verification_recorded",
+      sql`${table.status} = 'unverified' OR (${table.verifiedAt} IS NOT NULL AND ${table.verifiedByName} IS NOT NULL AND ${table.verifiedByEmail} IS NOT NULL AND ${table.verifiedByRole} IS NOT NULL)`,
     ),
   ],
 );

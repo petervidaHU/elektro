@@ -14,6 +14,7 @@ import { contentRoutes } from "./routes/content.js";
 import { healthRoutes } from "./routes/health.js";
 import { learningRoutes } from "./routes/learning.js";
 import { monitoringRoutes } from "./routes/monitoring.js";
+import { referenceTableRoutes } from "./routes/reference-tables.js";
 import { reportRoutes } from "./routes/reports.js";
 import { reviewRoutes } from "./routes/review.js";
 import { meRoutes } from "./routes/me.js";
@@ -100,6 +101,7 @@ export async function buildApp(): Promise<FastifyInstance> {
       await api.register(monitoringRoutes);
       await api.register(reportRoutes);
       await api.register(reviewRoutes);
+      await api.register(referenceTableRoutes);
     },
     { prefix: "/api" },
   );

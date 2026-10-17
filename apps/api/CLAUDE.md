@@ -36,7 +36,8 @@ src/lib/react-router.ts    mounts the SSR handler as the not-found handler
 src/lib/settings.ts        admin settings with their defaults
 src/plugins/auth.ts        session resolution + requireUser / requireRole
 src/routes/                health, topics, calc, calculators (registry), content, admin, auth,
-                           learning (dashboard, history), monitoring (teacher), reports, review (queue)
+                           learning (dashboard, history), monitoring (teacher), reports, review (queue),
+                           reference-tables (versioned, verified before students see them)
 src/scripts/               migrate.ts, seed.ts
 drizzle/                   generated migrations (never edited by hand; data backfills
                            and triggers go in `drizzle-kit generate --custom` files)

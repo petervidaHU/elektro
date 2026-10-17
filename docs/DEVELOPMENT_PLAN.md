@@ -73,6 +73,7 @@ Key facts from the documents that shape this plan:
 | Q22 | Admin edits | **An admin's lesson edit goes live directly** (decided 2026-10-17): it is approved in the same save with the `publish_directly` action and recorded in the approval record like any approval (Q19). A teacher's edit is a draft (`ai_draft`) and goes through review |
 | Q23 | Deleting a lesson | **Archive, restorable** (decided 2026-10-17): an archived lesson is hidden from everyone but admins (lists, reading, progress), its versions, reading history and approval log stay, and an admin can restore it (it goes to the end of its topic). The hard `DELETE /api/lessons/:slug` stays for housekeeping and e2e cleanup |
 | Q24 | Teacher navigation | **Teachers and admins get a "Tanári" tab in place of "Szimulátor"** on the phone bar (decided with M2, to keep five tabs); the simulator stays reachable from the home page. The tab leads to students / review queue / problem reports / insights and carries the number of lessons waiting for review as a badge |
+| Q26 | K8a pre-filled tables | **Postponed by the user (M3):** the reference tables start empty. Teachers enter values with their source, or the pre-fill is resolved later; until a table exists and is verified, `cable-selection` (K9) stays blocked |
 | Q25 | K12 task-text rows | **The mirrored i18n texts are stored `approved` with a fixed marker** (M2, K12): approver snapshot name "Repository review (pull request)", e-mail `repository-review@elektro.invalid`, role `admin`, no `approved_by` account. They were reviewed in the pull request, and the next real review replaces the marker. The scenario is a map `scenarios` (key → text), because a template can have several scenario variants (e.g. single- and three-phase) |
 | Q18 | Extra calculators from the theory TOC review | **Added to the §2.2 catalogue** (2026-10-16). Highest value: `connection-power`, `phase-balancing` (P1), `material-list`, `short-circuit-current` (P2) |
 
@@ -571,7 +572,7 @@ transaction as each write, and an admin script can rebuild all of it.
 | K5 | Practice UI: task screen, step feedback, tolerance display, hints, solution reveal, session summary |
 | K6 | Voltage-drop templates (difficulty 1–3) + misconception detectors + ρ warning, which completes **milestone 1** |
 | K7 | P1 physics calculators + templates: ohms-law, equivalent-resistance, power-dc, load-demand, power-ac-single, power-three-phase. Done: engine in `calc/physics.ts`, one page route `calculators/:calculatorId`, 14 practice templates in `practice/templates/physics.ts` (`load-demand` has no demand or diversity factors, plain sum), registry rows seeded by migration `0009` |
-| K8 | Reference-tables entity: schema, versioning, verify workflow, teacher table editor, table-excerpt component |
+| K8 | Reference-tables entity: schema, versioning, verify workflow, teacher table editor, table-excerpt component. Done: `reference_tables` + `reference_table_versions` (migration `0011`), `/api/reference-tables`, verifier snapshot + `content_review_events` entries (kind `reference_table`, actions `create`/`verify`/`supersede`), `TableExcerpt`. Calculators and templates that depend on a table are not gated yet (`requiresTables` arrives with K9, the first user) |
 | K8a | Pre-fill candidate reference tables as `unverified`, with citations: current-carrying capacity, correction factors, permitted voltage drop, material constants |
 | K9 | `conductor-resistance` + `cable-selection` (exam III), once the tables are verified |
 | K10 | P2 calculators (physics first, then table-dependent ones once verified) |
@@ -739,7 +740,7 @@ All under `/:locale`. 🔓 = public, 👤 = student+, 🎓 = teacher+, 🛠 = ad
 | U10 | Teacher: review screen with preview + diff; content editor; approval record + review history (S8). Done: `/teacher/review[/:slug]` with queue badge, phone-width preview, line diff against the live version, approval record and review history; the editor is U14 |
 | U11 | Cross-cutting: skeletons, empty states, toasts, error boundaries, offline banner. Done: slow-navigation skeleton, `useToast`, an error boundary inside the app frame, offline banner (practice answer re-submit on a dropped connection is not built yet) |
 | U12 | Problem report stub: button + bottom sheet, `content_reports` table, POST endpoint, read-only teacher list. Done: on lessons, the voltage-drop calculator and practice tasks; `/teacher/reports` |
-| U13 | Teacher reference-table list/editor/verify (UI for K8) |
+| U13 | Teacher reference-table list/editor/verify (UI for K8). Done: `/teacher/reference-tables[/new|/:key]` with a grid editor, a mandatory source, and a verify step that needs a confirmed comparison |
 | U14 | **Content management** (Q21–Q23): detailed list view on `/syllabus` (Mantine `Table` per module) with lessons + calculators, new / edit / order, archive/restore (admin), calculator registry; forms under `/teacher/content/...` return to the syllabus. Done |
 
 ---

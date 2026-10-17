@@ -14,6 +14,8 @@ import {
   MASTERY_LEVELS,
   MISCONCEPTION_IDS,
   REPORT_CATEGORIES,
+  TABLE_ACTIONS,
+  TABLE_STATUSES,
   REPORT_TARGET_KINDS,
   TEMPLATES,
   buildTask,
@@ -112,6 +114,15 @@ describe("hu translations", () => {
     }
     for (const action of CONTENT_ACTIONS) {
       expect(hu.teacher.review.done, `missing teacher.review.done.${action}`).toHaveProperty(action);
+    }
+  });
+
+  it("covers every reference table status and action", () => {
+    for (const status of TABLE_STATUSES) {
+      expect(hu.referenceTables.status, `missing referenceTables.status.${status}`).toHaveProperty(status);
+    }
+    for (const action of [...TABLE_ACTIONS, "create"]) {
+      expect(hu.referenceTables.action, `missing referenceTables.action.${action}`).toHaveProperty(action);
     }
   });
 

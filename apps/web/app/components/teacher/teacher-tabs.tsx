@@ -7,6 +7,7 @@ import { useLayoutData } from "../../lib/use-layout-data";
 const TABS = [
   { path: "teacher/students", key: "students" },
   { path: "teacher/review", key: "review" },
+  { path: "teacher/reference-tables", key: "referenceTables" },
   { path: "teacher/reports", key: "reports" },
   { path: "teacher/insights", key: "insights" },
 ] as const;
