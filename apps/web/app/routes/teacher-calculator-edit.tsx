@@ -4,10 +4,9 @@ import { redirect, useActionData, useLoaderData } from "react-router";
 import { DEFAULT_LOCALE, isCalculatorId, isLocale } from "@elektro/shared";
 import type { BreadcrumbHandle } from "../components/app-shell/breadcrumbs";
 import { CalculatorForm, type CalculatorFormValues } from "../components/content/calculator-form";
-import { localePath } from "../i18n/locale";
 import { apiFetch } from "../lib/api";
 import { actionFailure, type ManagedCalculators } from "../lib/content-admin";
-import { jsonBody, parseCalculatorInput } from "../lib/content-admin-actions";
+import { jsonBody, syllabusAfterSave, parseCalculatorInput } from "../lib/content-admin-actions";
 import { requireStaff } from "../lib/session";
 import type { Route } from "./+types/teacher-calculator-edit";
 
@@ -47,14 +46,14 @@ export async function action({ request, params }: Route.ActionArgs) {
   } catch (error) {
     return actionFailure(error);
   }
-  return redirect(localePath(locale, "teacher/content?tab=calculators&notice=saved"));
+  return redirect(syllabusAfterSave(locale, input.value.topicId));
 }
 
 export const handle: BreadcrumbHandle = {
   breadcrumbs: (data) => {
     const values = (data as { values?: CalculatorFormValues } | undefined)?.values;
     return [
-      { labelKey: "contentAdmin.title", path: "teacher/content?tab=calculators" },
+      { labelKey: "nav.lessons", path: "syllabus" },
       values?.title ? { label: values.title } : { labelKey: "contentAdmin.edit" },
     ];
   },

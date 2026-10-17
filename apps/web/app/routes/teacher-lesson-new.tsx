@@ -11,10 +11,9 @@ import {
 } from "@elektro/shared";
 import type { BreadcrumbHandle } from "../components/app-shell/breadcrumbs";
 import { LessonForm } from "../components/content/lesson-form";
-import { localePath } from "../i18n/locale";
 import { apiFetch } from "../lib/api";
 import { actionFailure, type ManagedLesson } from "../lib/content-admin";
-import { jsonBody, parseLessonTranslation } from "../lib/content-admin-actions";
+import { jsonBody, syllabusAfterSave, parseLessonTranslation } from "../lib/content-admin-actions";
 import { requireStaff } from "../lib/session";
 import type { Route } from "./+types/teacher-lesson-new";
 
@@ -61,12 +60,12 @@ export async function action({ request, params }: Route.ActionArgs) {
   } catch (error) {
     return actionFailure(error);
   }
-  return redirect(localePath(locale, "teacher/content?tab=lessons&notice=saved"));
+  return redirect(syllabusAfterSave(locale, topicId));
 }
 
 export const handle: BreadcrumbHandle = {
   breadcrumbs: () => [
-    { labelKey: "contentAdmin.title", path: "teacher/content" },
+    { labelKey: "nav.lessons", path: "syllabus" },
     { labelKey: "contentAdmin.lesson.new" },
   ],
 };

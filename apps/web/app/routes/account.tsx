@@ -1,7 +1,7 @@
 import { Badge, Button, Card, Group, Stack, Text, Title } from "@mantine/core";
 import { useTranslation } from "react-i18next";
-import { Form, Link, useLoaderData } from "react-router";
-import { DEFAULT_LOCALE, hasAtLeastRole, isLocale } from "@elektro/shared";
+import { Form, useLoaderData } from "react-router";
+import { DEFAULT_LOCALE, isLocale } from "@elektro/shared";
 import { localePath } from "../i18n/locale";
 import { requireUser } from "../lib/session";
 import type { Route } from "./+types/account";
@@ -35,13 +35,6 @@ export default function Account() {
           </Group>
         </Stack>
       </Card>
-
-      {/* The phone tab bar has no teacher menu (plan §3.2), so it starts here. */}
-      {hasAtLeastRole(user.role, "teacher") && (
-        <Button component={Link} to={localePath(locale, "teacher/content")} variant="light" fullWidth>
-          {t("nav.content")}
-        </Button>
-      )}
 
       <Form method="post" action={localePath(locale, "logout")}>
         <Button type="submit" variant="default" fullWidth>

@@ -14,8 +14,7 @@
     "menu": "Menü",
     "bottomBar": "Alsó menü",
     "headerNav": "Felső menü",
-    "breadcrumbs": "Útvonal",
-    "content": "Tartalom"
+    "breadcrumbs": "Útvonal"
   },
   "home": {
     "title": "Mit szeretnél gyakorolni?",
@@ -443,14 +442,8 @@
     "chose-below-minimum": "Ez kisebb a szükségesnél. A szabványos sorból a legalább akkorát válaszd, mint a szükséges legkisebb keresztmetszet."
   },
   "contentAdmin": {
-    "title": "Tartalomkezelés",
-    "tab": {
-      "lessons": "Leckék",
-      "calculators": "Kalkulátorok"
-    },
     "saved": "Mentve.",
     "cancel": "Mégse",
-    "open": "Megnyitás",
     "edit": "Szerkesztés",
     "save": "Mentés",
     "saveDraft": "Mentés vázlatként",
@@ -458,7 +451,6 @@
     "moveUp": "Feljebb",
     "moveDown": "Lejjebb",
     "deletedAccount": "törölt fiók",
-    "updatedAt": "Módosítva: {{date}}",
     "invalidFields": "Hibás mezők: {{fields}}",
     "field": {
       "topic": "Témakör",
@@ -475,32 +467,22 @@
       "publishedHint": "Kikapcsolva csak oktatók és adminisztrátorok látják (előnézet)."
     },
     "lesson": {
-      "count_one": "{{count}} lecke",
-      "count_other": "{{count}} lecke",
       "new": "Új lecke",
       "edit": "Lecke szerkesztése",
       "editing": "{{slug}} · jelenleg a(z) {{version}}. változat",
       "editingNew": "{{slug}} · ezen a nyelven még nincs szövege",
-      "empty": "Még nincs lecke.",
       "archived": "Archivált",
-      "archivedAt": "Archiválva: {{date}}",
-      "latest": "Legújabb: {{version}}. változat · {{date}}",
       "noTranslation": "Ezen a nyelven még nincs szövege.",
-      "live": "Élő: {{version}}. változat · jóváhagyta: {{approver}} ({{role}}) · {{date}}",
-      "notLive": "Nincs jóváhagyott változat, a tanulók nem látják.",
       "archive": "Törlés",
       "archiveConfirm": "Igen, archiválom",
       "restore": "Visszaállítás",
       "savesDraft": "A mentés új vázlatot hoz létre; a tanulók a jóváhagyásig a korábbi jóváhagyott változatot látják.",
-      "publishesDirectly": "Adminisztrátorként a mentés azonnal élesedik, és a jóváhagyási naplóban a te nevedre kerül."
+      "publishesDirectly": "Adminisztrátorként a mentés azonnal élesedik, és a jóváhagyási naplóban a te nevedre kerül.",
+      "notLiveShort": "Nincs jóváhagyva"
     },
     "calculator": {
-      "count_one": "{{count}} kalkulátor",
-      "count_other": "{{count}} kalkulátor",
       "new": "Új kalkulátor",
       "edit": "Kalkulátor szerkesztése",
-      "empty": "Nincs listázott kalkulátor.",
-      "allListed": "Minden elkészült kalkulátor szerepel a listában.",
       "published": "Látható",
       "hidden": "Rejtett",
       "noText": "Ezen a nyelven nincs címe, ezért a tanulók nem látják.",
@@ -522,6 +504,29 @@
       "slugs": "Sorrend",
       "ids": "Sorrend",
       "_": "Űrlap"
+    },
+    "view": {
+      "label": "Nézet",
+      "list": "Részletes lista",
+      "cards": "Témakörök"
+    },
+    "moduleFilter": "Modul",
+    "allModules": "Minden modul",
+    "noContent": "Még nincs tartalma.",
+    "versionShort": "{{version}}. vált.",
+    "liveShort": "{{version}}. vált. · {{approver}} ({{role}})",
+    "type": {
+      "lesson": "Lecke",
+      "calculator": "Kalkulátor"
+    },
+    "column": {
+      "order": "Sorrend",
+      "type": "Típus",
+      "title": "Cím",
+      "status": "Állapot",
+      "live": "Élő változat / leírás",
+      "updated": "Módosítva",
+      "actions": "Műveletek"
     }
   }
 }

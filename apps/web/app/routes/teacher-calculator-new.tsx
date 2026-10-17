@@ -1,13 +1,12 @@
 import { Stack, Title } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { redirect, useActionData, useLoaderData } from "react-router";
-import { DEFAULT_LOCALE, isCalculatorId, isLocale } from "@elektro/shared";
+import { DEFAULT_LOCALE, isCalculatorId, isLocale, isTopicId } from "@elektro/shared";
 import type { BreadcrumbHandle } from "../components/app-shell/breadcrumbs";
 import { CalculatorForm } from "../components/content/calculator-form";
-import { localePath } from "../i18n/locale";
 import { apiFetch } from "../lib/api";
 import { actionFailure, type ManagedCalculators } from "../lib/content-admin";
-import { jsonBody, parseCalculatorInput } from "../lib/content-admin-actions";
+import { jsonBody, syllabusAfterSave, parseCalculatorInput } from "../lib/content-admin-actions";
 import { requireStaff } from "../lib/session";
 import type { Route } from "./+types/teacher-calculator-new";
 
@@ -19,7 +18,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     request,
     `/api/manage/calculators?locale=${locale}`,
   );
-  return { available };
+  // Opened from a topic row of the syllabus list: that topic is preselected.
+  const topicParam = new URL(request.url).searchParams.get("topicId");
+  return { available, topicId: isTopicId(topicParam) ? topicParam : null };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
@@ -39,19 +40,19 @@ export async function action({ request, params }: Route.ActionArgs) {
   } catch (error) {
     return actionFailure(error);
   }
-  return redirect(localePath(locale, "teacher/content?tab=calculators&notice=saved"));
+  return redirect(syllabusAfterSave(locale, input.value.topicId));
 }
 
 export const handle: BreadcrumbHandle = {
   breadcrumbs: () => [
-    { labelKey: "contentAdmin.title", path: "teacher/content?tab=calculators" },
+    { labelKey: "nav.lessons", path: "syllabus" },
     { labelKey: "contentAdmin.calculator.new" },
   ],
 };
 
 export default function TeacherCalculatorNew() {
   const { t } = useTranslation();
-  const { available } = useLoaderData<typeof loader>();
+  const { available, topicId } = useLoaderData<typeof loader>();
   const failure = useActionData<typeof action>() ?? undefined;
   const first = available[0];
 
@@ -63,7 +64,7 @@ export default function TeacherCalculatorNew() {
         failure={failure}
         initial={{
           id: first?.id ?? null,
-          topicId: first?.defaultTopicId ?? "voltage-drop",
+          topicId: topicId ?? first?.defaultTopicId ?? "voltage-drop",
           published: false,
           title: "",
           description: "",

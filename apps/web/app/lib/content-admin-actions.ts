@@ -1,10 +1,13 @@
 import {
   calculatorInputSchema,
+  getTopic,
+  isTopicId,
   upsertLessonTranslationSchema,
   type CalculatorInput,
   type Locale,
   type UpsertLessonTranslationInput,
 } from "@elektro/shared";
+import { localePath } from "../i18n/locale";
 import type { ActionFailure } from "./content-admin";
 
 /**
@@ -48,6 +51,13 @@ export function parseCalculatorInput(form: FormData, locale: Locale): Parsed<Cal
     description: text(form, "description"),
   });
   return result.success ? { ok: true, value: result.data } : failure(result.error);
+}
+
+/** Back to the syllabus list after a save, filtered to the saved item's module. */
+export function syllabusAfterSave(locale: Locale, topicId: string): string {
+  const query = new URLSearchParams({ notice: "saved" });
+  if (isTopicId(topicId)) query.set("module", getTopic(topicId).module);
+  return localePath(locale, `syllabus?${query.toString()}`);
 }
 
 export const jsonBody = (body: unknown) => ({

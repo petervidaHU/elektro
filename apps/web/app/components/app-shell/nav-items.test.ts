@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isNavItemActive, navItems, staffNavItems } from "./nav-items";
+import { isNavItemActive, navItems } from "./nav-items";
 
 /** docs/DEVELOPMENT_PLAN.md §3.2: the tabs differ for guests and users. */
 describe("navItems", () => {
@@ -44,18 +44,5 @@ describe("isNavItemActive", () => {
     }
     expect(isNavItemActive(lessons!, "hu", "/hu/calculators")).toBe(false);
     expect(isNavItemActive(lessons!, "hu", "/hu/syllabusx")).toBe(false);
-  });
-});
-
-describe("staffNavItems", () => {
-  it("gives teachers and admins the content page in the header (plan §3.2)", () => {
-    for (const role of ["teacher", "admin"] as const) {
-      expect(staffNavItems({ role }).map((item) => item.path)).toEqual(["teacher/content"]);
-    }
-  });
-
-  it("gives students and guests nothing", () => {
-    expect(staffNavItems({ role: "student" })).toEqual([]);
-    expect(staffNavItems(null)).toEqual([]);
   });
 });

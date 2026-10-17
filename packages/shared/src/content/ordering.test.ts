@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isReorderOf, moveItem } from "./ordering.js";
+import { isReorderOf, moveItem, moveWithinGroup } from "./ordering.js";
 
 describe("moveItem", () => {
   const ids = ["a", "b", "c"];
@@ -31,5 +31,21 @@ describe("isReorderOf", () => {
     expect(isReorderOf(["a", "b"], ["a"])).toBe(false);
     expect(isReorderOf(["a", "b"], ["a", "b", "c"])).toBe(false);
     expect(isReorderOf(["a", "b"], ["a", "a"])).toBe(false);
+  });
+});
+
+describe("moveWithinGroup", () => {
+  // Global calculator order; a, c and e share a topic.
+  const ids = ["a", "b", "c", "d", "e"];
+  const group = ["a", "c", "e"];
+
+  it("swaps an item with its group neighbour, leaving the others in place", () => {
+    expect(moveWithinGroup(ids, group, "c", "up")).toEqual(["c", "b", "a", "d", "e"]);
+    expect(moveWithinGroup(ids, group, "c", "down")).toEqual(["a", "b", "e", "d", "c"]);
+  });
+
+  it("keeps the order at the group's edges", () => {
+    expect(moveWithinGroup(ids, group, "a", "up")).toEqual(ids);
+    expect(moveWithinGroup(ids, group, "e", "down")).toEqual(ids);
   });
 });

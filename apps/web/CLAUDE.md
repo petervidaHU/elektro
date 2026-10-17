@@ -31,7 +31,7 @@ app/i18n/             i18next setup, locale helpers, hu resources
 app/routes/           route modules
 app/lib/api.ts        typed calls to /api from loaders and actions
 app/lib/calculators.ts the calculator registry (list, page loader); never hard-code calculators
-app/components/content/ forms of the content-management pages (/teacher/content)
+app/components/content/ the syllabus page's detailed list (content-table) and the content forms
 app/theme.ts          touch-first Mantine theme (MIN_TOUCH_TARGET)
 ```
 

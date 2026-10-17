@@ -4,7 +4,7 @@ import { Link, Outlet, useLoaderData, useLocation } from "react-router";
 import { isLocale } from "@elektro/shared";
 import { BottomNav } from "../components/app-shell/bottom-nav";
 import { Breadcrumbs } from "../components/app-shell/breadcrumbs";
-import { isNavItemActive, navItems, staffNavItems } from "../components/app-shell/nav-items";
+import { isNavItemActive, navItems } from "../components/app-shell/nav-items";
 import { localePath } from "../i18n/locale";
 import { getCurrentUser } from "../lib/session";
 import type { Route } from "./+types/locale-layout";
@@ -38,7 +38,6 @@ export default function LocaleLayout() {
   const { locale, user } = useLoaderData<typeof loader>();
   const { pathname } = useLocation();
   const items = navItems(user);
-  const headerItems = [...items, ...staffNavItems(user)];
 
   return (
     <AppShell
@@ -56,7 +55,7 @@ export default function LocaleLayout() {
             </Title>
 
             <Group gap="xs" visibleFrom="sm" component="nav" aria-label={t("nav.headerNav")}>
-              {headerItems.map((item) => (
+              {items.map((item) => (
                 <Button
                   key={item.key}
                   component={Link}
