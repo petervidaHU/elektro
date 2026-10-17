@@ -130,10 +130,12 @@ export default async function globalSetup(config: FullConfig) {
       }
     }
     await admin.delete("/api/topic-intros/logic-basics");
-    const lessonsListed = await admin.get("/api/lessons?locale=hu&topicId=logic-basics");
-    if (lessonsListed.ok()) {
+    // Lessons the S5/S6 and K11 tests created.
+    for (const topicId of ["logic-basics", "ohms-law"]) {
+      const lessonsListed = await admin.get(`/api/lessons?locale=hu&topicId=${topicId}`);
+      if (!lessonsListed.ok()) continue;
       const { lessons } = (await lessonsListed.json()) as { lessons: { slug: string }[] };
-      for (const lesson of lessons.filter((item) => item.slug.startsWith("e2e-term-lesson-"))) {
+      for (const lesson of lessons.filter((item) => /^e2e-(term|k11)-lesson-/.test(item.slug))) {
         await admin.delete(`/api/lessons/${lesson.slug}`);
       }
     }

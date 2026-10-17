@@ -235,7 +235,7 @@ which are rendered by the web app and validated by a shared zod schema on save:
 | --- | --- |
 | `:::goals` | 2–4 learning goals ("A lecke végére tudni fogod...") |
 | `:::formula{id=voltage-drop}` | Renders a formula **from `packages/shared`** by ID, so the text and the engine can never disagree |
-| `:::example` | Worked example; may link to the calculator pre-filled with the example's inputs |
+| `:::example` | Worked example; may contain `::calculator{id="ohms-law" voltage=230 resistance=46}`, a button that opens the calculator with those inputs (ids and input names come from `PREFILL_FIELDS` in `calc/prefill.ts`; an unknown id, input or value is rejected on save) |
 | `:::safety` | Safety callout, highlighted. Mandatory in 🛡 topics |
 | `:::mistake` | Common mistake + why it's wrong |
 | `:::exam` | "Így jelenik meg a vizsgán": which exam part the topic belongs to and what kind of task to expect |
@@ -576,7 +576,7 @@ transaction as each write, and an admin script can rebuild all of it.
 | K8a | Pre-fill candidate reference tables as `unverified`, with citations: current-carrying capacity, correction factors, permitted voltage drop, material constants |
 | K9 | `conductor-resistance` + `cable-selection` (exam III), once the tables are verified |
 | K10 | P2 calculators (physics first, then table-dependent ones once verified) |
-| K11 | Calculator ↔ lesson links (`:::example` opens the calculator pre-filled; calculator shows "learn the theory" link) |
+| K11 | Calculator ↔ lesson links (`:::example` opens the calculator pre-filled; calculator shows "learn the theory" link). Done: `::calculator` leaf directive, `readPrefill` on every calculator page, `TheoryLink` (first readable lesson of the topic, else the topic page) |
 | K12 | `practice_templates` / `practice_task_texts` tables + i18n → DB sync script (unused at runtime in v1). Done: `npm run db:sync:practice-texts` (Q25) |
 | K13 | P1 calculators from the TOC review: `connection-power`, `phase-balancing` + templates. Done: `calc/installation.ts`, 6 templates in `practice/templates/installation.ts`, migration `0010`; phase balancing suggests a split with the "largest circuit first onto the least loaded phase" rule |
 

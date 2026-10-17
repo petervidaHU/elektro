@@ -22,7 +22,16 @@ import { attempt, NumField, ResultCard } from "./kit";
 
 interface Props {
   locale: Locale;
+  /** Pre-filled inputs from a lesson example (validated by `readPrefill`). */
+  prefill: Record<string, string>;
 }
+
+/** A pre-filled number, or the default. */
+const pn = (prefill: Record<string, string>, key: string, fallback: number): number =>
+  prefill[key] === undefined ? fallback : Number(prefill[key].replace(",", "."));
+/** A pre-filled choice, or the default; the value was checked against the calculator's spec. */
+const pc = <T extends string>(prefill: Record<string, string>, key: string, fallback: T): T =>
+  (prefill[key] as T | undefined) ?? fallback;
 
 const num = (value: number | string) => (value === "" ? Number.NaN : Number(value));
 const optional = (value: number | string) => (value === "" || Number(value) === 0 ? undefined : Number(value));
@@ -57,14 +66,14 @@ function Choice<T extends string>({
 
 // ---- Ohm's law ---------------------------------------------------------------
 
-function OhmsLaw({ locale }: Props) {
+function OhmsLaw({ locale, prefill }: Props) {
   const { t } = useTranslation();
   const q = useQ(locale);
   type Unknown = "voltage" | "current" | "resistance";
-  const [unknown, setUnknown] = useState<Unknown>("current");
-  const [u, setU] = useState<number | string>(230);
-  const [i, setI] = useState<number | string>(5);
-  const [r, setR] = useState<number | string>(46);
+  const [unknown, setUnknown] = useState<Unknown>(pc<Unknown>(prefill, "unknown", "current"));
+  const [u, setU] = useState<number | string>(pn(prefill, "voltage", 230));
+  const [i, setI] = useState<number | string>(pn(prefill, "current", 5));
+  const [r, setR] = useState<number | string>(pn(prefill, "resistance", 46));
 
   const outcome = attempt(() =>
     solveOhmsLaw({
@@ -98,14 +107,14 @@ function OhmsLaw({ locale }: Props) {
 
 // ---- Equivalent resistance ---------------------------------------------------
 
-function EquivalentResistance({ locale }: Props) {
+function EquivalentResistance({ locale, prefill }: Props) {
   const { t } = useTranslation();
   const q = useQ(locale);
   type Mode = "series" | "parallel" | "mixed";
-  const [mode, setMode] = useState<Mode>("series");
+  const [mode, setMode] = useState<Mode>(pc<Mode>(prefill, "mode", "series"));
   const [count, setCount] = useState<"2" | "3">("2");
-  const [supply, setSupply] = useState<number | string>(24);
-  const [rs, setRs] = useState<(number | string)[]>([10, 20, 30]);
+  const [supply, setSupply] = useState<number | string>(pn(prefill, "supply", 24));
+  const [rs, setRs] = useState<(number | string)[]>([pn(prefill, "r1", 10), pn(prefill, "r2", 20), pn(prefill, "r3", 30)]);
 
   const setR = (index: number, value: number | string) => setRs((current) => current.map((r, k) => (k === index ? value : r)));
   const used = mode === "mixed" ? 3 : Number(count);
@@ -175,16 +184,16 @@ function EquivalentResistance({ locale }: Props) {
 
 // ---- DC power and energy -----------------------------------------------------
 
-function PowerDc({ locale }: Props) {
+function PowerDc({ locale, prefill }: Props) {
   const { t } = useTranslation();
   const q = useQ(locale);
   type Pair = "ui" | "ir" | "ur";
-  const [pair, setPair] = useState<Pair>("ui");
-  const [u, setU] = useState<number | string>(230);
-  const [i, setI] = useState<number | string>(10);
-  const [r, setR] = useState<number | string>(23);
-  const [hours, setHours] = useState<number | string>(2);
-  const [useful, setUseful] = useState<number | string>(0);
+  const [pair, setPair] = useState<Pair>(pc<Pair>(prefill, "known", "ui"));
+  const [u, setU] = useState<number | string>(pn(prefill, "voltage", 230));
+  const [i, setI] = useState<number | string>(pn(prefill, "current", 10));
+  const [r, setR] = useState<number | string>(pn(prefill, "resistance", 23));
+  const [hours, setHours] = useState<number | string>(pn(prefill, "duration", 2));
+  const [useful, setUseful] = useState<number | string>(pn(prefill, "useful", 0));
 
   const outcome = attempt(() =>
     powerDc({
@@ -230,16 +239,21 @@ function PowerDc({ locale }: Props) {
 
 const MAX_LOADS = 8;
 
-function LoadDemand({ locale }: Props) {
+function LoadDemand({ locale, prefill }: Props) {
   const { t } = useTranslation();
   const q = useQ(locale);
-  const [system, setSystem] = useState<"single-phase" | "three-phase">("single-phase");
-  const [pf, setPf] = useState<number | string>(1);
-  const [days, setDays] = useState<number | string>(30);
-  const [loads, setLoads] = useState<{ power: number | string; hours: number | string }[]>([
-    { power: 2000, hours: 1.5 },
-    { power: 100, hours: 8 },
-  ]);
+  const [system, setSystem] = useState<"single-phase" | "three-phase">(pc(prefill, "system", "single-phase"));
+  const [pf, setPf] = useState<number | string>(pn(prefill, "powerFactor", 1));
+  const [days, setDays] = useState<number | string>(pn(prefill, "days", 30));
+  const [loads, setLoads] = useState<{ power: number | string; hours: number | string }[]>(() => {
+    const given = Array.from({ length: 8 }, (_x, k) => k + 1).filter((n) => prefill[`power${n}`] !== undefined);
+    return given.length > 0
+      ? given.map((n) => ({ power: pn(prefill, `power${n}`, 1000), hours: pn(prefill, `hours${n}`, 1) }))
+      : [
+          { power: 2000, hours: 1.5 },
+          { power: 100, hours: 8 },
+        ];
+  });
 
   const update = (index: number, key: "power" | "hours", value: number | string) =>
     setLoads((current) => current.map((load, k) => (k === index ? { ...load, [key]: value } : load)));
@@ -305,14 +319,14 @@ function LoadDemand({ locale }: Props) {
 
 // ---- AC power (single- and three-phase) -------------------------------------
 
-function AcPower({ locale, threePhase }: Props & { threePhase: boolean }) {
+function AcPower({ locale, prefill, threePhase }: Props & { threePhase: boolean }) {
   const { t } = useTranslation();
   const q = useQ(locale);
-  const [known, setKnown] = useState<"current" | "power">("current");
-  const [u, setU] = useState<number | string>(threePhase ? 400 : 230);
-  const [i, setI] = useState<number | string>(10);
-  const [p, setP] = useState<number | string>(2000);
-  const [pf, setPf] = useState<number | string>(0.8);
+  const [known, setKnown] = useState<"current" | "power">(pc(prefill, "known", "current"));
+  const [u, setU] = useState<number | string>(pn(prefill, "voltage", threePhase ? 400 : 230));
+  const [i, setI] = useState<number | string>(pn(prefill, "current", 10));
+  const [p, setP] = useState<number | string>(pn(prefill, "power", 2000));
+  const [pf, setPf] = useState<number | string>(pn(prefill, "powerFactor", 0.8));
 
   const common = known === "current" ? { current_A: num(i) } : { activePower_W: num(p) };
   const outcome = attempt(() =>
@@ -355,12 +369,12 @@ function AcPower({ locale, threePhase }: Props & { threePhase: boolean }) {
 
 // ---- Connection power --------------------------------------------------------
 
-function ConnectionPower({ locale }: Props) {
+function ConnectionPower({ locale, prefill }: Props) {
   const { t } = useTranslation();
   const q = useQ(locale);
-  const [system, setSystem] = useState<"single-phase" | "three-phase">("single-phase");
-  const [breaker, setBreaker] = useState<number | string>(25);
-  const [demand, setDemand] = useState<number | string>(0);
+  const [system, setSystem] = useState<"single-phase" | "three-phase">(pc(prefill, "system", "single-phase"));
+  const [breaker, setBreaker] = useState<number | string>(pn(prefill, "breaker", 25));
+  const [demand, setDemand] = useState<number | string>(pn(prefill, "demand", 0));
   const voltage = system === "three-phase" ? 400 : 230;
 
   const outcome = attempt(() =>
@@ -405,15 +419,20 @@ function ConnectionPower({ locale }: Props) {
 
 const MAX_CIRCUITS = 12;
 
-function PhaseBalancing({ locale }: Props) {
+function PhaseBalancing({ locale, prefill }: Props) {
   const { t } = useTranslation();
   const q = useQ(locale);
-  const [circuits, setCircuits] = useState<{ current: number | string; phase: "0" | "1" | "2" }[]>([
-    { current: 10, phase: "0" },
-    { current: 16, phase: "0" },
-    { current: 6, phase: "1" },
-    { current: 13, phase: "2" },
-  ]);
+  const [circuits, setCircuits] = useState<{ current: number | string; phase: "0" | "1" | "2" }[]>(() => {
+    const given = Array.from({ length: 12 }, (_x, k) => k + 1).filter((n) => prefill[`current${n}`] !== undefined);
+    return given.length > 0
+      ? given.map((n) => ({ current: pn(prefill, `current${n}`, 10), phase: pc<"0" | "1" | "2">(prefill, `phase${n}`, "0") }))
+      : [
+          { current: 10, phase: "0" },
+          { current: 16, phase: "0" },
+          { current: 6, phase: "1" },
+          { current: 13, phase: "2" },
+        ];
+  });
 
   const update = (index: number, change: Partial<(typeof circuits)[number]>) =>
     setCircuits((current) => current.map((c, k) => (k === index ? { ...c, ...change } : c)));

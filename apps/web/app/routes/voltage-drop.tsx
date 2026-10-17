@@ -14,9 +14,10 @@ import {
 } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { ReportButton } from "../components/report/report-button";
-import { Link, useLoaderData, useParams } from "react-router";
+import { Link, useLoaderData, useParams, useSearchParams } from "react-router";
 import { localePath } from "../i18n/locale";
 import { CalcSteps } from "../components/calc-steps";
+import { loadTopicLessons, TheoryLink } from "../components/calculators/theory-link";
 import type { BreadcrumbHandle } from "../components/app-shell/breadcrumbs";
 import { loadCalculator, type ListedCalculator } from "../lib/calculators";
 import type { Route } from "./+types/voltage-drop";
@@ -29,6 +30,7 @@ import {
   formatPercent,
   formatQuantity,
   isLocale,
+  readPrefill,
   RESISTIVITY_AT_OPERATING_TEMPERATURE,
   STANDARD_CROSS_SECTIONS_MM2,
   type ConductorMaterial,
@@ -47,7 +49,10 @@ import {
  */
 /** Listed and published in the calculator registry, or 404 (plan Q21). */
 export async function loader({ request, params }: Route.LoaderArgs) {
-  return { calculator: await loadCalculator(request, String(params.locale), "voltage-drop") };
+  return {
+    calculator: await loadCalculator(request, String(params.locale), "voltage-drop"),
+    lessons: await loadTopicLessons(request, String(params.locale), "voltage-drop"),
+  };
 }
 
 export const handle: BreadcrumbHandle = {
@@ -62,17 +67,19 @@ export const handle: BreadcrumbHandle = {
 
 export default function VoltageDrop() {
   const { t } = useTranslation();
-  const { calculator } = useLoaderData<typeof loader>();
+  const { calculator, lessons } = useLoaderData<typeof loader>();
+  const [searchParams] = useSearchParams();
+  const prefill = readPrefill("voltage-drop", searchParams);
   const params = useParams();
   const locale = isLocale(params.locale) ? params.locale : DEFAULT_LOCALE;
 
-  const [system, setSystem] = useState<PhaseSystem>("single-phase");
-  const [material, setMaterial] = useState<ConductorMaterial>("copper");
-  const [current, setCurrent] = useState<number | string>(16);
-  const [length, setLength] = useState<number | string>(25);
-  const [crossSection, setCrossSection] = useState<string>("2.5");
-  const [nominalVoltage, setNominalVoltage] = useState<number | string>(230);
-  const [powerFactor, setPowerFactor] = useState<number | string>(1);
+  const [system, setSystem] = useState<PhaseSystem>((prefill["system"] as PhaseSystem | undefined) ?? "single-phase");
+  const [material, setMaterial] = useState<ConductorMaterial>((prefill["material"] as ConductorMaterial | undefined) ?? "copper");
+  const [current, setCurrent] = useState<number | string>(Number(prefill["current"] ?? 16));
+  const [length, setLength] = useState<number | string>(Number(prefill["length"] ?? 25));
+  const [crossSection, setCrossSection] = useState<string>(prefill["crossSection"] ?? "2.5");
+  const [nominalVoltage, setNominalVoltage] = useState<number | string>(Number(prefill["nominalVoltage"] ?? (prefill["system"] === "three-phase" ? 400 : 230)));
+  const [powerFactor, setPowerFactor] = useState<number | string>(Number(prefill["powerFactor"] ?? 1));
 
   const calculation = useMemo(() => {
     try {
@@ -245,6 +252,7 @@ export default function VoltageDrop() {
       <Button component={Link} to={localePath(locale, "practice/voltage-drop")} variant="light">
         {t("calculators.voltageDrop.practice")}
       </Button>
+      <TheoryLink topicId="voltage-drop" lessons={lessons} />
       <ReportButton targetKind="calculator" targetId="voltage-drop" />
     </Stack>
   );

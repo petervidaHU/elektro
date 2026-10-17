@@ -1,10 +1,13 @@
 import type { ReactNode } from "react";
-import { Alert, Anchor, Card, Code, List, Stack, Text, Title } from "@mantine/core";
+import { Alert, Anchor, Button, Card, Code, List, Stack, Text, Title } from "@mantine/core";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
+import { localePath } from "../../i18n/locale";
+import { useLayoutData } from "../../lib/use-layout-data";
 import type { Nodes, Root } from "mdast";
 import type {} from "mdast-util-directive";
 import { TermLink } from "./glossary-terms";
-import { FORMULAS, isFormulaId, lessonSections, type LessonContainerBlock } from "@elektro/shared";
+import { FORMULAS, getCalculatorDefinition, isFormulaId, lessonCalculatorLinks, lessonSections, type LessonContainerBlock } from "@elektro/shared";
 
 /**
  * Renders a parsed lesson body (`parseLessonBody` from @elektro/shared - the
@@ -91,6 +94,7 @@ function Block({ node, sectionId }: { node: Nodes; sectionId?: string }): ReactN
       return <hr />;
     case "leafDirective": {
       const id = node.attributes?.["id"] ?? "";
+      if (node.name === "calculator") return <CalculatorLink node={node} />;
       if (node.name !== "formula" || !isFormulaId(id)) return null;
       return (
         <Code block aria-label={t("lessonBlock.formula")} fz="md" ta="center" py="sm">
@@ -180,4 +184,24 @@ function Inline({ nodes }: { nodes: Nodes[] }): ReactNode {
         return null;
     }
   });
+}
+
+/** `::calculator{id=... inputs}` in an example: opens the calculator with those inputs (plan K11). */
+function CalculatorLink({ node }: { node: Extract<Nodes, { type: "leafDirective" }> }) {
+  const { t } = useTranslation();
+  const { locale } = useLayoutData();
+  const [link] = lessonCalculatorLinks({ type: "root", children: [node] });
+  if (!link) return null;
+
+  const path = getCalculatorDefinition(link.id).path;
+  return (
+    <Button
+      component={Link}
+      to={`${localePath(locale, path)}${link.query ? `?${link.query}` : ""}`}
+      variant="light"
+      data-calculator-link={link.id}
+    >
+      {t("lessonBlock.openCalculator")}
+    </Button>
+  );
 }

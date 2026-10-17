@@ -1,8 +1,9 @@
 import { Button, Stack, Title } from "@mantine/core";
 import { useTranslation } from "react-i18next";
-import { Link, useLoaderData } from "react-router";
-import { hasPractice, isCalculatorId, type CalculatorId } from "@elektro/shared";
+import { Link, useLoaderData, useSearchParams } from "react-router";
+import { hasPractice, isCalculatorId, readPrefill, type CalculatorId } from "@elektro/shared";
 import type { BreadcrumbHandle } from "../components/app-shell/breadcrumbs";
+import { loadTopicLessons, TheoryLink } from "../components/calculators/theory-link";
 import { PHYSICS_CALCULATORS } from "../components/calculators/physics-calculators";
 import { ReportButton } from "../components/report/report-button";
 import { localePath } from "../i18n/locale";
@@ -21,7 +22,12 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   if (!isCalculatorId(id) || !PHYSICS_CALCULATORS[id]) {
     throw new Response(null, { status: 404 });
   }
-  return { id: id as CalculatorId, calculator: await loadCalculator(request, String(params.locale), id) };
+  const calculator = await loadCalculator(request, String(params.locale), id);
+  return {
+    id: id as CalculatorId,
+    calculator,
+    lessons: await loadTopicLessons(request, String(params.locale), calculator.topicId),
+  };
 }
 
 export const handle: BreadcrumbHandle = {
@@ -34,13 +40,17 @@ export const handle: BreadcrumbHandle = {
 export default function CalculatorPage() {
   const { t } = useTranslation();
   const { locale } = useLayoutData();
-  const { id, calculator } = useLoaderData<typeof loader>();
+  const { id, calculator, lessons } = useLoaderData<typeof loader>();
   const render = PHYSICS_CALCULATORS[id]!;
+  const [searchParams] = useSearchParams();
+  const prefill = readPrefill(id, searchParams);
 
   return (
     <Stack gap="lg" maw={640}>
       <Title order={2}>{calculator.title}</Title>
-      {render({ locale })}
+      {/* A new query string (another lesson example) starts the calculator afresh. */}
+      <div key={searchParams.toString()}>{render({ locale, prefill })}</div>
+      <TheoryLink topicId={calculator.topicId} lessons={lessons} />
       {hasPractice(calculator.topicId) && (
         <Button component={Link} to={localePath(locale, `practice/${calculator.topicId}`)} variant="light">
           {t("calculators.practice")}

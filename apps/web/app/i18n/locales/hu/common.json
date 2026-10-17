@@ -139,7 +139,9 @@
       "move": "áttéve",
       "after": "Fázisok közti eltérés: {{before}} → {{after}}",
       "note": "A javaslat a legnagyobb áramú áramkörtől kezdve mindig a legkevésbé terhelt fázisra teszi a következőt; kiindulópont, a végleges elosztást a kábelezés és a fogyasztók jellege is befolyásolja."
-    }
+    },
+    "theory": "Tanuld meg az elméletet: {{title}}",
+    "theoryTopic": "A témakör oldala"
   },
   "simulator": {
     "title": "Mérés szimulátor",
@@ -429,7 +431,8 @@
     "safety": "Biztonság",
     "mistake": "Gyakori hiba",
     "exam": "A vizsgán",
-    "formula": "Képlet"
+    "formula": "Képlet",
+    "openCalculator": "Kipróbálom a számológépben"
   },
   "lessonSummary": {
     "title": "Összefoglaló",

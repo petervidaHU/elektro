@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   lessonBodySchema,
+  lessonCalculatorLinks,
   lessonGoals,
   lessonSections,
   parseLessonBody,
@@ -127,5 +128,28 @@ describe("glossary term references", () => {
 
   it("still treats other inline colons as plain text", () => {
     expect(validateLessonBody("Arány 1:2, idő 16:30 és :valami.").ok).toBe(true);
+  });
+});
+
+describe("calculator links in examples", () => {
+  it("accepts ::calculator with a known id and valid pre-fill values", () => {
+    const body = ':::example\nEgy fogyasztó 230 V-on.\n\n::calculator{id="ohms-law" unknown=current voltage=230 resistance=46}\n:::';
+    expect(validateLessonBody(body)).toEqual({ ok: true, errors: [] });
+  });
+
+  it("rejects an unknown calculator", () => {
+    expect(validateLessonBody('::calculator{id="made-up"}').errors).toEqual([{ code: "unknown-calculator", block: "calculator", value: "made-up" }]);
+    expect(validateLessonBody("::calculator").ok).toBe(false);
+  });
+
+  it("rejects an input the calculator does not have, and bad values", () => {
+    const unknown = validateLessonBody('::calculator{id="ohms-law" colour=red}');
+    expect(unknown.errors).toEqual([{ code: "invalid-prefill", block: "calculator", value: "colour" }]);
+    expect(validateLessonBody('::calculator{id="ohms-law" voltage=abc}').ok).toBe(false);
+  });
+
+  it("collects the calculator links of a lesson with their query strings", () => {
+    const tree = parseLessonBody('::calculator{id="ohms-law" voltage=230 resistance=4,6}');
+    expect(lessonCalculatorLinks(tree)).toEqual([{ id: "ohms-law", query: "voltage=230&resistance=4.6" }]);
   });
 });

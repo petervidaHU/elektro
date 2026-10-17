@@ -3,7 +3,9 @@ import { directiveFromMarkdown } from "mdast-util-directive";
 import { fromMarkdown } from "mdast-util-from-markdown";
 import { directive } from "micromark-extension-directive";
 import { z } from "zod";
+import { isCalculatorId, type CalculatorId } from "../calc/catalogue.js";
 import { isFormulaId } from "../calc/formulas.js";
+import { prefillQuery, validatePrefill } from "../calc/prefill.js";
 
 /**
  * Lesson bodies are Markdown plus a small set of blocks
@@ -12,6 +14,7 @@ import { isFormulaId } from "../calc/formulas.js";
  *
  *     :::goals / :::example / :::safety / :::mistake / :::exam   container blocks
  *     ::formula{id="voltage-drop"}                                 leaf block
+ *     ::calculator{id="ohms-law" voltage=230 resistance=46}        link to a calculator, pre-filled
  *
  *     :term[label]{id=voltage-drop}                                inline glossary reference
  *
@@ -20,7 +23,7 @@ import { isFormulaId } from "../calc/formulas.js";
  * The `next` links are added by the reader, never authored.
  */
 export const LESSON_CONTAINER_BLOCKS = ["goals", "example", "safety", "mistake", "exam"] as const;
-export const LESSON_LEAF_BLOCKS = ["formula"] as const;
+export const LESSON_LEAF_BLOCKS = ["formula", "calculator"] as const;
 
 export type LessonContainerBlock = (typeof LESSON_CONTAINER_BLOCKS)[number];
 
@@ -28,7 +31,9 @@ export type LessonBodyError =
   | { code: "empty" }
   | { code: "invalid-term"; value: string }
   | { code: "unknown-block"; block: string }
-  | { code: "unknown-formula"; block: "formula"; value: string };
+  | { code: "unknown-formula"; block: "formula"; value: string }
+  | { code: "unknown-calculator"; block: "calculator"; value: string }
+  | { code: "invalid-prefill"; block: "calculator"; value: string };
 
 export interface LessonSection {
   id: string;
@@ -93,6 +98,15 @@ export function validateLessonBody(markdown: string): { ok: boolean; errors: Les
     } else if (node.type === "leafDirective") {
       if (!(LESSON_LEAF_BLOCKS as readonly string[]).includes(node.name)) {
         errors.push({ code: "unknown-block", block: node.name });
+      } else if (node.name === "calculator") {
+        const { id = "", ...prefill } = definedAttributes(node.attributes);
+        if (!isCalculatorId(id)) {
+          errors.push({ code: "unknown-calculator", block: "calculator", value: id });
+        } else {
+          for (const error of validatePrefill(id, prefill).errors) {
+            errors.push({ code: "invalid-prefill", block: "calculator", value: error.field });
+          }
+        }
       } else {
         const id = node.attributes?.["id"] ?? "";
         if (!isFormulaId(id)) {
@@ -137,6 +151,30 @@ export function lessonSections(tree: Root): LessonSection[] {
   }
 
   return sections;
+}
+
+function definedAttributes(attributes: Record<string, string | null | undefined> | null | undefined): Record<string, string> {
+  return Object.fromEntries(Object.entries(attributes ?? {}).filter((entry): entry is [string, string] => typeof entry[1] === "string"));
+}
+
+export interface LessonCalculatorLink {
+  id: CalculatorId;
+  /** Query string with the pre-filled inputs (may be empty). */
+  query: string;
+}
+
+/** The `::calculator` links of a lesson, in order, with the query string of each. */
+export function lessonCalculatorLinks(tree: Root): LessonCalculatorLink[] {
+  const links: LessonCalculatorLink[] = [];
+  visit(tree, (node) => {
+    if (node.type === "leafDirective" && node.name === "calculator") {
+      const { id = "", ...prefill } = definedAttributes(node.attributes);
+      if (isCalculatorId(id) && validatePrefill(id, prefill).ok) {
+        links.push({ id, query: prefillQuery(id, prefill) });
+      }
+    }
+  });
+  return links;
 }
 
 /** The items of the `:::goals` block - what the lesson summary repeats. */
