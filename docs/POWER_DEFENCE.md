@@ -88,7 +88,7 @@ Each level is tagged with topic IDs, so play counts towards topic progress.
 - **Circuit simulation:** a pure-TS solver in `packages/shared` (radial networks
   first: source → board → circuits → loads), built on the existing calculation
   functions. Test-first, like the rest of the engine.
-- **Rendering:** a canvas library (PixiJS or Phaser) in one React Router route,
+- **Rendering:** PixiJS (Q29) on a canvas in one React Router route,
   client-only. Menus, the prediction prompt and the results screen stay Mantine.
 - **Touch:** snap grid; tap a component, tap a target to connect; large hit areas;
   night actions are single taps on highlighted devices. No drag precision needed.
@@ -134,10 +134,10 @@ data and the simulator.
 - *Scope creep / balancing effort:* MVP limited to tiers 1–3 and one map; new
   content is mainly level JSON, not code.
 
-## 9. Open questions
+## 9. Decisions and open questions
 
-| # | Question | Default until answered |
+| # | Question | Status |
 | - | --- | --- |
-| Q28 | Theme: warehouse vs. zombies, or something less violent for some learners? | Warehouse vs. zombies |
-| Q29 | Rendering library: PixiJS (renderer only) or Phaser (full game framework)? | Decide in PD3 with a small spike |
-| Q30 | Does game play count towards mastery, or only towards "started/practising"? | Only correct predictions count as solved tasks |
+| Q28 | Theme: warehouse vs. zombies, or something milder? | **Decided 2026-11-16:** zombies for now; may change later |
+| Q29 | Rendering library | **Decided 2026-11-16:** **PixiJS** (renderer only); the game loop and state are our own code |
+| Q30 | Does game play count towards mastery, or only towards "started/practising"? | **Open.** Default: only correct predictions count as solved tasks |
