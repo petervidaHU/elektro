@@ -13,5 +13,6 @@ in `CLAUDE.md`.
 | ☐ | **M3** Exam breadth | K7 ✓ K8 ✓ U13 ✓ K13 ✓ S5 ✓ S6 ✓ K11 ✓ lessons A, B, E ✓ (drafts, in review) · K8a K9 open (cable tables postponed, Q26) | Teacher verifies a table → `cable-selection` becomes visible to students |
 | ☑ | **M4** More calculators | K10 ✓ (physics set; the table-dependent calculators wait for verified tables) · lessons C, D, G ✓ (drafts, in review) | P2 calculators reachable from their topic hubs |
 | ☐ | **M5+** | Simulator → AI drafting → pilot | Defined when M4 is done |
+| ☐ | **M6** Power-defence game MVP | PD1–PD6 (see [`POWER_DEFENCE.md`](POWER_DEFENCE.md)) | Student wires a lamp and a turret by touch, answers the prediction, survives a night; the result shows in topic progress |
 
 Tick a milestone only when its acceptance test is green on `main`.
