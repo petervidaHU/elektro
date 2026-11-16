@@ -75,6 +75,7 @@ Key facts from the documents that shape this plan:
 | Q24 | Teacher navigation | **Teachers and admins get a "Tanári" tab in place of "Szimulátor"** on the phone bar (decided with M2, to keep five tabs); the simulator stays reachable from the home page. The tab leads to students / review queue / problem reports / insights and carries the number of lessons waiting for review as a badge |
 | Q26 | K8a pre-filled tables | **Postponed by the user (M3):** the reference tables start empty. Teachers enter values with their source, or the pre-fill is resolved later; until a table exists and is verified, `cable-selection` (K9) stays blocked | The UI says so: the teacher reference-table list shows a "missing tables" checklist for `cable-selection` (`REQUIRED_TABLES`, `PLANNED_CALCULATORS` in `reference/required.ts`), and `/calculators` shows a "Hamarosan" card for it (staff also see how many tables are missing) |
 | Q25 | K12 task-text rows | **The mirrored i18n texts are stored `approved` with a fixed marker** (M2, K12): approver snapshot name "Repository review (pull request)", e-mail `repository-review@elektro.invalid`, role `admin`, no `approved_by` account. They were reviewed in the pull request, and the next real review replaces the marker. The scenario is a map `scenarios` (key → text), because a template can have several scenario variants (e.g. single- and three-phase) |
+| Q27 | Power-defence game | **Decided 2026-11-16:** a real-time tower/area-defence game (warehouse vs. zombies) becomes a **practice mode inside this app**, not a separate game. It covers voltage drop, sizing, protection and measuring. Day = untimed build, night = real-time protection actions, dawn = verification with the simulator. It reuses the `packages/shared` engine and verified reference data only. Design and tasks (PD1–PD9): [`POWER_DEFENCE.md`](POWER_DEFENCE.md). Scheduled after the simulator (§4, M6) |
 | Q18 | Extra calculators from the theory TOC review | **Added to the §2.2 catalogue** (2026-10-16). Highest value: `connection-power`, `phase-balancing` (P1), `material-list`, `short-circuit-current` (P2) |
 
 ---
@@ -760,6 +761,7 @@ adds Playwright for the acceptance tests.
 | **M3** Exam-relevant breadth | K7, K13, K8 + U13, K8a, K9, S5 glossary, S6 intros, K11; lessons for modules A, B (phase 1), E | All P1 physics calculators with practice; reference-table workflow live; `cable-selection` live once tables are verified; ~15 approved lessons |
 | **M4** Further calculators & content | K10, lessons for modules C, D, G (phase 1) | P2 calculators live; verification topics have lessons ready for the simulator |
 | **M5+** | Simulator (phase 4), AI drafting (phase 5: task texts move to DB), pilot (phase 6), content phase 2–3 topics | per roadmap |
+| **M6** Power-defence game MVP | PD1–PD6 ([`POWER_DEFENCE.md`](POWER_DEFENCE.md)); PD7–PD9 later | A student wires a lamp and a turret by touch, answers the prediction, survives a night, and the result shows in topic progress |
 
 Every PR runs `npm run lint && npm run typecheck && npm test`. Tests are required for:
 - the calculation engine;
@@ -782,3 +784,4 @@ None of these questions blocks work: each has a default that is built until it i
 | Q2 | **Resistivity convention**: operating-temperature (current) or 20 °C values? | Operating temperature + UI warning; ρ printed in every task |
 | Q20 | **GDPR basis for the approval record**: legal basis, retention period and wording in the privacy notice for keeping deleted reviewers' name and email (Q11 exception). The owner will elaborate. | Keep the snapshot; hide it from the UI; admin-only retrieval; no automatic erasure |
 | Q14 | **Textbook**: which textbook does the course use? It decides material constants, worked examples for tests, and which reference tables to verify first. Still unknown. | Teachers verify the tables against the standards directly; engine tests use the standard-based values |
+| Q28–Q30 | **Power-defence**: theme, rendering library, how play counts towards mastery | See [`POWER_DEFENCE.md`](POWER_DEFENCE.md) §9 |
